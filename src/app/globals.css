@@ -128,3 +128,13 @@
     @apply font-sans;
   }
 }
+
+/* Khung xác thực (S01, S16–S18): bảng màu xanh #2563EB riêng cho 4 màn này, không đổi theme toàn ứng dụng. */
+.auth-theme {
+  --background: #f8fafc;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --ring: #2563eb;
+  --auth-panel: #eff6ff;
+  --auth-soft: #dbeafe;
+}

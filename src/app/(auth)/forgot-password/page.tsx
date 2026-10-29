@@ -1,7 +1,13 @@
-export default function Page() {
+import type { Metadata } from "next";
+import { AuthCardShell } from "@/features/auth/auth-card-shell";
+import { ForgotPasswordForm } from "@/features/auth/forgot-password-form";
+
+export const metadata: Metadata = { title: "Quên mật khẩu · Adaptive Placement Test" };
+
+export default function ForgotPasswordPage() {
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">forgot-password</h1>
-    </div>
+    <AuthCardShell>
+      <ForgotPasswordForm />
+    </AuthCardShell>
   );
 }
