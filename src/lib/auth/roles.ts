@@ -12,6 +12,9 @@ export function isStaff(role: string | undefined | null): boolean {
 
 const STUDENT_PREFIXES = ["/exam", "/results", "/history"];
 
+/** Trang xác thực công khai (S01, S17, S18): vào được khi chưa đăng nhập. */
+const PUBLIC_PATHS = ["/login", "/forgot-password", "/reset-password"];
+
 export type RouteVerdict = "allow" | "login" | "forbidden" | "redirect-home";
 
 /**
@@ -20,7 +23,7 @@ export type RouteVerdict = "allow" | "login" | "forbidden" | "redirect-home";
  */
 export function routeVerdict(pathname: string, role: string | null | undefined): RouteVerdict {
   const isLogin = pathname === "/login";
-  if (!role) return isLogin ? "allow" : "login";
+  if (!role) return PUBLIC_PATHS.includes(pathname) ? "allow" : "login";
   if (isLogin) return "redirect-home";
   const staffArea = pathname === "/teacher" || pathname.startsWith("/teacher/");
   const adminArea = pathname === "/admin" || pathname.startsWith("/admin/");

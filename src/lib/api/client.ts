@@ -65,6 +65,19 @@ async function readBody(res: Response): Promise<unknown> {
   }
 }
 
+/** Tài khoản còn mustChangePassword ⇒ route khác trả 403 PASSWORD_CHANGE_REQUIRED, FE chuyển về màn đổi mật khẩu (S16). */
+function redirectIfPasswordChangeRequired(err: ApiError) {
+  if (
+    err.code === "PASSWORD_CHANGE_REQUIRED" &&
+    typeof window !== "undefined" &&
+    window.location.pathname !== "/change-password"
+  ) {
+    // Tải lại toàn trang có chủ đích: thoát mọi trạng thái React đang bị backend chặn
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.assign("/change-password?first=1");
+  }
+}
+
 /** Gọi API qua BFF, trả JSON đã kiểu hóa; lỗi ⇒ ApiError (có `code`). */
 export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   return bffRequest<T>(`${PROXY_PREFIX}${path}`, opts);
@@ -74,7 +87,11 @@ export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Pr
 export async function bffRequest<T>(fullPath: string, opts: RequestOptions = {}): Promise<T> {
   const res = await send(fullPath, opts);
   const data = await readBody(res);
-  if (!res.ok) throw toApiError(res.status, data);
+  if (!res.ok) {
+    const err = toApiError(res.status, data);
+    redirectIfPasswordChangeRequired(err);
+    throw err;
+  }
   return (res.status === 204 ? undefined : data) as T;
 }
 
