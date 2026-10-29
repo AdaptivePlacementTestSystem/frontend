@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# env (repo is PUBLIC - never commit secrets)
+.env
+.env.*
+!.env.example
+
+# test output
+coverage/
+playwright-report/
+test-results/
+blob-report/
+tests/e2e/__screens__/
+
+# build / misc
+*.tsbuildinfo
+dist/
+build/
+.DS_Store
+Thumbs.db
+npm-debug.log*
+.vercel
+*.pem
+
+# Báo cáo sinh ra khi chạy công cụ
+/reports/

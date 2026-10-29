@@ -1,0 +1,180 @@
+# Pipeline CI/CD frontend — CHƯA CHẠY THỬ trên GitHub. Kiểm bằng `actionlint`, thử trên nhánh chore/ci-* trước khi bật required.
+# Chặng: 1 build → 2 lint/static → 3 test → 4 bảo mật → 5 đóng gói Docker (GHCR) → 6 deploy staging (+ smoke test trong deploy.sh).
+name: pipeline
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+concurrency:
+  group: pipeline-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Chặng 1–3: build, lint/typecheck, test ─────────────────────────────────────────────
+  build-test:
+    name: build-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }} # trống trên PR từ fork ⇒ bước Sonar tự bỏ qua
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # SonarCloud cần lịch sử đầy đủ
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - name: Phân tích tĩnh — trùng lặp mã (jscpd, ngưỡng 3%)
+        run: npm run dup
+      - name: Báo cáo trùng lặp
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jscpd-frontend
+          path: reports/jscpd
+          if-no-files-found: ignore
+      - run: npm run typecheck
+      - run: npm run format:check
+      - run: npm run test:cov
+      - run: npm run build
+        env:
+          API_BASE_URL: http://localhost:3001/api/v1
+      - name: Báo cáo coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-frontend
+          path: coverage
+          if-no-files-found: ignore
+      # SonarCloud: chạy sau khi có coverage/lcov.info. Cần secret SONAR_TOKEN (cấp repo) và file sonar-project.properties đã điền.
+      - name: SonarCloud
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v7
+
+  # ── Chặng 4: bảo mật ───────────────────────────────────────────────────────────────────
+  security:
+    name: security
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITLEAKS_VERSION: "8.18.4"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Quét secret toàn lịch sử (gitleaks)
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
+          ./gitleaks detect --source . --redact --verbose
+      - name: Lỗ hổng thư viện chạy thật (npm audit)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Review phụ thuộc trên PR
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+
+  # ── Chặng 5: đóng gói Docker, đẩy GHCR (chỉ trên develop) ─────────────────────────────
+  package:
+    name: package
+    needs: [build-test, security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tên image (chữ thường)
+        id: meta
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}"
+          echo "image=${IMAGE}:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "repo=${IMAGE}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}
+            ${{ steps.meta.outputs.repo }}:develop
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── Chặng 6: deploy staging ────────────────────────────────────────────────────────────
+  deploy:
+    name: deploy-staging
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging # để GitHub ghi vào mục Deployments (bằng chứng TC2.6)
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      # Frontend không có thư mục deploy: compose/nginx/deploy.sh do pipeline của backend sao chép lên server.
+      # Lần đầu phải deploy backend trước để server có sẵn các file này.
+      - run: echo "Deploy frontend"
+      - name: Kiểm tra secret staging
+        id: guard
+        env:
+          READY: ${{ secrets.STAGING_SSH_KEY != '' && secrets.STAGING_KNOWN_HOSTS != '' && secrets.STAGING_HOST != '' && secrets.STAGING_USER != '' }}
+        run: |
+          echo "ready=${READY}" >> "$GITHUB_OUTPUT"
+          if [ "$READY" != "true" ]; then
+            echo "::warning::Thiếu secret staging (STAGING_SSH_KEY, STAGING_KNOWN_HOSTS, STAGING_HOST, STAGING_USER) nên bỏ qua deploy. Thêm secret trong Settings > Secrets and variables > Actions."
+          fi
+      - name: Cấu hình SSH
+        if: steps.guard.outputs.ready == 'true'
+        env:
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_staging
+          chmod 600 ~/.ssh/id_staging
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Đăng nhập GHCR trên server
+        if: steps.guard.outputs.ready == 'true'
+        env:
+          TARGET: ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          printf '%s' "$GHCR_TOKEN" | ssh -i ~/.ssh/id_staging "$TARGET" "docker login ghcr.io -u '$ACTOR' --password-stdin"
+      - name: Deploy
+        if: steps.guard.outputs.ready == 'true'
+        env:
+          TARGET: ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }}
+          IMAGE: ${{ needs.package.outputs.image }}
+        run: |
+          ssh -i ~/.ssh/id_staging "$TARGET" "flock /tmp/placement-deploy.lock bash ~/placement/deploy.sh frontend '$IMAGE'"
+      - name: Đăng xuất GHCR trên server
+        if: always() && steps.guard.outputs.ready == 'true'
+        env:
+          TARGET: ${{ secrets.STAGING_USER }}@${{ secrets.STAGING_HOST }}
+        run: ssh -i ~/.ssh/id_staging "$TARGET" "docker logout ghcr.io" || true
