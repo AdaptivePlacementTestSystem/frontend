@@ -95,6 +95,30 @@ export async function bffRequest<T>(fullPath: string, opts: RequestOptions = {})
   return (res.status === 204 ? undefined : data) as T;
 }
 
+/** Tải file lên qua BFF (multipart). Không đặt `content-type` để trình duyệt tự thêm boundary. */
+export async function apiUpload<T>(
+  path: string,
+  form: FormData,
+  opts: { query?: Query; signal?: AbortSignal; timeoutMs?: number } = {},
+): Promise<T> {
+  const { query, signal, timeoutMs = 60_000 } = opts;
+  let res: Response;
+  try {
+    res = await fetch(buildUrl(`${PROXY_PREFIX}${path}`, query), {
+      method: "POST",
+      body: form,
+      signal: combineSignals(signal, timeoutMs),
+      credentials: "same-origin",
+      cache: "no-store",
+    });
+  } catch (e) {
+    throw networkError(e, signal);
+  }
+  const data = await readBody(res);
+  if (!res.ok) throw toApiError(res.status, data);
+  return data as T;
+}
+
 export interface DownloadResult {
   blob: Blob;
   filename: string;

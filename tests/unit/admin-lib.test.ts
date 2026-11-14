@@ -111,3 +111,37 @@ describe("nhãn và màu theo enum", () => {
     expect(Object.keys(ITEM_STATUS_COLORS)).toHaveLength(6);
   });
 });
+
+describe("proxy-policy: import tài khoản bằng file (S19)", () => {
+  const ROW = "3f2b8a52-6c1d-4f8e-9a57-1b2c3d4e5f60";
+  it.each([
+    [["users", "import", "upload"]],
+    [["users", "import", "grid"]],
+    [["users", "import", "grid", ROW]],
+    [["users", "import", "save"]],
+    [["users", "import", "save-status"]],
+    [["users", "import", "template"]],
+  ])("cho phép %j", (segments) => {
+    expect(isAllowedProxyPath(segments)).toBe(true);
+  });
+
+  it.each([
+    [["users", "import"]],
+    [["users", "import", "evil"]],
+    [["users", "import", "grid", "a", "b"]],
+    [["users", "import", "grid", ".."]],
+    [["users", "import", "grid", "a%2Fb"]],
+    [["users", "import", "upload", "x"]],
+  ])("chặn %j", (segments) => {
+    expect(isAllowedProxyPath(segments)).toBe(false);
+  });
+
+  it("endpoints import tạo đúng đường dẫn", () => {
+    expect(endpoints.importUpload()).toBe("/users/import/upload");
+    expect(endpoints.importGrid()).toBe("/users/import/grid");
+    expect(endpoints.importRow("a b")).toBe("/users/import/grid/a%20b");
+    expect(endpoints.importSave()).toBe("/users/import/save");
+    expect(endpoints.importStatus()).toBe("/users/import/save-status");
+    expect(endpoints.importTemplate()).toBe("/users/import/template");
+  });
+});

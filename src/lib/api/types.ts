@@ -280,6 +280,51 @@ export interface UpdateAccountBody {
 
 export type AssignableRole = "ADMIN" | "TEACHER";
 
+// ───────── Import tài khoản bằng file (S19, UCADM08) ─────────
+/** Một dòng đã hợp lệ trong lưới tạm (Redis, chưa ghi DB). `code` là MSSV hoặc Mã GV theo loại. */
+export interface ImportGridRow {
+  rowKey: string;
+  code: string;
+  fullName: string;
+  email: string;
+}
+
+export type ImportRejectCode = "MISSING_FIELD" | "INVALID_EMAIL" | "DUPLICATE_IN_FILE";
+
+/** Dòng bị loại vì không hợp lệ; `row` là số dòng trong file Excel. */
+export interface ImportRejectedRow {
+  row: number;
+  code: ImportRejectCode;
+  reason: string;
+}
+
+/** Dòng trùng tài khoản đã có trong hệ thống (popup riêng, không vào lưới). */
+export interface ImportExistingRow {
+  row: number;
+  field: "email" | "code";
+  value: string;
+}
+
+export interface ImportUploadResult {
+  grid: ImportGridRow[];
+  rejected: ImportRejectedRow[];
+  existing: ImportExistingRow[];
+  added: number;
+  ignoredDuplicates: number;
+}
+
+/** Trạng thái lần Lưu chạy nền; `NONE` khi chưa có hoặc đã hết hạn. Không chứa mật khẩu. */
+export type ImportSaveStatus =
+  | { status: "NONE" }
+  | {
+      status: "PROCESSING" | "DONE" | "FAILED";
+      total: number;
+      processed: number;
+      created?: number;
+      queued?: number;
+      error?: { code: "CONFLICT" | "UNKNOWN"; message: string; conflicts?: ImportExistingRow[] };
+    };
+
 export interface StudentProfileView {
   student: { studentCode: string; fullName: string };
   latest: SessionResult | null;

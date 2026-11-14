@@ -4,6 +4,9 @@ import type {
   AdminAccount,
   AssignableRole,
   CreateAccountBody,
+  ImportGridRow,
+  ImportSaveStatus,
+  ImportUploadResult,
   SystemOverview,
   UpdateAccountBody,
 } from "@/lib/api/types";
@@ -202,7 +205,108 @@ export function createAdminHandlers({ api, authUser, err, now }: Deps): HttpHand
 
   const find = (params: Params) => accounts.find((a) => a.id === String(params.id));
 
+  // ── Import tài khoản bằng file (S19): lưới tạm và tác vụ Lưu nền giả, theo từng loại ──
+  const grids: Record<string, ImportGridRow[]> = { STUDENT: [], TEACHER: [] };
+  const jobs: Record<string, ImportSaveStatus> = {};
+  const pollsLeft: Record<string, number> = {};
+  const kindParam = (request: Request) => {
+    const kind = new URL(request.url).searchParams.get("kind");
+    return kind === "STUDENT" || kind === "TEACHER" ? kind : null;
+  };
+  const badKind = () => err(400, "VALIDATION_FAILED", "kind không hợp lệ");
+  let importSeq = 0;
+
   return [
+    // Mẫu: mỗi file tải lên thêm 2 dòng mới, loại 1 dòng sai email và báo 1 dòng trùng tài khoản đã có
+    http.post(`${api}/users/import/upload`, async ({ request }: Req) => {
+      const u = admin(request);
+      if (u instanceof Response) return u;
+      const kind = kindParam(request);
+      if (!kind) return badKind();
+      const file = (await request.formData().catch(() => null))?.get("file");
+      if (!(file instanceof Blob)) return err(400, "IMPORT_FILE_INVALID", "Chưa chọn file .xlsx.");
+      const base = importSeq;
+      importSeq += 2;
+      const added: ImportGridRow[] = [1, 2].map((n) => ({
+        rowKey: `mock-row-${base + n}`,
+        code: `${kind === "STUDENT" ? "SVM" : "GVM"}${base + n}`,
+        fullName: `Người mới ${base + n}`,
+        email: `moi${base + n}@example.test`,
+      }));
+      grids[kind] = [...(grids[kind] ?? []), ...added];
+      const result: ImportUploadResult = {
+        grid: grids[kind] ?? [],
+        rejected: [{ row: 4, code: "INVALID_EMAIL", reason: "Email không đúng định dạng." }],
+        existing: [{ row: 5, field: "email", value: "sv001@example.test" }],
+        added: added.length,
+        ignoredDuplicates: 0,
+      };
+      return HttpResponse.json(result);
+    }),
+    http.get(`${api}/users/import/grid`, ({ request }: Req) => {
+      const u = admin(request);
+      if (u instanceof Response) return u;
+      const kind = kindParam(request);
+      return kind ? HttpResponse.json({ grid: grids[kind] ?? [] }) : badKind();
+    }),
+    http.delete(`${api}/users/import/grid/:rowKey`, ({ request, params }: Req) => {
+      const u = admin(request);
+      if (u instanceof Response) return u;
+      const kind = kindParam(request);
+      if (!kind) return badKind();
+      grids[kind] = (grids[kind] ?? []).filter((r) => r.rowKey !== String(params.rowKey));
+      return HttpResponse.json({ grid: grids[kind] });
+    }),
+    http.delete(`${api}/users/import/grid`, ({ request }: Req) => {
+      const u = admin(request);
+      if (u instanceof Response) return u;
+      const kind = kindParam(request);
+      if (!kind) return badKind();
+      grids[kind] = [];
+      return new HttpResponse(null, { status: 204 });
+    }),
+    http.post(`${api}/users/import/save`, ({ request }: Req) => {
+      const u = admin(request);
+      if (u instanceof Response) return u;
+      const kind = kindParam(request);
+      if (!kind) return badKind();
+      const rows = grids[kind] ?? [];
+      if (rows.length === 0) return err(422, "IMPORT_GRID_EMPTY", "Bảng import chưa có dòng nào.");
+      if (jobs[kind]?.status === "PROCESSING") return err(409, "CONFLICT", "Đang Lưu.");
+      jobs[kind] = { status: "PROCESSING", total: rows.length, processed: 0 };
+      pollsLeft[kind] = 2; // sau 2 lần hỏi trạng thái thì xong
+      return HttpResponse.json({ total: rows.length }, { status: 202 });
+    }),
+    http.get(`${api}/users/import/save-status`, ({ request }: Req) => {
+      const u = admin(request);
+      if (u instanceof Response) return u;
+      const kind = kindParam(request);
+      if (!kind) return badKind();
+      const job = jobs[kind];
+      if (job?.status === "PROCESSING") {
+        pollsLeft[kind] = (pollsLeft[kind] ?? 0) - 1;
+        if ((pollsLeft[kind] ?? 0) <= 0) {
+          const total = grids[kind]?.length ?? 0;
+          grids[kind] = [];
+          jobs[kind] = { status: "DONE", total, processed: total, created: total, queued: total };
+        } else {
+          jobs[kind] = { ...job, processed: Math.floor(job.total / 2) };
+        }
+      }
+      return HttpResponse.json(jobs[kind] ?? { status: "NONE" });
+    }),
+    http.get(`${api}/users/import/template`, ({ request }: Req) => {
+      const u = admin(request);
+      if (u instanceof Response) return u;
+      const kind = kindParam(request);
+      if (!kind) return badKind();
+      return new HttpResponse("mock-template", {
+        headers: {
+          "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "content-disposition": `attachment; filename="mock-${kind.toLowerCase()}.xlsx"`,
+        },
+      });
+    }),
     http.get(`${api}/reports/overview`, ({ request }: Req) => {
       const u = admin(request);
       if (u instanceof Response) return u;

@@ -251,6 +251,74 @@ export const vi = {
     loadError: "Không tải được số liệu.",
   },
 
+  /** Import tài khoản SV/GV bằng file (S19, UCADM08, F-18). */
+  accountImport: {
+    title: "Import tài khoản",
+    subtitle:
+      "Tải một hoặc nhiều file .xlsx vào bảng tạm, kiểm tra rồi bấm Lưu. Chỉ tạo tài khoản mới; tài khoản đã có sẽ bị bỏ qua.",
+    kindLabel: "Loại tài khoản",
+    kindStudent: "Sinh viên",
+    kindTeacher: "Giảng viên",
+    templateStudent: "Tải file mẫu sinh viên",
+    templateTeacher: "Tải file mẫu giảng viên",
+    templateError: "Không tải được file mẫu.",
+    uploadLabel: "Chọn file .xlsx",
+    uploadHint: "Có thể chọn nhiều file. Mỗi file tối đa 2 MB và 1000 dòng; bảng tối đa 1000 dòng.",
+    uploading: (done: number, total: number) => `Đang đọc file ${done}/${total}…`,
+    uploaded: (name: string, added: number, ignored: number) =>
+      `${name}: thêm ${added} dòng${ignored > 0 ? `, bỏ qua ${ignored} dòng đã có trong bảng` : ""}.`,
+    uploadFailed: (name: string) => `${name}: không tải được.`,
+    gridTitle: (n: number) => `Bảng sẽ tạo (${n} tài khoản)`,
+    gridEmpty: "Chưa có dòng nào. Tải file .xlsx để bắt đầu.",
+    colIndex: "#",
+    colStudentCode: "MSSV",
+    colTeacherCode: "Mã GV",
+    colName: "Họ tên",
+    colEmail: "Email",
+    colAction: "Thao tác",
+    deleteRow: "Xóa",
+    clearAll: "Xóa cả bảng",
+    confirmClearTitle: "Xóa cả bảng?",
+    confirmClearBody: "Toàn bộ các dòng đang chờ Lưu của loại tài khoản này sẽ bị xóa.",
+    save: "Lưu",
+    saving: "Đang tạo tài khoản…",
+    progress: (processed: number, total: number) => `Đã xử lý ${processed}/${total} tài khoản`,
+    result: (created: number, queued: number) =>
+      `Đã tạo ${created} tài khoản, ${queued} email đã xếp hàng gửi.`,
+    resultNote:
+      'Mật khẩu tạm được gửi qua email. Nếu thư không tới, dùng "Gửi lại mật khẩu tạm" ở danh sách tài khoản.',
+    dismiss: "Ẩn",
+    rejectedButton: (n: number) => `Xem ${n} dòng bị loại`,
+    existingButton: (n: number) => `Xem ${n} tài khoản đã tồn tại`,
+    rejectedTitle: "Dòng bị loại",
+    rejectedIntro:
+      "Các dòng sau không hợp lệ nên không vào bảng. Sửa trong file rồi tải lại nếu cần.",
+    existingTitle: "Tài khoản đã tồn tại",
+    existingIntro:
+      "Các dòng sau không vào bảng vì email hoặc mã đã có trong hệ thống. Chỉ tạo mới, không cập nhật tài khoản có sẵn.",
+    colFile: "File",
+    colRow: "Dòng",
+    colReason: "Lý do",
+    colValue: "Giá trị",
+    rejectReason: {
+      MISSING_FIELD: "Thiếu mã, họ tên hoặc email.",
+      INVALID_EMAIL: "Email không đúng định dạng.",
+      DUPLICATE_IN_FILE: "Trùng email hoặc mã với một dòng trước trong file.",
+    },
+    existingReason: {
+      email: "Email đã tồn tại",
+      studentCode: "MSSV đã tồn tại",
+      teacherCode: "Mã GV đã tồn tại",
+    },
+    close: "Đóng",
+    saveConflict:
+      "Có tài khoản đã tồn tại. Hãy xóa các dòng trùng khỏi bảng rồi Lưu lại; chưa có tài khoản nào được tạo.",
+    saveFailed: "Không lưu được. Chưa có tài khoản nào được tạo; vui lòng thử lại.",
+    conflictRow: (row: number, reason: string, value: string) =>
+      `Dòng ${row} trong bảng: ${reason} (${value})`,
+    backToAccounts: "Quay lại danh sách tài khoản",
+  },
+
   /** Quản lý tài khoản SV/GV (S24, F-22). */
   accounts: {
     title: "Tài khoản",

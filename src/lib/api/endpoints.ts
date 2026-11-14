@@ -1,4 +1,4 @@
-import { apiDownload, apiRequest, type DownloadResult } from "./client";
+import { apiDownload, apiRequest, apiUpload, type DownloadResult } from "./client";
 import { normalizeNextItem } from "./normalize";
 import { type ItemStatusValue as ItemStatus } from "@apt/shared-types";
 import type {
@@ -9,6 +9,9 @@ import type {
   AdminAccount,
   AssignableRole,
   ClassDistribution,
+  ImportGridRow,
+  ImportSaveStatus,
+  ImportUploadResult,
   CreateAccountBody,
   SystemOverview,
   UpdateAccountBody,
@@ -58,6 +61,13 @@ export const endpoints = {
   account: (kind: AccountKind, id: string) =>
     `${kind === "STUDENT" ? "/students" : "/teachers"}/${encodeURIComponent(id)}`,
   // Thao tác tài khoản dùng chung SV/GV (chốt 14/11/2026: gộp về /users/:id/...)
+  // Import tài khoản bằng file (S19): lưới tạm theo (admin, loại)
+  importUpload: () => "/users/import/upload",
+  importGrid: () => "/users/import/grid",
+  importRow: (rowKey: string) => `/users/import/grid/${encodeURIComponent(rowKey)}`,
+  importSave: () => "/users/import/save",
+  importStatus: () => "/users/import/save-status",
+  importTemplate: () => "/users/import/template",
   accountAction: (id: string, action: "lock" | "unlock" | "resend-temporary-password" | "role") =>
     `/users/${encodeURIComponent(id)}/${action}`,
 } as const;
@@ -169,3 +179,32 @@ export const changeAccountRole = (id: string, role: AssignableRole) =>
     method: "PATCH",
     body: { role },
   });
+
+// ───────── Import tài khoản bằng file (Admin, S19) ─────────
+export const uploadImportFile = (kind: AccountKind, file: File, signal?: AbortSignal) => {
+  const form = new FormData();
+  form.append("file", file);
+  return apiUpload<ImportUploadResult>(endpoints.importUpload(), form, { query: { kind }, signal });
+};
+
+export const getImportGrid = (kind: AccountKind, signal?: AbortSignal) =>
+  apiRequest<{ grid: ImportGridRow[] }>(endpoints.importGrid(), { query: { kind }, signal });
+
+export const removeImportRow = (kind: AccountKind, rowKey: string) =>
+  apiRequest<{ grid: ImportGridRow[] }>(endpoints.importRow(rowKey), {
+    method: "DELETE",
+    query: { kind },
+  });
+
+export const clearImportGrid = (kind: AccountKind) =>
+  apiRequest<void>(endpoints.importGrid(), { method: "DELETE", query: { kind } });
+
+/** Nút Lưu: trả ngay (202); tạo tài khoản chạy nền, theo dõi bằng `getImportStatus`. */
+export const saveImportGrid = (kind: AccountKind) =>
+  apiRequest<{ total: number }>(endpoints.importSave(), { method: "POST", query: { kind } });
+
+export const getImportStatus = (kind: AccountKind, signal?: AbortSignal) =>
+  apiRequest<ImportSaveStatus>(endpoints.importStatus(), { query: { kind }, signal });
+
+export const downloadImportTemplate = (kind: AccountKind): Promise<DownloadResult> =>
+  apiDownload(endpoints.importTemplate(), { query: { kind } });
