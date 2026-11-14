@@ -189,11 +189,14 @@ export interface ItemFilters {
 }
 
 // ───────── Báo cáo ─────────
+/** `GET /reports/class-distribution` — đúng dạng backend trả (ClassReportEntity). */
 export interface ClassDistribution {
-  total: number;
-  distribution: { cefrLevel: CefrLevel; count: number }[];
-  /** Chỉ Admin (UCADM05). */
-  itemsByStatus?: { status: ItemStatus; count: number }[];
+  examRoundId: string | null;
+  totalStudents: number;
+  /** Số sinh viên theo từng mức CEFR (đủ 6 khóa). */
+  cefrDistribution: Record<CefrLevel, number>;
+  averageTheta: number;
+  generatedAt: string;
 }
 
 export interface ClassErrorPattern {

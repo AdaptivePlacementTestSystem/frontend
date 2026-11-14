@@ -311,7 +311,7 @@ export function createHandlers(db: MockDb): HttpHandler[] {
       const u = authUser(request);
       if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");
       if (!isStaffUser(u)) return err(403, "FORBIDDEN", "Không có quyền");
-      return HttpResponse.json(mockDistribution(u.role === "ADMIN", db));
+      return HttpResponse.json(mockDistribution());
     }),
     http.get(`${API}/reports/error-patterns`, ({ request }: Req) => {
       const u = authUser(request);
@@ -333,7 +333,7 @@ export function createHandlers(db: MockDb): HttpHandler[] {
             ])
           : toCsv([
               ["CEFR", "Số SV"],
-              ...mockDistribution(false, db).distribution.map((d) => [d.cefrLevel, d.count]),
+              ...Object.entries(mockDistribution().cefrDistribution),
             ]);
       return new HttpResponse(csv, {
         headers: {

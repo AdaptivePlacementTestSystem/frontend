@@ -7,6 +7,11 @@ import { errorMessage } from "./error-message";
  */
 export function notifyError(e: unknown): string {
   const message = errorMessage(e);
-  toast.error(message, { id: message });
+  // Yêu cầu bị huỷ chủ động (đổi trang, huỷ truy vấn) không phải lỗi để báo cho người dùng
+  if (!isAbort(e)) toast.error(message, { id: message });
   return message;
+}
+
+function isAbort(e: unknown): boolean {
+  return e instanceof Error && e.name === "AbortError";
 }

@@ -34,10 +34,10 @@ const MAIN: NavItem[] = [
   },
 ];
 
-// Admin xem báo cáo lớp và hồ sơ sinh viên ở màn dùng chung với giảng viên (R-2)
+// Báo cáo lớp và hồ sơ sinh viên: dùng chung thành phần với giảng viên (R-2) nhưng nằm trong khung Admin
 const SHARED: NavItem[] = [
-  { href: "/teacher/reports", label: vi.adminNav.reports, icon: "bar_chart" },
-  { href: "/teacher/students", label: vi.adminNav.students, icon: "person_search" },
+  { href: "/admin/reports", label: vi.adminNav.reports, icon: "bar_chart" },
+  { href: "/admin/students", label: vi.adminNav.students, icon: "person_search" },
 ];
 
 function isActive(pathname: string, item: NavItem): boolean {
