@@ -1,7 +1,7 @@
-export default function Page() {
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">teachers</h1>
-    </div>
-  );
+import { AccountsView } from "@/features/admin-users/accounts-view";
+import { requireUser } from "@/lib/auth/session";
+
+export default async function TeacherAccountsPage() {
+  const user = await requireUser("admin");
+  return <AccountsView key="TEACHER" kind="TEACHER" currentUserId={user.id} />;
 }

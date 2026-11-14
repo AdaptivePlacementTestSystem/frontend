@@ -2,7 +2,8 @@ export const TOKEN_COOKIE = "apt_token";
 
 /** Trang đích sau đăng nhập (file mô tả màn hình, Mục 3). */
 export function homeFor(role: string | undefined | null): string {
-  if (role === "TEACHER" || role === "ADMIN") return "/teacher/items";
+  if (role === "ADMIN") return "/admin/dashboard"; // S36 là trang chủ Admin (R-5 đã chốt 14/11/2026)
+  if (role === "TEACHER") return "/teacher/items";
   return "/";
 }
 

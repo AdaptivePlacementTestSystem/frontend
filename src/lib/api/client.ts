@@ -8,7 +8,7 @@ export type QueryValue = string | number | boolean | undefined | null;
 export type Query = Record<string, QueryValue>;
 
 export interface RequestOptions {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: unknown;
   query?: Query;
   signal?: AbortSignal;

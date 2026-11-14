@@ -205,6 +205,81 @@ export interface ClassErrorPattern {
 
 export type ExportType = "distribution" | "profiles";
 
+// ───────── Tổng quan hệ thống cho Admin (F-29, S36; SRS 9b.19) ─────────
+/** Một dòng bảng "Kỳ thi đang mở". `notStarted + inProgress + completed = participantCount`. */
+export interface OpenRoundRow {
+  id: string;
+  name: string;
+  opensAt: string;
+  closesAt: string;
+  durationMinutes: number;
+  participantCount: number;
+  notStarted: number;
+  inProgress: number;
+  completed: number;
+}
+
+export interface SystemOverview {
+  examRoundId: string | null;
+  studentsCompleted: number;
+  finalApprovedItems: number;
+  batchesNeedingAction: number;
+  openExamRounds: number;
+  cefrDistribution: Record<CefrLevel, number>;
+  itemStatusCounts: Record<ItemStatus, number>;
+  openRounds: OpenRoundRow[];
+  generatedAt: string;
+}
+
+// ───────── Quản lý tài khoản SV/GV của Admin (F-22, S24) ─────────
+export type AccountKind = "STUDENT" | "TEACHER";
+
+/** Phản hồi của backend; không bao giờ có mật khẩu hay mã băm. */
+export interface AdminAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  /** STUDENT, TEACHER hoặc ADMIN (Admin nằm trong danh sách giảng viên để thu hồi quyền). */
+  role: UserRole;
+  /** MSSV; chỉ sinh viên có. */
+  studentCode?: string;
+  /** Mã giảng viên; GV và Admin có. */
+  teacherCode?: string;
+  isActive: boolean;
+  /** `true` khi chưa đổi mật khẩu tạm (cột "Đã đổi mật khẩu: Chưa"). */
+  mustChangePassword: boolean;
+  createdAt: string;
+}
+
+/** Phân trang của backend cho danh sách tài khoản. */
+export interface AccountPage {
+  items: AdminAccount[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface AccountQuery {
+  q?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+/** Dữ liệu tạo mới: SV gửi `studentCode`, GV gửi `teacherCode`. */
+export interface CreateAccountBody {
+  studentCode?: string;
+  teacherCode?: string;
+  fullName: string;
+  email: string;
+}
+
+export interface UpdateAccountBody {
+  fullName?: string;
+  email?: string;
+}
+
+export type AssignableRole = "ADMIN" | "TEACHER";
+
 export interface StudentProfileView {
   student: { studentCode: string; fullName: string };
   latest: SessionResult | null;

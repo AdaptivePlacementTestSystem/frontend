@@ -2,6 +2,7 @@ import { http, HttpResponse, type HttpHandler } from "msw";
 import { decodeJwtClaims } from "@/lib/auth/jwt";
 import type { CurrentUser, ItemDetail, OptionKey, StudentProfileView } from "@/lib/api/types";
 import { OPTION_KEYS } from "@/lib/api/types";
+import { createAdminHandlers } from "./admin-handlers";
 import { ITEM_STATUSES } from "@apt/shared-types";
 import {
   MOCK_DISPLAY_MAX_ITEMS,
@@ -93,6 +94,8 @@ export function createHandlers(db: MockDb): HttpHandler[] {
   };
 
   return [
+    // ───────── Khu Admin: tài khoản SV/GV, tổng quan hệ thống ─────────
+    ...createAdminHandlers({ api: API, authUser, err, now: db.now }),
     // ───────── Xác thực ─────────
     http.post(`${API}/auth/login`, async ({ request }: Req) => {
       const b = (await request.json().catch(() => null)) as {
