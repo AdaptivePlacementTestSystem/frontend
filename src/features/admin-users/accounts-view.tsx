@@ -20,12 +20,14 @@ import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states
 import {
   changeAccountRole,
   createAccount,
+  downloadImportTemplate,
   listAccounts,
   lockAccount,
   resendTemporaryPassword,
   unlockAccount,
   updateAccount,
 } from "@/lib/api/endpoints";
+import { saveBlob } from "@/lib/download";
 import { notifyError } from "@/lib/api/notify-error";
 import type {
   AccountKind,
@@ -75,6 +77,15 @@ interface Props {
 export function AccountsView({ kind, currentUserId }: Props) {
   const queryClient = useQueryClient();
   const isStudent = kind === "STUDENT";
+
+  const downloadTemplate = async () => {
+    try {
+      const { blob, filename } = await downloadImportTemplate(kind);
+      saveBlob(blob, filename);
+    } catch (e) {
+      notifyError(e);
+    }
+  };
   const [search, setSearch] = useState("");
   const q = useDebounced(search.trim(), 300);
   const [page, setPage] = useState(1);
@@ -155,6 +166,9 @@ export function AccountsView({ kind, currentUserId }: Props) {
           </Button>
           <Button variant="outline" asChild data-testid="import-accounts">
             <Link href={`/admin/users/import?kind=${kind}`}>{t.importAccounts}</Link>
+          </Button>
+          <Button variant="outline" onClick={downloadTemplate} data-testid="download-template">
+            {isStudent ? vi.accountImport.templateStudent : vi.accountImport.templateTeacher}
           </Button>
         </div>
       </div>

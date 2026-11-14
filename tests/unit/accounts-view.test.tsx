@@ -15,6 +15,7 @@ const api = vi.hoisted(() => ({
   unlockAccount: vi.fn(),
   resendTemporaryPassword: vi.fn(),
   changeAccountRole: vi.fn(),
+  downloadImportTemplate: vi.fn(),
 }));
 vi.mock("@/lib/api/endpoints", () => api);
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
@@ -54,6 +55,37 @@ describe("AccountsView (S24)", () => {
     api.changeAccountRole.mockResolvedValue({});
     api.createAccount.mockResolvedValue({});
     api.updateAccount.mockResolvedValue({});
+  });
+
+  describe("file mẫu import", () => {
+    it("tab Sinh viên: nút tải file mẫu gọi đúng loại và lưu file", async () => {
+      const click = vi.fn();
+      vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(click);
+      URL.createObjectURL = vi.fn(() => "blob:x");
+      URL.revokeObjectURL = vi.fn();
+      api.downloadImportTemplate.mockResolvedValue({
+        blob: new Blob(["x"]),
+        filename: "mau-sinh-vien.xlsx",
+      });
+      const user = userEvent.setup();
+      renderView("STUDENT");
+
+      await user.click(await screen.findByTestId("download-template"));
+
+      await waitFor(() => expect(api.downloadImportTemplate).toHaveBeenCalledWith("STUDENT"));
+      expect(click).toHaveBeenCalled();
+    });
+
+    it("tab Giảng viên: tải file mẫu giảng viên; lỗi thì báo cho người dùng", async () => {
+      api.downloadImportTemplate.mockRejectedValue(new ApiError(500, "UNKNOWN", "x"));
+      const user = userEvent.setup();
+      renderView("TEACHER");
+
+      await user.click(await screen.findByTestId("download-template"));
+
+      await waitFor(() => expect(api.downloadImportTemplate).toHaveBeenCalledWith("TEACHER"));
+      await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    });
   });
 
   describe("danh sách", () => {
