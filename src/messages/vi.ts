@@ -16,6 +16,7 @@ import {
 export const vi = {
   common: {
     appName: "Adaptive Placement Test",
+    tagline: "Kiểm tra xếp lớp tiếng Anh thích ứng",
     loading: "Đang tải…",
     retry: "Thử lại",
     cancel: "Hủy",
@@ -213,10 +214,15 @@ export const vi = {
     reports: "Báo cáo lớp học",
     students: "Hồ sơ sinh viên",
     adminBadge: "Quản trị viên",
+    topbarBadge: "HỆ THỐNG CAT-RASCH",
+    support: "Hỗ trợ kỹ thuật",
+    changePassword: "Đổi MK",
+    logout: "Thoát",
   },
 
   /** Tổng quan hệ thống (S36, F-29). */
   overview: {
+    statusCenter: "Tổng mục hỏi",
     title: "Tổng quan hệ thống",
     subtitle: "Số liệu toàn hệ thống; chọn một kỳ thi để lọc số sinh viên và phân phối CEFR.",
     roundFilterLabel: "Kỳ thi",

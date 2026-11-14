@@ -138,3 +138,69 @@
   --auth-panel: #eff6ff;
   --auth-soft: #dbeafe;
 }
+
+/* ───────── Khu Admin: theo đúng bảng màu và kiểu chữ của bản thiết kế Stitch (Admin/Dashboard) ─────────
+   Lớp `admin-theme` được gắn vào <body> khi vào khu Admin (kể cả hộp thoại/toast đặt ngoài cây React chính). */
+@theme {
+  --color-surface: #f8f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container: #e5eeff;
+  --color-surface-container-high: #dce9ff;
+  --color-on-surface: #0b1c30;
+  --color-on-surface-variant: #434655;
+  --color-outline: #737686;
+  --color-outline-variant: #c3c6d7;
+  --color-primary-container: #2563eb;
+  --color-primary-fixed: #dbe1ff;
+  --color-on-primary-fixed: #00174b;
+  --color-teal: #006b5f;
+  --color-teal-fixed: #71f8e4;
+  --color-on-teal-fixed: #00201c;
+  --color-tertiary: #6a1edb;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.5rem;
+  --spacing-space-xl: 2rem;
+}
+
+.admin-theme {
+  --background: #f8f9ff;
+  --foreground: #0b1c30;
+  --card: #ffffff;
+  --card-foreground: #0b1c30;
+  --popover: #ffffff;
+  --popover-foreground: #0b1c30;
+  --primary: #004ac6;
+  --primary-foreground: #ffffff;
+  --secondary: #e5eeff;
+  --secondary-foreground: #004ac6;
+  --muted: #eff4ff;
+  --muted-foreground: #434655;
+  --accent: #eff4ff;
+  --accent-foreground: #0b1c30;
+  --destructive: #ba1a1a;
+  --border: #e2e8f0;
+  --input: #c3c6d7;
+  --ring: #2563eb;
+  --radius: 0.75rem;
+  font-family: var(--font-be-vietnam), system-ui, sans-serif;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}

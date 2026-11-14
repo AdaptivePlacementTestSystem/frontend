@@ -1,19 +1,9 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-  BarChart3,
-  CalendarDays,
-  Database,
-  LayoutDashboard,
-  Layers,
-  UserSearch,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { getSystemOverview } from "@/lib/api/endpoints";
 import type { CurrentUser } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
@@ -23,7 +13,8 @@ import { LogoutButton } from "./logout-button";
 interface NavItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  /** Tên biểu tượng Material Symbols (theo Stitch). */
+  icon: string;
   /** Đường dẫn khớp để tô sáng mục (mặc định là chính `href`). */
   match?: string;
   /** Chấm vàng "lô cần xử lý". */
@@ -31,22 +22,22 @@ interface NavItem {
 }
 
 const MAIN: NavItem[] = [
-  { href: "/admin/dashboard", label: vi.adminNav.dashboard, icon: LayoutDashboard },
-  { href: "/admin/item-bank", label: vi.adminNav.itemBank, icon: Database },
-  { href: "/admin/item-batches", label: vi.adminNav.itemBatches, icon: Layers, dot: true },
-  { href: "/admin/exam-rounds", label: vi.adminNav.examRounds, icon: CalendarDays },
+  { href: "/admin/dashboard", label: vi.adminNav.dashboard, icon: "dashboard" },
+  { href: "/admin/item-bank", label: vi.adminNav.itemBank, icon: "database" },
+  { href: "/admin/item-batches", label: vi.adminNav.itemBatches, icon: "layers", dot: true },
+  { href: "/admin/exam-rounds", label: vi.adminNav.examRounds, icon: "calendar_month" },
   {
     href: "/admin/users/students",
     label: vi.adminNav.accounts,
-    icon: Users,
+    icon: "group",
     match: "/admin/users",
   },
 ];
 
 // Admin xem báo cáo lớp và hồ sơ sinh viên ở màn dùng chung với giảng viên (R-2)
 const SHARED: NavItem[] = [
-  { href: "/teacher/reports", label: vi.adminNav.reports, icon: BarChart3 },
-  { href: "/teacher/students", label: vi.adminNav.students, icon: UserSearch },
+  { href: "/teacher/reports", label: vi.adminNav.reports, icon: "bar_chart" },
+  { href: "/teacher/students", label: vi.adminNav.students, icon: "person_search" },
 ];
 
 function isActive(pathname: string, item: NavItem): boolean {
@@ -64,27 +55,26 @@ function NavLink({
   showDot: boolean;
 }) {
   const active = isActive(pathname, item);
-  const Icon = item.icon;
   return (
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",
+        "flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-[15px] leading-5 font-medium whitespace-nowrap transition-colors",
         active
-          ? "bg-blue-100 text-blue-900"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          ? "bg-primary-container text-primary-foreground shadow-sm"
+          : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface",
       )}
     >
       <span className="flex items-center gap-3">
-        <Icon className="size-[18px]" aria-hidden />
+        <MaterialIcon name={item.icon} size={20} />
         {item.label}
       </span>
       {showDot && (
         <span
           data-testid="batches-dot"
           title={vi.overview.statBatches}
-          className="size-2 rounded-full bg-amber-500 ring-4 ring-amber-100"
+          className="flex size-2 rounded-full bg-amber-500 ring-4 ring-amber-100"
         />
       )}
     </Link>
@@ -92,7 +82,7 @@ function NavLink({
 }
 
 /**
- * Thanh bên khu Admin (L-SIDEBAR): 240 px ở màn rộng; ở màn hẹp thu thành dải điều hướng cuộn ngang.
+ * Thanh bên khu Admin (L-SIDEBAR, theo Stitch): cố định 240 px ở màn rộng; ở màn hẹp thu thành dải điều hướng cuộn ngang.
  * Chấm vàng cạnh "Lô câu hỏi" khi còn lô cần Admin xử lý (dùng chung cache với trang Tổng quan).
  */
 export function AdminSidebar({ user }: { user: CurrentUser }) {
@@ -106,17 +96,25 @@ export function AdminSidebar({ user }: { user: CurrentUser }) {
   return (
     <aside
       aria-label={vi.adminNav.label}
-      className="flex shrink-0 flex-col justify-between border-b bg-background md:w-60 md:border-r md:border-b-0"
+      className="z-50 flex flex-col justify-between border-b border-[#E2E8F0] bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] md:fixed md:top-0 md:left-0 md:h-full md:w-60 md:border-r md:border-b-0"
     >
-      <div>
-        <div className="flex h-16 items-center border-b px-4 font-semibold">
-          {vi.common.appName}
+      <div className="flex flex-col">
+        <div className="flex h-16 items-center border-b border-[#E2E8F0] px-4">
+          <span className="flex items-center gap-2.5">
+            <span className="flex size-8 items-center justify-center rounded-xl bg-primary-container text-primary-foreground">
+              <MaterialIcon name="check" size={20} />
+            </span>
+            <span className="leading-tight">
+              <span className="block text-sm font-bold">{vi.common.appName}</span>
+              <span className="block text-[11px] text-outline">{vi.common.tagline}</span>
+            </span>
+          </span>
         </div>
         <nav
           aria-label={vi.adminNav.label}
-          className="flex gap-1 overflow-x-auto p-3 md:flex-col md:overflow-visible"
+          className="flex gap-1 overflow-x-auto px-4 py-2 md:flex-col md:overflow-visible"
         >
-          <p className="hidden px-3 pb-1 text-xs font-semibold tracking-wider text-muted-foreground uppercase md:block">
+          <p className="mb-1 hidden px-1 text-xs font-semibold tracking-wider text-outline uppercase md:block">
             {vi.adminNav.label}
           </p>
           {MAIN.map((item) => (
@@ -127,28 +125,40 @@ export function AdminSidebar({ user }: { user: CurrentUser }) {
               showDot={Boolean(item.dot) && hasBatches}
             />
           ))}
-          <div className="mx-1 my-2 hidden border-t md:block" />
+          <div className="mx-1 my-2 hidden border-t border-[#E2E8F0] md:block" />
           {SHARED.map((item) => (
             <NavLink key={item.href} item={item} pathname={pathname} showDot={false} />
           ))}
         </nav>
       </div>
-      <div className="flex items-center justify-between gap-3 border-t p-4 md:flex-col md:items-stretch">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="border-t border-[#E2E8F0] bg-surface-container-lowest p-4">
+        <div className="mb-2 flex min-w-0 items-center gap-3">
           <span
             aria-hidden
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
           >
-            {user.fullName.trim().charAt(0).toUpperCase() || "A"}
+            <MaterialIcon name="person" size={18} />
           </span>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold" data-testid="user-name">
+          <div className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-[13px] font-semibold" data-testid="user-name">
               {user.fullName}
-            </p>
-            <Badge variant="secondary">{vi.adminNav.adminBadge}</Badge>
+            </span>
+            <span className="mt-0.5 inline-flex w-fit items-center rounded bg-primary-fixed px-2 py-0.5 text-[11px] font-medium text-on-primary-fixed">
+              {vi.adminNav.adminBadge}
+            </span>
           </div>
         </div>
-        <LogoutButton />
+        <div className="grid grid-cols-2 gap-1.5 border-t border-slate-100 pt-1">
+          <Link
+            href="/change-password"
+            title={vi.adminNav.changePassword}
+            className="flex items-center justify-center gap-1 rounded px-2 py-1.5 text-[13px] text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-on-surface"
+          >
+            <MaterialIcon name="key" size={16} />
+            {vi.adminNav.changePassword}
+          </Link>
+          <LogoutButton variant="admin" />
+        </div>
       </div>
     </aside>
   );

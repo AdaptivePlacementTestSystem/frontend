@@ -5,8 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import { Label } from "@/components/ui/label";
 import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { NativeSelect } from "@/components/layout/native-select";
@@ -55,11 +55,15 @@ export function OverviewView() {
   const totalItems = statusRows.reduce((sum, r) => sum + r.count, 0);
 
   return (
-    <div className="space-y-6" data-testid="admin-overview">
+    <div className="space-y-8" data-testid="admin-overview">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{vi.overview.title}</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">{vi.overview.subtitle}</p>
+          <h1 className="text-[32px] leading-10 font-bold tracking-tight text-on-surface">
+            {vi.overview.title}
+          </h1>
+          <p className="mt-0.5 text-[15px] leading-6 text-on-surface-variant">
+            {vi.overview.subtitle}
+          </p>
         </div>
         <div className="flex items-end gap-3">
           <div className="w-56 space-y-1">
@@ -80,11 +84,13 @@ export function OverviewView() {
             </NativeSelect>
           </div>
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={refresh}
             disabled={refreshing || query.isFetching}
             data-testid="overview-refresh"
+            className="h-10 gap-2 rounded-xl px-4 text-[15px] font-medium shadow-sm hover:bg-surface-container-high"
           >
+            <MaterialIcon name="sync" size={18} />
             {vi.overview.refresh}
           </Button>
         </div>
@@ -99,56 +105,69 @@ export function OverviewView() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               testId="stat-students"
+              icon="how_to_reg"
               label={vi.overview.statStudents}
               value={data.studentsCompleted}
               note={vi.overview.statStudentsNote}
             />
             <StatCard
               testId="stat-final-approved"
+              icon="fact_check"
               label={vi.overview.statItems}
               value={data.finalApprovedItems}
               note={vi.overview.statItemsNote}
             />
             <StatCard
               testId="stat-batches-open"
+              icon="pending_actions"
+              tone="amber"
               label={vi.overview.statBatches}
               value={data.batchesNeedingAction}
               badge={
                 data.batchesNeedingAction > 0 ? (
-                  <Badge variant="secondary">{vi.overview.statBatchesBadge}</Badge>
+                  <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">
+                    {vi.overview.statBatchesBadge}
+                  </span>
                 ) : undefined
               }
               link={{ href: "/admin/item-batches", label: vi.overview.statBatchesLink }}
             />
             <StatCard
               testId="stat-open-rounds"
+              icon="nest_clock_farsight_analog"
+              tone="teal"
               label={vi.overview.statRounds}
               value={data.openExamRounds}
               link={{ href: "/admin/exam-rounds", label: vi.overview.statRoundsLink }}
             />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-8 lg:grid-cols-12">
             <BreakdownCard
               testId="cefr"
               title={vi.overview.cefrTitle}
               note={vi.overview.cefrNote}
               rows={cefrRows}
               emptyText={vi.overview.cefrEmpty}
+              className="lg:col-span-7"
             />
-            <div className="space-y-2">
+            <div className="space-y-2 lg:col-span-5">
               <BreakdownCard
                 testId="item-status"
                 title={vi.overview.statusTitle}
                 note={vi.overview.statusTotal(totalItems)}
                 rows={statusRows}
+                variant="donut"
+                icon="pie_chart"
+                centerLabel={vi.overview.statusCenter}
               />
-              <div className="text-right">
+              <div className="flex justify-end">
                 <Link
                   href="/admin/item-bank"
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  className="flex items-center gap-1 text-[13px] font-medium text-primary hover:text-primary-container"
                 >
-                  {vi.overview.statusLink} →
+                  {vi.overview.statusLink}
+                  <MaterialIcon name="chevron_right" size={16} />
                 </Link>
               </div>
             </div>

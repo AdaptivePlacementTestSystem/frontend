@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AdminSidebar } from "@/components/layout/admin-sidebar";
 import type { CurrentUser } from "@/lib/api/types";
@@ -41,9 +41,12 @@ describe("AdminSidebar (L-SIDEBAR)", () => {
 
   it("có đủ 7 mục Admin theo đúng thứ tự và route", () => {
     renderSidebar();
-    const links = screen.getAllByRole("link");
+    const links = within(screen.getByRole("navigation")).getAllByRole("link");
 
-    expect(links.map((l) => [l.textContent, l.getAttribute("href")])).toEqual([
+    // textContent có kèm tên biểu tượng Material ở đầu (chữ thường) nên bỏ đi
+    expect(
+      links.map((l) => [l.textContent?.replace(/^[a-z_]+/, ""), l.getAttribute("href")]),
+    ).toEqual([
       ["Tổng quan", "/admin/dashboard"],
       ["Ngân hàng câu hỏi", "/admin/item-bank"],
       ["Lô câu hỏi", "/admin/item-batches"],

@@ -1,14 +1,6 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { EmptyBlock } from "@/components/layout/states";
+import { MaterialIcon } from "@/components/ui/material-icon";
 import type { OpenRoundRow } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 
@@ -26,58 +18,75 @@ interface Props {
   updatedAt?: string;
 }
 
-/** Bảng "Kỳ thi đang mở" (S36): tên, giờ mở — đóng, thời lượng, ba số sinh viên, lối vào quản lý. */
+/** Bảng "Kỳ thi đang mở" (S36, kiểu Stitch): tên, giờ mở — đóng, thời lượng, ba số sinh viên, lối vào quản lý. */
 export function OpenRoundsTable({ rounds, updatedAt }: Props) {
   return (
-    <Card data-testid="open-rounds-table">
-      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-        <CardTitle className="text-lg">{vi.overview.roundsTitle}</CardTitle>
-        {updatedAt && (
-          <span className="text-sm text-muted-foreground">
-            {vi.overview.roundsUpdatedAt(updatedAt)}
+    <div
+      data-testid="open-rounds-table"
+      className="rounded-xl bg-surface-container-lowest p-8 shadow-sm"
+    >
+      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex items-center gap-3">
+          <span className="flex size-10 items-center justify-center rounded-xl bg-teal/10 text-teal">
+            <MaterialIcon name="timer" size={22} />
           </span>
+          <h2 className="text-xl leading-7 font-semibold text-on-surface">
+            {vi.overview.roundsTitle}
+          </h2>
+        </div>
+        {updatedAt && (
+          <span className="text-[13px] text-outline">{vi.overview.roundsUpdatedAt(updatedAt)}</span>
         )}
-      </CardHeader>
-      <CardContent>
-        {rounds.length === 0 ? (
-          <EmptyBlock text={vi.overview.roundsEmpty} />
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{vi.overview.colRoundName}</TableHead>
-                <TableHead>{vi.overview.colRoundWindow}</TableHead>
-                <TableHead>{vi.overview.colRoundDuration}</TableHead>
-                <TableHead>{vi.overview.colRoundStudents}</TableHead>
-                <TableHead className="text-right">{vi.overview.colRoundAction}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+      </div>
+      {rounds.length === 0 ? (
+        <EmptyBlock text={vi.overview.roundsEmpty} />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-[15px]">
+            <thead>
+              <tr className="bg-surface-container-low text-xs font-semibold tracking-wider text-outline uppercase">
+                <th className="rounded-l-lg px-4 py-3">{vi.overview.colRoundName}</th>
+                <th className="px-4 py-3">{vi.overview.colRoundWindow}</th>
+                <th className="px-4 py-3">{vi.overview.colRoundDuration}</th>
+                <th className="px-4 py-3">{vi.overview.colRoundStudents}</th>
+                <th className="rounded-r-lg px-4 py-3 text-right">{vi.overview.colRoundAction}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-container-low">
               {rounds.map((round) => (
-                <TableRow key={round.id} data-testid={`open-round-${round.id}`}>
-                  <TableCell className="font-medium">{round.name}</TableCell>
-                  <TableCell>
+                <tr
+                  key={round.id}
+                  data-testid={`open-round-${round.id}`}
+                  className="transition-colors hover:bg-surface-container-low/50"
+                >
+                  <td className="px-4 py-4 font-semibold text-on-surface">{round.name}</td>
+                  <td className="px-4 py-4 text-[13px] font-medium text-on-surface">
                     {dateTime.format(new Date(round.opensAt))} —{" "}
                     {dateTime.format(new Date(round.closesAt))}
-                  </TableCell>
-                  <TableCell>{vi.overview.roundDuration(round.durationMinutes)}</TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className="inline-flex items-center gap-1 rounded bg-surface-container-low px-2 py-1 text-[13px] text-on-surface-variant">
+                      <MaterialIcon name="schedule" size={16} />
+                      {vi.overview.roundDuration(round.durationMinutes)}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 text-[13px] text-on-surface-variant">
                     {vi.overview.roundStudents(round.notStarted, round.inProgress, round.completed)}
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </td>
+                  <td className="px-4 py-4 text-right">
                     <Link
                       href={`/admin/exam-rounds/${round.id}`}
-                      className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                      className="text-[13px] font-semibold text-primary hover:text-primary-container"
                     >
                       {vi.overview.openRound}
                     </Link>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 }

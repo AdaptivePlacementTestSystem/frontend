@@ -73,11 +73,12 @@ describe("OverviewView (S36)", () => {
     expect(within(screen.getByTestId("cefr-row-B2")).getByText("25,1%")).toBeInTheDocument();
   });
 
-  it("thống kê trạng thái câu: 6 thanh ngang (không phải biểu đồ vòng), có tổng", async () => {
+  it("thống kê trạng thái câu: biểu đồ vòng (đúng Stitch) kèm 6 dòng chú giải và tổng", async () => {
     renderView();
     const card = await screen.findByTestId("item-status-distribution");
 
-    expect(within(card).getAllByRole("progressbar")).toHaveLength(6);
+    expect(within(card).getByRole("img")).toBeInTheDocument();
+    expect(within(card).getAllByRole("listitem")).toHaveLength(6);
     expect(within(card).getByText("Chờ duyệt vòng 1")).toBeInTheDocument();
     expect(within(card).getByText("AI đã loại")).toBeInTheDocument();
     expect(within(card).getByText("Tổng 693 câu")).toBeInTheDocument();
