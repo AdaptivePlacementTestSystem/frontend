@@ -168,7 +168,7 @@ export function AccountsView({ kind, currentUserId }: Props) {
             <Link href={`/admin/users/import?kind=${kind}`}>{t.importAccounts}</Link>
           </Button>
           <Button variant="outline" onClick={downloadTemplate} data-testid="download-template">
-            {isStudent ? vi.accountImport.templateStudent : vi.accountImport.templateTeacher}
+            {t.exportTemplate}
           </Button>
         </div>
       </div>

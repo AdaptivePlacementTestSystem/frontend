@@ -343,6 +343,8 @@ export const vi = {
     addStudent: "Thêm sinh viên",
     addTeacher: "Thêm giảng viên",
     importAccounts: "Import",
+    /** Tải file Excel mẫu để điền thông tin import. */
+    exportTemplate: "Export",
     colName: "Họ tên",
     colStudentCode: "MSSV",
     colTeacherCode: "Mã GV",
