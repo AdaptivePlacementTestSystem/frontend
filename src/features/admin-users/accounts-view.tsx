@@ -26,7 +26,7 @@ import {
   unlockAccount,
   updateAccount,
 } from "@/lib/api/endpoints";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import type {
   AccountKind,
   AdminAccount,
@@ -118,7 +118,7 @@ export function AccountsView({ kind, currentUserId }: Props) {
       setPending(null);
       await refresh();
     } catch (e) {
-      toast.error(errorMessage(e));
+      notifyError(e);
     } finally {
       setBusy(false);
     }
@@ -130,7 +130,7 @@ export function AccountsView({ kind, currentUserId }: Props) {
       toast.success(t.unlocked);
       await refresh();
     } catch (e) {
-      toast.error(errorMessage(e));
+      notifyError(e);
     }
   };
 

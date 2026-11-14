@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { bffError, postUpstream, upstreamCode } from "@/lib/api/bff-upstream";
+import { bffError, postUpstream, rateLimitedResponse, upstreamCode } from "@/lib/api/bff-upstream";
 import { setTokenCookie } from "@/lib/auth/cookie";
 import { PASSWORD_MIN_LENGTH } from "@/lib/auth/password-policy";
 import { TOKEN_COOKIE } from "@/lib/auth/roles";
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
   if (!upstream) return bffError(502, "NETWORK", "Không kết nối được máy chủ.");
 
   if (!upstream.ok) {
+    if (upstream.status === 429) return rateLimitedResponse(upstream);
     const code = upstreamCode(upstream.data);
     // Backend trả INVALID_CREDENTIALS khi mật khẩu hiện tại sai (change-password.use-case)
     if (code === "INVALID_CREDENTIALS") {

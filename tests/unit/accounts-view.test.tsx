@@ -404,7 +404,10 @@ describe("AccountsView (S24)", () => {
       await user.click(screen.getByTestId("confirm-yes"));
 
       await waitFor(() =>
-        expect(toast.error).toHaveBeenCalledWith("Bạn không có quyền thực hiện thao tác này."),
+        expect(toast.error).toHaveBeenCalledWith(
+          "Bạn không có quyền thực hiện thao tác này.",
+          expect.anything(),
+        ),
       );
     });
 

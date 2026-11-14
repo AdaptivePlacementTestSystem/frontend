@@ -1,14 +1,18 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ApiError } from "@/lib/api/errors";
+import { notifyError } from "@/lib/api/notify-error";
 import { Toaster } from "@/components/ui/sonner";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(
     () =>
       new QueryClient({
+        // Mọi lỗi tải dữ liệu hay thao tác đều phải báo cho người dùng (kể cả quá giới hạn kèm số giây phải chờ)
+        queryCache: new QueryCache({ onError: (e) => void notifyError(e) }),
+        mutationCache: new MutationCache({ onError: (e) => void notifyError(e) }),
         defaultOptions: {
           queries: {
             staleTime: 15_000,

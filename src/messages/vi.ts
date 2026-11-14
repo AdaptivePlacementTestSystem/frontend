@@ -77,6 +77,10 @@ export const vi = {
     IMPORTED: "Nhập từ file",
     AI_GENERATED: "Do AI sinh",
   } satisfies Record<ItemBatchSource, string>,
+  /** Bị giới hạn tần suất (429): nêu số giây phải chờ. */
+  rateLimitedWait: (seconds: number) =>
+    `Bạn thao tác quá nhanh. Vui lòng thử lại sau ${seconds} giây.`,
+
   errors: {
     INVALID_CREDENTIALS: "Thông tin đăng nhập không chính xác.",
     ACCOUNT_LOCKED: "Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.",
@@ -127,6 +131,7 @@ export const vi = {
     submitting: "Đang đăng nhập…",
     required: "Trường này là bắt buộc",
     forgot: "Quên mật khẩu?",
+    fillAll: "Vui lòng nhập đầy đủ email và mật khẩu.",
     valueProp: "Đo đúng năng lực, không mất thời gian vào câu quá dễ hay quá khó.",
   },
 

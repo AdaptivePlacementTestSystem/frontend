@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError } from "@/lib/api/errors";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import type {
   AccountKind,
   AdminAccount,
@@ -118,7 +118,7 @@ function FormBody({
           message: field === "studentCode" ? t.dupStudentCode : t.dupTeacherCode,
         });
       } else {
-        setServerError(errorMessage(e));
+        setServerError(notifyError(e));
       }
     }
   });

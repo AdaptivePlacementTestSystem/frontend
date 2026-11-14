@@ -2,7 +2,6 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { downloadCsv, getClassDistribution, getClassErrorPatterns } from "@/lib/api/endpoints";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import type { ExportType } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 
@@ -46,7 +45,7 @@ export function ReportsView() {
       const { blob, filename } = await downloadCsv(type);
       saveBlob(blob, filename);
     } catch (e) {
-      toast.error(errorMessage(e));
+      notifyError(e);
     } finally {
       setBusy(null);
     }

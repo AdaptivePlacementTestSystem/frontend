@@ -27,6 +27,7 @@ import {
   uploadImportFile,
 } from "@/lib/api/endpoints";
 import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import { ApiError } from "@/lib/api/errors";
 import type {
   AccountKind,
@@ -126,7 +127,9 @@ export function ImportAccountsView({ initialKind }: { initialKind: AccountKind }
         queryClient.setQueryData(gridKey, { grid: result.grid });
         messages.push(t.uploaded(file.name, result.added, result.ignoredDuplicates));
       } catch (e) {
-        messages.push(`${t.uploadFailed(file.name)} ${importErrorText(e)}`);
+        const text = importErrorText(e);
+        toast.error(`${t.uploadFailed(file.name)} ${text}`, { id: `${file.name}:${text}` });
+        messages.push(`${t.uploadFailed(file.name)} ${text}`);
       }
     }
     setProgress(null);
@@ -140,7 +143,7 @@ export function ImportAccountsView({ initialKind }: { initialKind: AccountKind }
       const result = await removeImportRow(kind, rowKey);
       queryClient.setQueryData(gridKey, { grid: result.grid });
     } catch (e) {
-      toast.error(errorMessage(e));
+      notifyError(e);
     }
   };
 
@@ -150,7 +153,7 @@ export function ImportAccountsView({ initialKind }: { initialKind: AccountKind }
       queryClient.setQueryData(gridKey, { grid: [] });
       setConfirmClear(false);
     } catch (e) {
-      toast.error(errorMessage(e));
+      notifyError(e);
     }
   };
 
@@ -161,7 +164,7 @@ export function ImportAccountsView({ initialKind }: { initialKind: AccountKind }
       await saveImportGrid(kind);
       await statusQuery.refetch();
     } catch (e) {
-      toast.error(errorMessage(e));
+      notifyError(e);
       if (e instanceof ApiError && e.code === "IMPORT_GRID_EXPIRED") {
         queryClient.setQueryData(gridKey, { grid: [] });
       }

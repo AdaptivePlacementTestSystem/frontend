@@ -490,7 +490,10 @@ describe("ImportAccountsView (S19)", () => {
       await user.click(screen.getByTestId("import-save"));
 
       await waitFor(() =>
-        expect(toast.error).toHaveBeenCalledWith("Bảng import đã hết hạn. Vui lòng tải lại file."),
+        expect(toast.error).toHaveBeenCalledWith(
+          "Bảng import đã hết hạn. Vui lòng tải lại file.",
+          expect.anything(),
+        ),
       );
       await waitFor(() => expect(screen.queryByTestId("import-row-k1")).not.toBeInTheDocument());
     });

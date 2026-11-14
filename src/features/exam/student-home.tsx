@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { getActiveSession, startSession } from "@/lib/api/endpoints";
 import { ApiError } from "@/lib/api/errors";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import { vi } from "@/messages/vi";
 
 export function StudentHome() {
@@ -33,7 +33,7 @@ export function StudentHome() {
           return;
         }
       }
-      toast.error(errorMessage(e));
+      notifyError(e);
     },
   });
 

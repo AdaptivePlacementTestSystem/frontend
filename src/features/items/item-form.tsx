@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { NativeSelect } from "@/components/layout/native-select";
 import { createItem, generateExplanation, getItem, updateItem } from "@/lib/api/endpoints";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import { OPTION_KEYS, type CefrTarget, type ItemInput, type OptionKey } from "@/lib/api/types";
 import { SKILLS } from "@apt/shared-types";
 import { parseExplanation } from "@/lib/explanation";
@@ -132,7 +132,7 @@ export function ItemForm({ itemId }: { itemId?: string }) {
       void qc.invalidateQueries({ queryKey: ["item", item.id] });
       router.push(`/teacher/items/${item.id}`);
     },
-    onError: (e) => toast.error(errorMessage(e)),
+    onError: (e) => notifyError(e),
   });
 
   const ai = useMutation({
@@ -149,7 +149,7 @@ export function ItemForm({ itemId }: { itemId?: string }) {
       for (const k of OPTION_KEYS) setValue(`exp${k}`, exp.options[k] ?? "");
       setAiUsed(true);
     },
-    onError: (e) => toast.error(errorMessage(e)),
+    onError: (e) => notifyError(e),
   });
 
   if (itemId && existing.isPending) return <LoadingBlock rows={6} />;

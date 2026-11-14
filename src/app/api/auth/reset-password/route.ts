@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { bffError, postUpstream, upstreamCode } from "@/lib/api/bff-upstream";
+import { bffError, postUpstream, rateLimitedResponse, upstreamCode } from "@/lib/api/bff-upstream";
 import { PASSWORD_MIN_LENGTH } from "@/lib/auth/password-policy";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   if (!upstream) return bffError(502, "NETWORK", "Không kết nối được máy chủ.");
   if (upstream.ok) return new NextResponse(null, { status: 204 });
 
-  if (upstream.status === 429) return bffError(429, "RATE_LIMITED", "Quá nhiều yêu cầu.");
+  if (upstream.status === 429) return rateLimitedResponse(upstream);
   const known = upstreamCode(upstream.data);
   if (known === "INVALID_RESET_OTP") return bffError(400, known, "Không đặt lại được mật khẩu.");
   // 400 không kèm mã là lỗi kiểm tra dữ liệu của backend (ví dụ mật khẩu mới không đạt chính sách), không phải OTP sai

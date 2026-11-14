@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { bffError, postUpstream } from "@/lib/api/bff-upstream";
+import { bffError, postUpstream, rateLimitedResponse } from "@/lib/api/bff-upstream";
 import { setTokenCookie } from "@/lib/auth/cookie";
 import { toCurrentUser } from "@/lib/auth/user";
 
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       return bffError(401, "INVALID_CREDENTIALS", "Thông tin đăng nhập không chính xác.");
     }
     if (upstream.status === 403) return bffError(403, "ACCOUNT_LOCKED", "Tài khoản đã bị khóa.");
-    if (upstream.status === 429) return bffError(429, "RATE_LIMITED", "Quá nhiều yêu cầu.");
+    if (upstream.status === 429) return rateLimitedResponse(upstream);
     return bffError(502, "UNKNOWN", "Máy chủ gặp lỗi, vui lòng thử lại.");
   }
 
