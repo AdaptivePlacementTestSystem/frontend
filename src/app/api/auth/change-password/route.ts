@@ -27,9 +27,16 @@ export async function POST(req: NextRequest) {
 
   if (!upstream.ok) {
     const code = upstreamCode(upstream.data);
+    // Backend trả INVALID_CREDENTIALS khi mật khẩu hiện tại sai (change-password.use-case)
+    if (code === "INVALID_CREDENTIALS") {
+      return bffError(400, "CURRENT_PASSWORD_INVALID", "Mật khẩu hiện tại không đúng.");
+    }
     if (code) return bffError(upstream.status, code, "Không đổi được mật khẩu.");
-    // TODO-CONFIRM: backend chưa có mã riêng cho "sai mật khẩu hiện tại" (SRS X chỉ ghi POST change-password).
-    if (upstream.status === 400 || upstream.status === 401) {
+    // 400 không kèm mã là lỗi kiểm tra dữ liệu (ví dụ mật khẩu mới không đạt chính sách), KHÔNG phải sai mật khẩu hiện tại
+    if (upstream.status === 400) {
+      return bffError(400, "VALIDATION_FAILED", "Mật khẩu mới chưa đạt yêu cầu.");
+    }
+    if (upstream.status === 401) {
       return bffError(400, "CURRENT_PASSWORD_INVALID", "Mật khẩu hiện tại không đúng.");
     }
     return bffError(502, "UNKNOWN", "Máy chủ gặp lỗi, vui lòng thử lại.");

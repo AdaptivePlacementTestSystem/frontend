@@ -138,7 +138,10 @@ export const vi = {
     required: "Trường này là bắt buộc",
     emailInvalid: "Email không hợp lệ.",
     passwordTooShort: (min: number) => `Mật khẩu mới chưa đạt yêu cầu (tối thiểu ${min} ký tự).`,
-    passwordHint: (min: number) => `Khác mật khẩu cũ, độ dài tối thiểu ${min} ký tự.`,
+    passwordPolicy:
+      "Mật khẩu mới phải có ít nhất 8 ký tự, gồm chữ thường, chữ hoa, chữ số và ký tự đặc biệt.",
+    passwordHint: (min: number) =>
+      `Khác mật khẩu cũ, tối thiểu ${min} ký tự, gồm chữ thường, chữ hoa, chữ số và ký tự đặc biệt.`,
     confirmMismatch: "Mật khẩu nhập lại không khớp.",
     sameAsCurrent: "Mật khẩu mới phải khác mật khẩu hiện tại.",
     forgot: {
