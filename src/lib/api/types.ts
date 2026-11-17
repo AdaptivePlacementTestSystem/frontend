@@ -69,11 +69,7 @@ export interface ExamRoundDetail {
   activeSessionId?: string;
 }
 
-export type CurrentRoundSessionStatus =
-  | "NOT_STARTED"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "ABANDONED";
+export type CurrentRoundSessionStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
 
 export interface CurrentRoundSessionResponse {
   status: CurrentRoundSessionStatus;
@@ -93,7 +89,7 @@ export interface CurrentRoundSessionResponse {
 export interface ResumeSessionResponse {
   examRoundId?: string;
   currentItem: ExamItem | null;
-  state: any;
+  state: Record<string, unknown>;
   isExpired?: boolean;
 }
 

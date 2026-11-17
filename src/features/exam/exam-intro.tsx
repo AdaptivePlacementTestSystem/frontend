@@ -16,7 +16,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Wifi,
-  Sparkles,
   AlertCircle,
   PlayCircle,
   ShieldCheck,
@@ -51,12 +50,7 @@ export function ExamIntro({ roundId }: { roundId: string }) {
 
   if (roundQuery.isPending) return <LoadingBlock />;
   if (roundQuery.isError) {
-    return (
-      <ErrorBlock
-        error={roundQuery.error}
-        onRetry={() => roundQuery.refetch()}
-      />
-    );
+    return <ErrorBlock error={roundQuery.error} onRetry={() => roundQuery.refetch()} />;
   }
 
   const round = roundQuery.data;
@@ -73,13 +67,11 @@ export function ExamIntro({ roundId }: { roundId: string }) {
                 Bạn đang có một bài thi dở dang
               </h3>
               <p className="text-sm text-on-surface-variant">
-                Hệ thống phát hiện phiên thi trước của bạn chưa được nộp. Bạn có thể tiếp tục làm bài ngay để không bị mất thời gian.
+                Hệ thống phát hiện phiên thi trước của bạn chưa được nộp. Bạn có thể tiếp tục làm
+                bài ngay để không bị mất thời gian.
               </p>
               <div className="flex flex-wrap items-center gap-3 pt-1">
-                <Button
-                  asChild
-                  className="bg-primary hover:bg-primary/90 text-white font-semibold"
-                >
+                <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold">
                   <Link href={`/exams/${roundId}/take`}>
                     <PlayCircle className="mr-2 h-4 w-4" />
                     Tiếp tục bài thi
@@ -197,7 +189,8 @@ export function ExamIntro({ roundId }: { roundId: string }) {
         <div className="flex items-center gap-3 rounded-xl border border-outline-variant/30 bg-slate-50 p-4 text-xs text-on-surface-variant">
           <Wifi className="h-5 w-5 text-primary shrink-0" />
           <span>
-            Đảm bảo kết nối Internet ổn định trong suốt quá trình thi để thuật toán CAT ghi nhận câu trả lời liên tục.
+            Đảm bảo kết nối Internet ổn định trong suốt quá trình thi để thuật toán CAT ghi nhận câu
+            trả lời liên tục.
           </span>
         </div>
 

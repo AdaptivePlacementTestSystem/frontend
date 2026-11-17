@@ -13,7 +13,6 @@ import { parseExplanation } from "@/lib/explanation";
 import { vi } from "@/messages/vi";
 import {
   ArrowLeft,
-  CheckCircle2,
   XCircle,
   Lightbulb,
   Check,
@@ -28,13 +27,7 @@ import {
 
 type FilterType = "all" | "wrong" | "vocab" | "grammar";
 
-function ExplanationPanel({
-  entry,
-  index,
-}: {
-  entry: ReviewEntry;
-  index: number;
-}) {
+function ExplanationPanel({ entry, index }: { entry: ReviewEntry; index: number }) {
   const exp = parseExplanation(entry.explanation);
   if (!exp) {
     return (
@@ -124,12 +117,8 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
             data-testid="review-disabled"
             className="rounded-xl border-amber-500/30 bg-amber-50 text-amber-900 p-5 shadow-sm"
           >
-            <AlertTitle className="text-base font-bold">
-              {vi.review.disabledTitle}
-            </AlertTitle>
-            <AlertDescription className="text-sm mt-1">
-              {vi.review.disabledBody}
-            </AlertDescription>
+            <AlertTitle className="text-base font-bold">{vi.review.disabledTitle}</AlertTitle>
+            <AlertDescription className="text-sm mt-1">{vi.review.disabledBody}</AlertDescription>
           </Alert>
           {backBtn}
         </div>
@@ -263,7 +252,7 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
       <div className="flex flex-col gap-space-sm" data-testid="review-list">
         {filteredEntries.map((e, idx) => {
           const entryOrder = typeof e.order === "number" && e.order > 0 ? e.order : idx + 1;
-          const isOpen = openItems[entryOrder] ?? (idx === 0);
+          const isOpen = openItems[entryOrder] ?? idx === 0;
           const skillLabel = e.skill === "VOCABULARY" ? "Từ vựng" : "Ngữ pháp";
 
           return (
@@ -360,9 +349,7 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
                         <div key={key} className={containerClass}>
                           <div className="flex items-center gap-3 min-w-0 pr-2">
                             <span className={badgeClass}>{key}</span>
-                            <span className={textClass}>
-                              {e.options ? e.options[key] : ""}
-                            </span>
+                            <span className={textClass}>{e.options ? e.options[key] : ""}</span>
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">

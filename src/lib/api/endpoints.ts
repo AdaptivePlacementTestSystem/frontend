@@ -90,19 +90,30 @@ export const startSession = (examRoundId?: string) =>
     body: { examRoundId },
   });
 
-export async function getActiveSession(
-  signal?: AbortSignal,
-): Promise<ActiveSessionResponse> {
-  const raw = await apiRequest<any>(endpoints.activeSession(), { signal });
+interface RawActiveSession {
+  session?: ActiveSessionResponse["session"];
+  activeSessionId?: string;
+  sessionId?: string;
+  id?: string;
+  examRoundId?: string;
+  itemCount?: number;
+  maxItems?: number;
+  expiresAt?: string;
+  serverTime?: string;
+  closedPrevious?: ActiveSessionResponse["closedPrevious"];
+}
+
+export async function getActiveSession(signal?: AbortSignal): Promise<ActiveSessionResponse> {
+  const raw = await apiRequest<RawActiveSession | null>(endpoints.activeSession(), { signal });
   if (!raw) return { session: null };
-  if ("session" in raw) return raw as ActiveSessionResponse;
+  if ("session" in raw && raw.session !== undefined) return raw as ActiveSessionResponse;
   return {
     session: {
-      sessionId: raw.activeSessionId ?? raw.sessionId ?? raw.id,
+      sessionId: raw.activeSessionId ?? raw.sessionId ?? raw.id ?? "",
       examRoundId: raw.examRoundId,
       itemCount: raw.itemCount ?? 0,
       maxItems: raw.maxItems ?? 25,
-      expiresAt: raw.expiresAt,
+      expiresAt: raw.expiresAt ?? new Date().toISOString(),
       serverTime: raw.serverTime ?? new Date().toISOString(),
     },
     closedPrevious: raw.closedPrevious ?? null,
@@ -122,10 +133,7 @@ export const submitResponse = (
   body: { itemId: string; response: OptionKey; responseTimeMs?: number },
 ) => apiRequest<SubmitResult>(endpoints.submit(sessionId), { method: "POST", body });
 
-export async function getResult(
-  sessionId: string,
-  signal?: AbortSignal,
-): Promise<SessionResult> {
+export async function getResult(sessionId: string, signal?: AbortSignal): Promise<SessionResult> {
   const raw = await apiRequest<unknown>(endpoints.result(sessionId), { signal });
   return normalizeSessionResult(raw);
 }

@@ -11,12 +11,7 @@ import { getNextItem, submitResponse } from "@/lib/api/endpoints";
 import { ApiError } from "@/lib/api/errors";
 import { errorMessage } from "@/lib/api/error-message";
 import { notifyError } from "@/lib/api/notify-error";
-import {
-  OPTION_KEYS,
-  type ExamItem,
-  type OptionKey,
-  type SessionMeta,
-} from "@/lib/api/types";
+import { OPTION_KEYS, type ExamItem, type OptionKey, type SessionMeta } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 import { formatClock, useCountdown } from "./use-countdown";
 import {
@@ -38,18 +33,14 @@ interface QuestionProps {
   onExpired: () => void;
 }
 
-function Question({
-  sessionId,
-  item,
-  session,
-  receivedAt,
-  onExpired,
-}: QuestionProps) {
+function Question({ sessionId, item, session, receivedAt, onExpired }: QuestionProps) {
   const router = useRouter();
   const qc = useQueryClient();
   const [choice, setChoice] = useState<OptionKey | null>(null);
   const [shownAt] = useState(() => Date.now());
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(() =>
+    typeof navigator !== "undefined" ? navigator.onLine : true,
+  );
   const [networkError, setNetworkError] = useState(false);
 
   const left = useCountdown(session.expiresAt, session.serverTime, receivedAt);
@@ -60,7 +51,6 @@ function Question({
     const handleOffline = () => setIsOnline(false);
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
-    setIsOnline(navigator.onLine);
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
@@ -135,8 +125,7 @@ function Question({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleSelect, handleSubmit]);
 
-  const skillName =
-    item.skill === "VOCABULARY" ? "Từ vựng" : "Ngữ pháp";
+  const skillName = item.skill === "VOCABULARY" ? "Từ vựng" : "Ngữ pháp";
 
   return (
     <div className="w-full max-w-[800px] mx-auto space-y-4">
@@ -168,9 +157,7 @@ function Question({
               className="text-sm font-bold text-on-surface sm:text-base"
             >
               Câu {session.itemCount + 1}{" "}
-              <span className="text-xs font-normal text-on-surface-variant">
-                (tối đa 25)
-              </span>
+              <span className="text-xs font-normal text-on-surface-variant">(tối đa 25)</span>
             </span>
           </div>
 
@@ -211,13 +198,14 @@ function Question({
         </div>
 
         {/* 4 Phương án A, B, C, D */}
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-3" role="radiogroup" aria-label="Phương án trả lời">
           {OPTION_KEYS.map((key) => {
             const isSelected = choice === key;
             return (
               <button
                 key={key}
                 type="button"
+                role="radio"
                 data-testid={`option-${key}`}
                 data-option={key}
                 aria-checked={isSelected}
@@ -267,7 +255,26 @@ function Question({
             <div className="flex items-center gap-1.5">
               <Keyboard className="h-3.5 w-3.5 text-outline" />
               <span>
-                Phím tắt: bấm <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">A</kbd>, <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">B</kbd>, <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">C</kbd>, <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">D</kbd> hoặc <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">1-4</kbd>
+                Phím tắt: bấm{" "}
+                <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">
+                  A
+                </kbd>
+                ,{" "}
+                <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">
+                  B
+                </kbd>
+                ,{" "}
+                <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">
+                  C
+                </kbd>
+                ,{" "}
+                <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">
+                  D
+                </kbd>{" "}
+                hoặc{" "}
+                <kbd className="px-1 py-0.5 rounded bg-slate-100 font-mono font-bold text-slate-800">
+                  1-4
+                </kbd>
               </span>
             </div>
             <span className="text-[11px] text-outline ml-5">
@@ -319,11 +326,7 @@ function Question({
   );
 }
 
-export function ExamRunner({
-  sessionId,
-}: {
-  sessionId: string;
-}) {
+export function ExamRunner({ sessionId }: { sessionId: string }) {
   const router = useRouter();
   const next = useQuery({
     queryKey: ["next-item", sessionId],
@@ -339,8 +342,7 @@ export function ExamRunner({
     router.replace(`/results/${sessionId}`);
   }, [sessionId, router]);
 
-  const finishedId =
-    next.data?.kind === "finished" ? next.data.sessionId : null;
+  const finishedId = next.data?.kind === "finished" ? next.data.sessionId : null;
   useEffect(() => {
     if (finishedId) {
       router.replace(`/results/${finishedId}`);
@@ -376,9 +378,7 @@ export function ExamRunner({
         <div className="w-12 h-12 rounded-full bg-blue-50 text-primary mx-auto flex items-center justify-center">
           <CheckCircle2 className="h-6 w-6" />
         </div>
-        <p className="text-base font-semibold text-on-surface">
-          Đang tổng hợp kết quả bài thi...
-        </p>
+        <p className="text-base font-semibold text-on-surface">Đang tổng hợp kết quả bài thi...</p>
       </div>
     );
   }

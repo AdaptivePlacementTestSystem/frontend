@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCurrentRoundSession } from "@/lib/api/endpoints";
@@ -9,8 +9,6 @@ import { LoadingBlock, ErrorBlock } from "@/components/layout/states";
 
 export function TakeExamContainer({ roundId }: { roundId: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const searchSessionId = searchParams.get("sessionId");
 
   // Gọi endpoint duy nhất xác định session của roundId này (loại bỏ hoàn toàn waterfall)
   const currentSessionQuery = useQuery({
@@ -43,12 +41,7 @@ export function TakeExamContainer({ roundId }: { roundId: string }) {
   }
 
   if (isError) {
-    return (
-      <ErrorBlock
-        error={error}
-        onRetry={() => refetch()}
-      />
-    );
+    return <ErrorBlock error={error} onRetry={() => refetch()} />;
   }
 
   // Nếu không có phiên đang chạy (đang trong quá trình redirect)

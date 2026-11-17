@@ -2,18 +2,11 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
+import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { Button } from "@/components/ui/button";
 import { getHistory } from "@/lib/api/endpoints";
 import { vi } from "@/messages/vi";
-import {
-  CheckSquare,
-  TrendingUp,
-  ArrowRight,
-  PlayCircle,
-  FileText,
-  Calendar,
-} from "lucide-react";
+import { TrendingUp, ArrowRight, PlayCircle, FileText } from "lucide-react";
 
 export function HistoryView({ studentCode }: { studentCode: string | null }) {
   const code = studentCode || "me";
@@ -39,9 +32,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
           <span className="text-xs font-bold uppercase tracking-wider text-primary">
             Hồ sơ năng lực
           </span>
-          <h1 className="text-2xl font-bold text-on-surface sm:text-3xl mt-0.5">
-            Lịch sử bài thi
-          </h1>
+          <h1 className="text-2xl font-bold text-on-surface sm:text-3xl mt-0.5">Lịch sử bài thi</h1>
           <p className="text-sm text-on-surface-variant mt-1">
             Xem lại toàn bộ kết quả các kỳ thi xếp lớp và đánh giá định kỳ của bạn.
           </p>
@@ -62,7 +53,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
             <span className="text-xs text-on-surface-variant font-medium">Cấp độ hiện tại:</span>
             <span className="px-2 py-0.5 rounded text-xs font-bold bg-sky-100 text-sky-900">
               {latestCompleted?.cefrLevel
-                ? vi.cefrLevel[latestCompleted.cefrLevel] ?? latestCompleted.cefrLevel
+                ? (vi.cefrLevel[latestCompleted.cefrLevel] ?? latestCompleted.cefrLevel)
                 : "Chưa xác định"}
             </span>
           </div>
@@ -77,10 +68,14 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
             Bạn chưa hoàn thành bài thi nào.
           </p>
           <p className="text-xs text-on-surface-variant max-w-md mx-auto">
-            Khi bạn tham gia các kỳ thi xếp lớp hoặc khảo sát năng lực thích ứng CAT, kết quả và phân tích chi tiết sẽ được lưu tại đây.
+            Khi bạn tham gia các kỳ thi xếp lớp hoặc khảo sát năng lực thích ứng CAT, kết quả và
+            phân tích chi tiết sẽ được lưu tại đây.
           </p>
           <div className="pt-2">
-            <Button asChild className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold shadow-sm">
+            <Button
+              asChild
+              className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold shadow-sm"
+            >
               <Link href="/">
                 <span>Bắt đầu bài thi</span>
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -112,7 +107,6 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
                 {history.map((row) => {
                   const isCompleted =
                     row.status === "COMPLETED" || (!row.status && !!row.completedAt);
-                  const isAbandoned = row.status === "ABANDONED";
                   const isInProgress = row.status === "IN_PROGRESS";
                   const isTimeout = row.stoppingReason === "TIMEOUT";
 
@@ -142,9 +136,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
                                   : "bg-slate-300"
                             }`}
                           />
-                          <span>
-                            {row.examRoundTitle ?? "Kỳ thi phân lớp tiếng Anh"}
-                          </span>
+                          <span>{row.examRoundTitle ?? "Kỳ thi phân lớp tiếng Anh"}</span>
                         </div>
                       </td>
 
@@ -211,14 +203,23 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
 
                       <td className="px-5 py-3 text-right whitespace-nowrap">
                         {isCompleted ? (
-                          <Button asChild variant="link" size="sm" className="font-semibold text-primary">
+                          <Button
+                            asChild
+                            variant="link"
+                            size="sm"
+                            className="font-semibold text-primary"
+                          >
                             <Link href={`/results/${row.sessionId}`}>
                               <span>Xem chi tiết</span>
                               <ArrowRight className="ml-1 h-3.5 w-3.5" />
                             </Link>
                           </Button>
                         ) : isInProgress ? (
-                          <Button asChild size="sm" className="bg-amber-600 hover:bg-amber-700 text-white font-semibold">
+                          <Button
+                            asChild
+                            size="sm"
+                            className="bg-amber-600 hover:bg-amber-700 text-white font-semibold"
+                          >
                             <Link href={`/exams/${row.examRoundId ?? row.sessionId}/take`}>
                               <span>Tiếp tục</span>
                               <PlayCircle className="ml-1 h-3.5 w-3.5" />
@@ -238,8 +239,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
           {/* Mobile Card List View (< 768px) */}
           <div className="md:hidden divide-y divide-outline-variant/20">
             {history.map((row) => {
-              const isCompleted =
-                row.status === "COMPLETED" || (!row.status && !!row.completedAt);
+              const isCompleted = row.status === "COMPLETED" || (!row.status && !!row.completedAt);
               const isInProgress = row.status === "IN_PROGRESS";
               const isTimeout = row.stoppingReason === "TIMEOUT";
 
@@ -278,7 +278,9 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
                     </div>
                     <div>
                       <span className="text-outline block uppercase text-[10px]">Số câu</span>
-                      <span className="font-medium text-on-surface">{row.itemsAdministered} câu</span>
+                      <span className="font-medium text-on-surface">
+                        {row.itemsAdministered} câu
+                      </span>
                     </div>
                     <div>
                       <span className="text-outline block uppercase text-[10px]">Điểm θ</span>
@@ -319,14 +321,23 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
                     )}
 
                     {isCompleted ? (
-                      <Button asChild variant="link" size="sm" className="font-semibold text-primary p-0 h-auto">
+                      <Button
+                        asChild
+                        variant="link"
+                        size="sm"
+                        className="font-semibold text-primary p-0 h-auto"
+                      >
                         <Link href={`/results/${row.sessionId}`}>
                           <span>Xem chi tiết</span>
                           <ArrowRight className="ml-1 h-3.5 w-3.5" />
                         </Link>
                       </Button>
                     ) : isInProgress ? (
-                      <Button asChild size="sm" className="bg-amber-600 hover:bg-amber-700 text-white font-semibold h-8 text-xs">
+                      <Button
+                        asChild
+                        size="sm"
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-semibold h-8 text-xs"
+                      >
                         <Link href={`/exams/${row.examRoundId ?? row.sessionId}/take`}>
                           <span>Tiếp tục</span>
                         </Link>

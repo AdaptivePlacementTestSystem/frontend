@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import type { SessionResult } from "@/lib/api/types";
+import type { ErrorPattern, SessionResult } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 import {
   AlertTriangle,
@@ -90,29 +89,45 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
     );
   }
 
+  type ExtendedResult = SessionResult & {
+    thetaFinal?: number;
+    theta?: number;
+    seFinal?: number;
+    standardError?: number;
+    confidenceInterval95?: [number, number];
+    totalItems?: number;
+    itemsAdministered?: number;
+    durationSeconds?: number;
+    stoppingReason?: string;
+    confidenceLevel?: string;
+  };
+  const rawRes = result as ExtendedResult;
+
   const ability = result.ability ?? {
-    theta: (result as any)?.thetaFinal ?? (result as any)?.theta ?? 0,
-    standardError: (result as any)?.seFinal ?? (result as any)?.standardError ?? 0.35,
-    ci95: (result as any)?.confidenceInterval95 ?? [0, 0],
+    theta: rawRes.thetaFinal ?? rawRes.theta ?? 0,
+    standardError: rawRes.seFinal ?? rawRes.standardError ?? 0.35,
+    ci95: rawRes.confidenceInterval95 ?? [0, 0],
   };
   const meta = result.meta ?? {
-    itemsAdministered: (result as any)?.totalItems ?? (result as any)?.itemsAdministered ?? 0,
-    durationSeconds: (result as any)?.durationSeconds ?? 0,
-    stoppingReason: (result as any)?.stoppingReason ?? "SE_REACHED",
+    itemsAdministered: rawRes.totalItems ?? rawRes.itemsAdministered ?? 0,
+    durationSeconds: rawRes.durationSeconds ?? 0,
+    stoppingReason:
+      (rawRes.stoppingReason as SessionResult["meta"]["stoppingReason"]) ?? "SE_REACHED",
   };
   const cefrKey = result.cefrLevel ?? "B1";
-  const levelDisplay = vi.cefrLevel[cefrKey] ?? cefrKey;
   const cefrInfo = CEFR_DESCRIPTIONS[cefrKey] ?? CEFR_DESCRIPTIONS["B1"]!;
+  const cefrConfidenceMap = vi.cefrConfidence as Record<string, string>;
   const confidenceDisplay =
-    (vi.cefrConfidence as any)?.[result.cefrConfidence] ??
-    (vi.cefrConfidence as any)?.[(result as any)?.confidenceLevel] ??
+    cefrConfidenceMap[result.cefrConfidence] ??
+    (rawRes.confidenceLevel ? cefrConfidenceMap[rawRes.confidenceLevel] : undefined) ??
     result.cefrConfidence ??
     "Cao";
 
   // Stopping reason label
-  const stopReason: string = String(meta?.stoppingReason ?? (result as any)?.stoppingReason ?? "SE_REACHED");
+  const stopReason: string = String(meta?.stoppingReason ?? rawRes.stoppingReason ?? "SE_REACHED");
+  const stoppingReasonMap = vi.stoppingReason as Record<string, string>;
   const stopReasonText =
-    (vi.stoppingReason as any)?.[stopReason] ??
+    stoppingReasonMap[stopReason] ??
     (stopReason === "SE_REACHED" || stopReason === "SE_THRESHOLD"
       ? "Đạt ngưỡng tin cậy (SE < 0.35)"
       : stopReason === "MAX_ITEMS" || stopReason === "MAX_ITEMS_REACHED"
@@ -125,48 +140,52 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
   const vocabProfile = skillProfiles.find((s) => s.skill === "VOCABULARY");
   const grammarProfile = skillProfiles.find((s) => s.skill === "GRAMMAR");
 
+  type ExtendedProfile = {
+    questionsCount?: number;
+    total?: number;
+  };
+  const vocabExt = vocabProfile as ExtendedProfile | undefined;
   const vocabTotal =
-    vocabProfile?.itemsAdministered ??
-    (vocabProfile as any)?.questionsCount ??
-    (vocabProfile as any)?.total ??
-    0;
+    vocabProfile?.itemsAdministered ?? vocabExt?.questionsCount ?? vocabExt?.total ?? 0;
   const vocabCorrect = vocabProfile?.correctCount ?? 0;
 
+  const grammarExt = grammarProfile as ExtendedProfile | undefined;
   const grammarTotal =
-    grammarProfile?.itemsAdministered ??
-    (grammarProfile as any)?.questionsCount ??
-    (grammarProfile as any)?.total ??
-    0;
+    grammarProfile?.itemsAdministered ?? grammarExt?.questionsCount ?? grammarExt?.total ?? 0;
   const grammarCorrect = grammarProfile?.correctCount ?? 0;
 
   // Position on CEFR scale bar (0% to 100%)
-  const levelIndex = CEFR_LEVELS.indexOf(cefrKey as any);
+  const levelIndex = (CEFR_LEVELS as readonly string[]).indexOf(cefrKey);
   const scalePercent =
     levelIndex >= 0
       ? Math.min(95, Math.max(5, ((levelIndex + 0.5) / CEFR_LEVELS.length) * 100))
       : 58;
 
+  type ExtendedErrorPattern = ErrorPattern & {
+    topic?: string;
+    total?: number;
+    count?: number;
+  };
   // Chuẩn hóa và chống lỗi NaN / undefined ở bảng Error Patterns
-  const errorPatterns = (result.errorPatterns ?? []).map((e: any, idx: number) => {
-    const rawTag = e.topicTag ?? e.topic ?? `Chủ điểm ${idx + 1}`;
+  const errorPatterns = (result.errorPatterns ?? []).map((rawItem, idx: number) => {
+    const e = rawItem as ExtendedErrorPattern;
+    const rawTag = String(e.topicTag ?? e.topic ?? `Chủ điểm ${idx + 1}`);
     const topicTitle = formatTopic(rawTag);
+    const correct = typeof e.correctCount === "number" ? e.correctCount : 0;
     const attempted =
       typeof e.itemsAttempted === "number"
         ? e.itemsAttempted
         : typeof e.total === "number"
           ? e.total
           : typeof e.count === "number"
-            ? e.count + (e.correctCount ?? 0)
+            ? e.count + correct
             : 1;
-    const correct = typeof e.correctCount === "number" ? e.correctCount : 0;
     const accuracy =
-      typeof e.accuracyRate === "number"
-        ? e.accuracyRate
-        : attempted > 0
-          ? correct / attempted
-          : 0;
+      typeof e.accuracyRate === "number" ? e.accuracyRate : attempted > 0 ? correct / attempted : 0;
     const errorPct = Math.max(0, Math.min(100, Math.round((1 - accuracy) * 100)));
-    const severity = e.severity ?? (accuracy < 0.4 ? "HIGH" : accuracy < 0.7 ? "MEDIUM" : "LOW");
+    const severity = String(
+      e.severity ?? (accuracy < 0.4 ? "HIGH" : accuracy < 0.7 ? "MEDIUM" : "LOW"),
+    );
     return {
       key: `${rawTag}-${idx}`,
       rawTag,
@@ -228,7 +247,10 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
           <div
             className={`px-8 py-3 rounded-full ${cefrInfo.bg} text-white shadow-md flex items-center justify-center transform transition-transform hover:scale-105 duration-200`}
           >
-            <span data-testid="cefr-level" className="font-headline-xl text-[36px] font-extrabold tracking-tight">
+            <span
+              data-testid="cefr-level"
+              className="font-headline-xl text-[36px] font-extrabold tracking-tight"
+            >
               {cefrKey === "C1_PLUS" ? "C1+" : cefrKey}
             </span>
           </div>
@@ -257,7 +279,8 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
                   : "bg-surface-container text-on-surface-variant"
               }`}
             >
-              Đạt SE &lt; 0.35 {stopReason === "SE_REACHED" || stopReason === "SE_THRESHOLD" ? "(Hiện tại)" : ""}
+              Đạt SE &lt; 0.35{" "}
+              {stopReason === "SE_REACHED" || stopReason === "SE_THRESHOLD" ? "(Hiện tại)" : ""}
             </span>
             <span
               className={`px-2 py-0.5 rounded-full ${

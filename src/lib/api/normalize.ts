@@ -1,9 +1,20 @@
 import { ApiError } from "./errors";
-import type { ExamItem, NextItemResult, OptionKey, Options, ReviewEntry, SessionMeta, SessionResult } from "./types";
+import type {
+  ExamItem,
+  NextItemResult,
+  OptionKey,
+  Options,
+  ReviewEntry,
+  SessionMeta,
+  SessionResult,
+  Severity,
+} from "./types";
 import { OPTION_KEYS } from "./types";
 import {
   SKILLS,
   STOPPING_REASONS,
+  type CefrConfidenceValue as CefrConfidence,
+  type CefrLevelValue as CefrLevel,
   type SkillValue as Skill,
   type StoppingReasonValue as StoppingReason,
 } from "@apt/shared-types";
@@ -46,10 +57,7 @@ function toSessionMeta(raw: unknown): SessionMeta {
       typeof raw.expiresAt === "string"
         ? raw.expiresAt
         : new Date(Date.now() + 45 * 60 * 1000).toISOString(),
-    serverTime:
-      typeof raw.serverTime === "string"
-        ? raw.serverTime
-        : new Date().toISOString(),
+    serverTime: typeof raw.serverTime === "string" ? raw.serverTime : new Date().toISOString(),
   };
 }
 
@@ -160,11 +168,9 @@ export function normalizeSessionResult(raw: unknown): SessionResult {
     "SE_REACHED";
 
   const cefrConfidence =
-    (raw.cefrConfidence as any) ??
-    (raw.confidenceLevel as any) ??
-    "HIGH";
+    (raw.cefrConfidence as CefrConfidence) ?? (raw.confidenceLevel as CefrConfidence) ?? "HIGH";
 
-  const rawSkillProfiles = Array.isArray(raw.skillProfiles) ? (raw.skillProfiles as any[]) : [];
+  const rawSkillProfiles = Array.isArray(raw.skillProfiles) ? (raw.skillProfiles as Rec[]) : [];
   const skillProfiles = rawSkillProfiles.map((s) => ({
     skill: (s.skill as Skill) ?? "VOCABULARY",
     itemsAdministered:
@@ -180,27 +186,28 @@ export function normalizeSessionResult(raw: unknown): SessionResult {
     accuracyRate: typeof s.accuracyRate === "number" ? s.accuracyRate : undefined,
   }));
 
-  const rawErrorPatterns = Array.isArray(raw.errorPatterns) ? (raw.errorPatterns as any[]) : [];
+  const rawErrorPatterns = Array.isArray(raw.errorPatterns) ? (raw.errorPatterns as Rec[]) : [];
   const errorPatterns = rawErrorPatterns.map((e, index) => {
     const topicTag = String(e.topicTag ?? e.topic ?? `Chủ điểm ${index + 1}`);
     const skill = (e.skill as Skill) ?? "GRAMMAR";
+    const correctCount = typeof e.correctCount === "number" ? e.correctCount : 0;
     const itemsAttempted =
       typeof e.itemsAttempted === "number"
         ? e.itemsAttempted
         : typeof e.total === "number"
           ? e.total
           : typeof e.count === "number"
-            ? e.count + (e.correctCount ?? 0)
+            ? e.count + correctCount
             : 1;
-    const correctCount = typeof e.correctCount === "number" ? e.correctCount : 0;
     const accuracyRate =
       typeof e.accuracyRate === "number"
         ? e.accuracyRate
         : itemsAttempted > 0
           ? parseFloat((correctCount / itemsAttempted).toFixed(2))
           : 0;
-    const severity =
-      e.severity ?? (accuracyRate < 0.4 ? "HIGH" : accuracyRate < 0.7 ? "MEDIUM" : "LOW");
+    const severity: Severity =
+      (e.severity as Severity) ??
+      (accuracyRate < 0.4 ? "HIGH" : accuracyRate < 0.7 ? "MEDIUM" : "LOW");
 
     return {
       topicTag,
@@ -215,7 +222,7 @@ export function normalizeSessionResult(raw: unknown): SessionResult {
   return {
     sessionId: String(raw.sessionId ?? raw.id ?? ""),
     completedAt: String(raw.completedAt ?? new Date().toISOString()),
-    cefrLevel: (raw.cefrLevel as any) ?? "B1",
+    cefrLevel: (raw.cefrLevel as CefrLevel) ?? "B1",
     cefrConfidence,
     boundaryEffect: Boolean(raw.boundaryEffect),
     ability: {
@@ -225,7 +232,9 @@ export function normalizeSessionResult(raw: unknown): SessionResult {
     },
     skillProfiles,
     errorPatterns,
-    aiRecommendations: Array.isArray(raw.aiRecommendations) ? raw.aiRecommendations : [],
+    aiRecommendations: Array.isArray(raw.aiRecommendations)
+      ? (raw.aiRecommendations as string[])
+      : [],
     meta: {
       itemsAdministered,
       durationSeconds,
@@ -241,7 +250,7 @@ export function normalizeSessionResult(raw: unknown): SessionResult {
  */
 export function normalizeReview(raw: unknown): ReviewEntry[] {
   if (!Array.isArray(raw)) return [];
-  return raw.map((entry: any, idx: number) => {
+  return raw.map((entry: Rec, idx: number) => {
     // Map field names: backend có thể trả questionNumber hoặc order
     const order: number =
       typeof entry.order === "number"
@@ -253,7 +262,7 @@ export function normalizeReview(raw: unknown): ReviewEntry[] {
     const content: string = String(entry.content ?? "");
 
     // Normalize options: có thể là Record<A,B,C,D> hoặc plain object
-    const rawOptions = entry.options ?? {};
+    const rawOptions = (isRec(entry.options) ? entry.options : {}) as Rec;
     const options: Options = {
       A: String(rawOptions.A ?? rawOptions.a ?? ""),
       B: String(rawOptions.B ?? rawOptions.b ?? ""),
@@ -262,13 +271,13 @@ export function normalizeReview(raw: unknown): ReviewEntry[] {
     };
 
     // chosen: backend có thể trả selectedAnswer hoặc chosen
-    const chosenRaw = entry.chosen ?? entry.selectedAnswer ?? entry.selected ?? "A";
+    const chosenRaw = String(entry.chosen ?? entry.selectedAnswer ?? entry.selected ?? "A");
     const chosen: OptionKey = (OPTION_KEYS as readonly string[]).includes(chosenRaw)
       ? (chosenRaw as OptionKey)
       : "A";
 
     // correct: backend có thể trả correctAnswer hoặc correct
-    const correctRaw = entry.correct ?? entry.correctAnswer ?? entry.answer ?? "A";
+    const correctRaw = String(entry.correct ?? entry.correctAnswer ?? entry.answer ?? "A");
     const correct: OptionKey = (OPTION_KEYS as readonly string[]).includes(correctRaw)
       ? (correctRaw as OptionKey)
       : "A";
@@ -286,7 +295,7 @@ export function normalizeReview(raw: unknown): ReviewEntry[] {
       correct,
       isCorrect,
       skill,
-      explanation: entry.explanation ?? null,
+      explanation: (entry.explanation as ReviewEntry["explanation"]) ?? null,
     };
   });
 }
