@@ -80,6 +80,10 @@ describe("auth", () => {
   it("điều hướng theo vai trò", () => {
     expect(routeVerdict("/teacher/items", null)).toBe("login");
     expect(routeVerdict("/login", null)).toBe("allow");
+    expect(routeVerdict("/forgot-password", null)).toBe("allow");
+    expect(routeVerdict("/reset-password", null)).toBe("allow");
+    expect(routeVerdict("/change-password", null)).toBe("login");
+    expect(routeVerdict("/change-password", "TEACHER")).toBe("allow");
     expect(routeVerdict("/login", "STUDENT")).toBe("redirect-home");
     expect(routeVerdict("/teacher/items", "STUDENT")).toBe("forbidden");
     expect(routeVerdict("/", "TEACHER")).toBe("redirect-home");

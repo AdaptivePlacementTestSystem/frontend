@@ -4,7 +4,7 @@ const PASSWORD = "password123";
 
 async function login(page: Page, identifier: string) {
   await page.goto("/login");
-  await page.getByLabel("Email hoặc MSSV").fill(identifier);
+  await page.getByLabel("Email").fill(identifier);
   await page.getByLabel("Mật khẩu").fill(PASSWORD);
   await page.getByTestId("login-submit").click();
   await expect(page.getByTestId("user-name")).toBeVisible(); // đã vào trang đích, tránh đua với chuyển hướng
@@ -18,7 +18,7 @@ test.describe("đăng nhập và phân quyền", () => {
 
   test("sai mật khẩu hiện lỗi, không lộ ô nào sai", async ({ page }) => {
     await page.goto("/login");
-    await page.getByLabel("Email hoặc MSSV").fill("sv001@example.test");
+    await page.getByLabel("Email").fill("sv001@example.test");
     await page.getByLabel("Mật khẩu").fill("sai-mat-khau");
     await page.getByTestId("login-submit").click();
     await expect(page.getByTestId("login-error")).toContainText("không chính xác");

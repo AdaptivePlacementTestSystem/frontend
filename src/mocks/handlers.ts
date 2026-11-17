@@ -110,6 +110,24 @@ export function createHandlers(db: MockDb): HttpHandler[] {
       return u ? HttpResponse.json(publicUser(u)) : err(401, "UNAUTHENTICATED", "Chưa đăng nhập");
     }),
 
+    // Quên/đặt lại/đổi mật khẩu (UCSV08/09). OTP giả luôn là 123456; mật khẩu hiện tại giả là MOCK_PASSWORD.
+    http.post(`${API}/auth/forgot-password`, () => new HttpResponse(null, { status: 202 })),
+    http.post(`${API}/auth/reset-password`, async ({ request }: Req) => {
+      const b = (await request.json().catch(() => null)) as { otp?: string } | null;
+      return b?.otp === "123456"
+        ? new HttpResponse(null, { status: 204 })
+        : err(400, "INVALID_RESET_OTP", "Mã không đúng hoặc đã hết hạn");
+    }),
+    http.post(`${API}/auth/change-password`, async ({ request }: Req) => {
+      const u = authUser(request);
+      if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");
+      const b = (await request.json().catch(() => null)) as { currentPassword?: string } | null;
+      // Backend thật chưa có mã riêng ⇒ trả 400 không kèm `code`, giống BFF mong đợi
+      if (b?.currentPassword !== MOCK_PASSWORD)
+        return HttpResponse.json({ message: "Mật khẩu hiện tại không đúng" }, { status: 400 });
+      return HttpResponse.json({ accessToken: makeMockToken(u, db.now()) });
+    }),
+
     // ───────── Phiên thi ─────────
     http.post(`${API}/sessions`, ({ request }: Req) => {
       const u = authUser(request);
