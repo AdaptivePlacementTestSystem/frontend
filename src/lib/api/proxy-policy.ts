@@ -6,6 +6,7 @@ const ALLOWED: readonly RegExp[] = [
   /^auth\/me$/,
   /^sessions(\/[A-Za-z0-9-]+(\/(next-item|responses|resume|result|review))?)?$/,
   /^sessions\/active$/,
+  /^exam-rounds(\/(mine|[A-Za-z0-9-]+(\/session\/current)?))?$/,
   /^items(\/(generate-explanation|[A-Za-z0-9-]+(\/(approve|reject|clone))?))?$/,
   /^placement-profiles\/[A-Za-z0-9._-]+(\/history)?$/,
   /^reports\/(class-distribution|error-patterns|export-csv|overview)$/,

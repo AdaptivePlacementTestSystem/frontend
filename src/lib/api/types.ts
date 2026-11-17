@@ -43,6 +43,60 @@ export interface SessionMeta {
   serverTime: string;
 }
 
+export interface StudentExamRound {
+  id: string;
+  title: string;
+  opensAt: string;
+  closesAt: string;
+  durationMinutes: number;
+  status: string;
+  effectiveStatus: string;
+  sessionStatus: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  sessionId?: string;
+  scoreCefr?: string | null;
+}
+
+export interface ExamRoundDetail {
+  id: string;
+  title: string;
+  opensAt: string;
+  closesAt: string;
+  durationMinutes: number;
+  status: string;
+  effectiveStatus: string;
+  sessionStatus?: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+  sessionId?: string;
+  activeSessionId?: string;
+}
+
+export type CurrentRoundSessionStatus =
+  | "NOT_STARTED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "ABANDONED";
+
+export interface CurrentRoundSessionResponse {
+  status: CurrentRoundSessionStatus;
+  sessionId?: string;
+  examRoundId?: string;
+  startedAt?: string;
+  expiresAt?: string;
+  serverTime?: string;
+  itemCount?: number;
+  maxItems?: number;
+  currentItem?: ExamItem | null;
+  completedAt?: string | null;
+  stoppingReason?: string | null;
+  isExpired?: boolean;
+}
+
+export interface ResumeSessionResponse {
+  examRoundId?: string;
+  currentItem: ExamItem | null;
+  state: any;
+  isExpired?: boolean;
+}
+
 /** Câu hỏi khi thi: KHÔNG có đáp án đúng, KHÔNG có cefrTarget, KHÔNG có irtB (SRS 15.3). */
 export interface ExamItem {
   id: string;
@@ -62,6 +116,7 @@ export interface SubmitResult {
 
 export interface ActiveSession {
   sessionId: string;
+  examRoundId?: string;
   itemCount: number;
   maxItems: number;
   expiresAt: string;
@@ -81,8 +136,8 @@ export interface StartSessionResponse {
 // ───────── Kết quả ─────────
 export interface SkillProfile {
   skill: Skill;
-  scorePercent: number;
-  cefrEstimate: CefrLevel;
+  scorePercent?: number;
+  cefrEstimate?: CefrLevel;
   itemsAdministered: number;
   correctCount: number;
 }
@@ -130,11 +185,16 @@ export interface ReviewEntry {
 
 export interface HistoryRow {
   sessionId: string;
-  completedAt: string;
+  examRoundId?: string;
+  examRoundTitle?: string;
+  startedAt?: string;
+  completedAt: string | null;
   itemsAdministered: number;
-  cefrLevel: CefrLevel;
-  theta: number;
-  standardError: number;
+  cefrLevel: CefrLevel | null;
+  theta: number | null;
+  standardError: number | null;
+  status?: SessionStatus;
+  stoppingReason?: StoppingReason | null;
 }
 
 // ───────── Ngân hàng câu hỏi ─────────

@@ -51,7 +51,6 @@ export function ChangePasswordForm({ forced }: { forced: boolean }) {
     resolver: zodResolver(schema),
     defaultValues: { currentPassword: "", newPassword: "", confirm: "" },
   });
-
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
     try {
@@ -68,6 +67,8 @@ export function ChangePasswordForm({ forced }: { forced: boolean }) {
       if (e instanceof ApiError && e.code === "CURRENT_PASSWORD_INVALID") {
         resetField("currentPassword");
         setFocus("currentPassword");
+      } else if (e instanceof ApiError && e.code === "VALIDATION_FAILED") {
+        setFocus("newPassword");
       }
     }
   });
@@ -101,7 +102,7 @@ export function ChangePasswordForm({ forced }: { forced: boolean }) {
           autoComplete="new-password"
           placeholder={t.newPlaceholder(PASSWORD_MIN_LENGTH)}
           error={errors.newPassword?.message}
-          hint={vi.auth.passwordHint(PASSWORD_MIN_LENGTH)}
+          hint="Tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt."
           data-testid="cp-new"
           {...register("newPassword")}
         />
