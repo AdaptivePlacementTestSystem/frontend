@@ -46,11 +46,7 @@ export async function POST(req: NextRequest) {
     if (code) return bffError(upstream.status, code, messageStr ?? "Không đổi được mật khẩu.");
     // 400 không kèm mã là lỗi kiểm tra dữ liệu (ví dụ mật khẩu mới không đạt chính sách), KHÔNG phải sai mật khẩu hiện tại
     if (upstream.status === 400 || upstream.status === 422) {
-      return bffError(
-        400,
-        "VALIDATION_FAILED",
-        messageStr ?? "Mật khẩu mới chưa đạt yêu cầu.",
-      );
+      return bffError(400, "VALIDATION_FAILED", messageStr ?? "Mật khẩu mới chưa đạt yêu cầu.");
     }
     if (upstream.status === 401) {
       return bffError(400, "CURRENT_PASSWORD_INVALID", "Mật khẩu hiện tại không đúng.");

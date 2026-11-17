@@ -40,9 +40,7 @@ describe("S03 - ExamIntro Component", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Kỳ thi xếp lớp tiếng Anh học kỳ 1 năm 2026"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Kỳ thi xếp lớp tiếng Anh học kỳ 1 năm 2026")).toBeInTheDocument();
     });
 
     // 6 lưu ý quan trọng

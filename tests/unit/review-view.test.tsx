@@ -55,9 +55,7 @@ describe("S06 - ReviewView Component", () => {
     expect(screen.getByTestId("review-item-1")).toBeInTheDocument();
     expect(screen.getByTestId("chosen-mark")).toHaveTextContent("Bạn đã chọn");
     expect(screen.getByTestId("correct-mark")).toHaveTextContent("Đáp án đúng");
-    expect(screen.getByTestId("explanation-general")).toHaveTextContent(
-      "have an impact on",
-    );
+    expect(screen.getByTestId("explanation-general")).toHaveTextContent("have an impact on");
   });
 
   it("hiển thị thông báo khi tính năng xem lại bị khóa (REVIEW_DISABLED)", async () => {

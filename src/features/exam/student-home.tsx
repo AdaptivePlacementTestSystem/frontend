@@ -69,15 +69,11 @@ export function StudentHome() {
           <AlertTriangle className="h-5 w-5 text-amber-600" />
           <AlertDescription className="ml-2 flex items-center justify-between">
             <span>
-              {closed.status === "ABANDONED"
-                ? vi.home.closedAbandoned
-                : vi.home.closedCompleted}
+              {closed.status === "ABANDONED" ? vi.home.closedAbandoned : vi.home.closedCompleted}
             </span>
             {closed.status === "COMPLETED" && (
               <Button asChild variant="link" size="sm" className="font-semibold underline">
-                <Link href={`/results/${closed.sessionId}`}>
-                  {vi.exam.viewResult}
-                </Link>
+                <Link href={`/results/${closed.sessionId}`}>{vi.exam.viewResult}</Link>
               </Button>
             )}
           </AlertDescription>
@@ -137,19 +133,14 @@ export function StudentHome() {
       {/* 2. My Exam Rounds Section: Danh sách kỳ thi của tôi */}
       <section data-testid="my-rounds" className="space-y-4">
         <div className="flex items-center justify-between pb-1">
-          <h2 className="text-xl font-bold text-on-surface">
-            Kỳ thi của tôi
-          </h2>
+          <h2 className="text-xl font-bold text-on-surface">Kỳ thi của tôi</h2>
           <span className="text-xs font-semibold text-on-surface-variant">
             {rounds.length} đợt khảo thí
           </span>
         </div>
 
         {roundsQuery.isError ? (
-          <ErrorBlock
-            error={roundsQuery.error}
-            onRetry={() => roundsQuery.refetch()}
-          />
+          <ErrorBlock error={roundsQuery.error} onRetry={() => roundsQuery.refetch()} />
         ) : rounds.length === 0 ? (
           <div className="rounded-xl border border-dashed border-outline-variant/60 bg-surface-container-lowest p-8 text-center text-on-surface-variant">
             <Layers className="mx-auto mb-2 h-8 w-8 text-outline" />
@@ -201,9 +192,7 @@ export function StudentHome() {
                         </span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-on-surface">
-                        {round.title}
-                      </h3>
+                      <h3 className="text-lg font-bold text-on-surface">{round.title}</h3>
 
                       <p className="flex items-center gap-1.5 text-xs text-on-surface-variant">
                         <Calendar className="h-3.5 w-3.5 text-outline" />

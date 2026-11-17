@@ -28,9 +28,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
           className="flex flex-col items-center justify-center py-16 text-center space-y-3"
         >
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-base font-medium text-on-surface">
-            {vi.result.pending}
-          </p>
+          <p className="text-base font-medium text-on-surface">{vi.result.pending}</p>
           <p className="text-xs text-on-surface-variant">
             Hệ thống đang tổng hợp dữ liệu và sinh phân tích năng lực từ thuật toán CAT...
           </p>

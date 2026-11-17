@@ -182,7 +182,9 @@ export function createHandlers(db: MockDb): HttpHandler[] {
           serverTime: new Date(db.now()).toISOString(),
           itemCount: active.answers.length,
           maxItems: 25,
-          currentItem: active.currentItemId ? (db.items.find((i) => i.id === active.currentItemId) ?? null) : null,
+          currentItem: active.currentItemId
+            ? (db.items.find((i) => i.id === active.currentItemId) ?? null)
+            : null,
         });
       }
       return HttpResponse.json({

@@ -52,9 +52,7 @@ describe("S07 - HistoryView Component", () => {
     });
 
     expect(screen.getByTestId("history-row-sess-hist-1")).toBeInTheDocument();
-    expect(
-      screen.getAllByText("Kỳ thi xếp lớp đầu khóa 2026").length,
-    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Kỳ thi xếp lớp đầu khóa 2026").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("B1").length).toBeGreaterThanOrEqual(1);
 
     expect(screen.getByTestId("history-row-sess-hist-2")).toBeInTheDocument();
@@ -71,9 +69,7 @@ describe("S07 - HistoryView Component", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Bạn chưa hoàn thành bài thi nào."),
-      ).toBeInTheDocument();
+      expect(screen.getByText("Bạn chưa hoàn thành bài thi nào.")).toBeInTheDocument();
     });
   });
 });
