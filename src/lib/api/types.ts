@@ -189,11 +189,14 @@ export interface ItemFilters {
 }
 
 // ───────── Báo cáo ─────────
+/** `GET /reports/class-distribution` — đúng dạng backend trả (ClassReportEntity). */
 export interface ClassDistribution {
-  total: number;
-  distribution: { cefrLevel: CefrLevel; count: number }[];
-  /** Chỉ Admin (UCADM05). */
-  itemsByStatus?: { status: ItemStatus; count: number }[];
+  examRoundId: string | null;
+  totalStudents: number;
+  /** Số sinh viên theo từng mức CEFR (đủ 6 khóa). */
+  cefrDistribution: Record<CefrLevel, number>;
+  averageTheta: number;
+  generatedAt: string;
 }
 
 export interface ClassErrorPattern {
@@ -204,6 +207,126 @@ export interface ClassErrorPattern {
 }
 
 export type ExportType = "distribution" | "profiles";
+
+// ───────── Tổng quan hệ thống cho Admin (F-29, S36; SRS 9b.19) ─────────
+/** Một dòng bảng "Kỳ thi đang mở". `notStarted + inProgress + completed = participantCount`. */
+export interface OpenRoundRow {
+  id: string;
+  name: string;
+  opensAt: string;
+  closesAt: string;
+  durationMinutes: number;
+  participantCount: number;
+  notStarted: number;
+  inProgress: number;
+  completed: number;
+}
+
+export interface SystemOverview {
+  examRoundId: string | null;
+  studentsCompleted: number;
+  finalApprovedItems: number;
+  batchesNeedingAction: number;
+  openExamRounds: number;
+  cefrDistribution: Record<CefrLevel, number>;
+  itemStatusCounts: Record<ItemStatus, number>;
+  openRounds: OpenRoundRow[];
+  generatedAt: string;
+}
+
+// ───────── Quản lý tài khoản SV/GV của Admin (F-22, S24) ─────────
+export type AccountKind = "STUDENT" | "TEACHER";
+
+/** Phản hồi của backend; không bao giờ có mật khẩu hay mã băm. */
+export interface AdminAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  /** STUDENT, TEACHER hoặc ADMIN (Admin nằm trong danh sách giảng viên để thu hồi quyền). */
+  role: UserRole;
+  /** MSSV; chỉ sinh viên có. */
+  studentCode?: string;
+  /** Mã giảng viên; GV và Admin có. */
+  teacherCode?: string;
+  isActive: boolean;
+  /** `true` khi chưa đổi mật khẩu tạm (cột "Đã đổi mật khẩu: Chưa"). */
+  mustChangePassword: boolean;
+  createdAt: string;
+}
+
+/** Phân trang của backend cho danh sách tài khoản. */
+export interface AccountPage {
+  items: AdminAccount[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface AccountQuery {
+  q?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+/** Dữ liệu tạo mới: SV gửi `studentCode`, GV gửi `teacherCode`. */
+export interface CreateAccountBody {
+  studentCode?: string;
+  teacherCode?: string;
+  fullName: string;
+  email: string;
+}
+
+export interface UpdateAccountBody {
+  fullName?: string;
+  email?: string;
+}
+
+export type AssignableRole = "ADMIN" | "TEACHER";
+
+// ───────── Import tài khoản bằng file (S19, UCADM08) ─────────
+/** Một dòng đã hợp lệ trong lưới tạm (Redis, chưa ghi DB). `code` là MSSV hoặc Mã GV theo loại. */
+export interface ImportGridRow {
+  rowKey: string;
+  code: string;
+  fullName: string;
+  email: string;
+}
+
+export type ImportRejectCode = "MISSING_FIELD" | "INVALID_EMAIL" | "DUPLICATE_IN_FILE";
+
+/** Dòng bị loại vì không hợp lệ; `row` là số dòng trong file Excel. */
+export interface ImportRejectedRow {
+  row: number;
+  code: ImportRejectCode;
+  reason: string;
+}
+
+/** Dòng trùng tài khoản đã có trong hệ thống (popup riêng, không vào lưới). */
+export interface ImportExistingRow {
+  row: number;
+  field: "email" | "code";
+  value: string;
+}
+
+export interface ImportUploadResult {
+  grid: ImportGridRow[];
+  rejected: ImportRejectedRow[];
+  existing: ImportExistingRow[];
+  added: number;
+  ignoredDuplicates: number;
+}
+
+/** Trạng thái lần Lưu chạy nền; `NONE` khi chưa có hoặc đã hết hạn. Không chứa mật khẩu. */
+export type ImportSaveStatus =
+  | { status: "NONE" }
+  | {
+      status: "PROCESSING" | "DONE" | "FAILED";
+      total: number;
+      processed: number;
+      created?: number;
+      queued?: number;
+      error?: { code: "CONFLICT" | "UNKNOWN"; message: string; conflicts?: ImportExistingRow[] };
+    };
 
 export interface StudentProfileView {
   student: { studentCode: string; fullName: string };

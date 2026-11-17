@@ -4,6 +4,12 @@ import "./src/lib/env";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Chỉ ảnh hưởng `next dev`: cho phép mở bằng IP mạng LAN (vd. http://10.10.60.2:3000).
+  // Đặt ALLOWED_DEV_ORIGINS="10.10.60.2,192.168.1.5" (phân tách bằng dấu phẩy) khi cần.
+  allowedDevOrigins: (process.env.ALLOWED_DEV_ORIGINS ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
   turbopack: {
     rules: {
       "*.css": {

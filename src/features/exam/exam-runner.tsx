@@ -14,6 +14,7 @@ import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { getNextItem, submitResponse } from "@/lib/api/endpoints";
 import { ApiError } from "@/lib/api/errors";
 import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import { OPTION_KEYS, type ExamItem, type OptionKey, type SessionMeta } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 import { formatClock, useCountdown } from "./use-countdown";
@@ -62,7 +63,7 @@ function Question({ sessionId, item, session, receivedAt, onExpired }: QuestionP
         toast.info(errorMessage(e));
         router.replace("/");
       } else {
-        toast.error(errorMessage(e)); // lỗi mạng: giữ nguyên lựa chọn để thử nộp lại
+        notifyError(e); // lỗi mạng: giữ nguyên lựa chọn để thử nộp lại
       }
     },
   });

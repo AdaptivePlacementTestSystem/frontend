@@ -27,13 +27,18 @@ export const getSessionUser = cache(async (): Promise<CurrentUser | null> => {
   }
 });
 
-type Audience = "student" | "staff";
+type Audience = "student" | "staff" | "admin";
 
 /** Chặn truy cập theo vai trò ở layout (bổ sung cho proxy.ts; vẫn chỉ là UX, backend kiểm quyền thật). */
 export async function requireUser(audience: Audience): Promise<CurrentUser> {
   const user = await getSessionUser();
   if (!user) redirect("/login");
-  const ok = audience === "staff" ? isStaff(user.role) : user.role === "STUDENT";
-  if (!ok) redirect(audience === "staff" ? "/403" : homeFor(user.role));
+  const ok =
+    audience === "admin"
+      ? user.role === "ADMIN"
+      : audience === "staff"
+        ? isStaff(user.role)
+        : user.role === "STUDENT";
+  if (!ok) redirect(audience === "student" ? homeFor(user.role) : "/403");
   return user;
 }

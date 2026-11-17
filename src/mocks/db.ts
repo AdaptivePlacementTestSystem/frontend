@@ -500,27 +500,18 @@ export function historyFor(db: MockDb, studentId: string): HistoryRow[] {
 }
 
 // ───────── Báo cáo mẫu ─────────
-export function mockDistribution(isAdmin: boolean, db: MockDb): ClassDistribution {
+export function mockDistribution(): ClassDistribution {
   const levels: CefrLevel[] = ["PRE_A1", "A1", "A2", "B1", "B2", "C1_PLUS"];
   const counts = [1, 6, 14, 11, 4, 0];
   const out: ClassDistribution = {
-    total: counts.reduce((a, b) => a + b, 0),
-    distribution: levels.map((cefrLevel, i) => ({ cefrLevel, count: counts[i] ?? 0 })),
+    examRoundId: null,
+    totalStudents: counts.reduce((a, b) => a + b, 0),
+    cefrDistribution: Object.fromEntries(
+      levels.map((cefrLevel, i) => [cefrLevel, counts[i] ?? 0]),
+    ) as ClassDistribution["cefrDistribution"],
+    averageTheta: 0.12,
+    generatedAt: new Date().toISOString(),
   };
-  if (isAdmin) {
-    const statuses: ItemStatus[] = [
-      "DRAFT",
-      "FIRST_APPROVED",
-      "SECOND_APPROVED",
-      "FINAL_APPROVED",
-      "REJECTED",
-      "AI_REJECTED",
-    ];
-    out.itemsByStatus = statuses.map((status) => ({
-      status,
-      count: db.items.filter((i) => i.status === status).length,
-    }));
-  }
   return out;
 }
 

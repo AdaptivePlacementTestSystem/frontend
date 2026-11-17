@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlert, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { bffRequest } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import { PASSWORD_MIN_LENGTH } from "@/lib/auth/password-policy";
 import { vi } from "@/messages/vi";
 import { PasswordField } from "./password-field";
@@ -44,7 +44,6 @@ export function ChangePasswordForm({ forced }: { forced: boolean }) {
   const {
     register,
     handleSubmit,
-    control,
     resetField,
     setFocus,
     formState: { errors, isSubmitting },
@@ -52,12 +51,6 @@ export function ChangePasswordForm({ forced }: { forced: boolean }) {
     resolver: zodResolver(schema),
     defaultValues: { currentPassword: "", newPassword: "", confirm: "" },
   });
-
-  const [current, next, confirm] = useWatch({
-    control,
-    name: ["currentPassword", "newPassword", "confirm"],
-  });
-  const ready = !!current && next.length >= PASSWORD_MIN_LENGTH && confirm === next;
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
@@ -71,7 +64,7 @@ export function ChangePasswordForm({ forced }: { forced: boolean }) {
       router.replace("/");
       router.refresh();
     } catch (e) {
-      setServerError(errorMessage(e));
+      setServerError(notifyError(e));
       if (e instanceof ApiError && e.code === "CURRENT_PASSWORD_INVALID") {
         resetField("currentPassword");
         setFocus("currentPassword");
@@ -135,7 +128,7 @@ export function ChangePasswordForm({ forced }: { forced: boolean }) {
 
         <Button
           type="submit"
-          disabled={isSubmitting || !ready}
+          disabled={isSubmitting}
           data-testid="cp-submit"
           className="mt-1 h-12 w-full rounded-xl text-base font-semibold"
         >

@@ -8,7 +8,12 @@ const ALLOWED: readonly RegExp[] = [
   /^sessions\/active$/,
   /^items(\/(generate-explanation|[A-Za-z0-9-]+(\/(approve|reject|clone))?))?$/,
   /^placement-profiles\/[A-Za-z0-9._-]+(\/history)?$/,
-  /^reports\/(class-distribution|error-patterns|export-csv)$/,
+  /^reports\/(class-distribution|error-patterns|export-csv|overview)$/,
+  /^(students|teachers)(\/[A-Za-z0-9-]+)?$/,
+  /^users\/[A-Za-z0-9-]+\/(lock|unlock|resend-temporary-password|role)$/,
+  // Import tài khoản bằng file (S19): `import` là đoạn cố định, không trùng id người dùng
+  /^users\/import\/(upload|grid|save|save-status|template)$/,
+  /^users\/import\/grid\/[A-Za-z0-9-]+$/,
 ];
 
 export function isAllowedProxyPath(segments: readonly string[]): boolean {

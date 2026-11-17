@@ -1,7 +1,9 @@
-export default function Page() {
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">import</h1>
-    </div>
-  );
+import { ImportAccountsView } from "@/features/admin-import/import-accounts-view";
+
+export default async function ImportAccountsPage({
+  searchParams,
+}: PageProps<"/admin/users/import">) {
+  const kind = (await searchParams).kind;
+  // `?kind=STUDENT|TEACHER` chọn sẵn loại theo tab đã bấm Import; mặc định sinh viên
+  return <ImportAccountsView initialKind={kind === "TEACHER" ? "TEACHER" : "STUDENT"} />;
 }

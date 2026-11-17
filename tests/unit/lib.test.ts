@@ -88,7 +88,8 @@ describe("auth", () => {
     expect(routeVerdict("/teacher/items", "STUDENT")).toBe("forbidden");
     expect(routeVerdict("/", "TEACHER")).toBe("redirect-home");
     expect(routeVerdict("/exam/1", "STUDENT")).toBe("allow");
-    expect(homeFor("ADMIN")).toBe("/teacher/items");
+    expect(homeFor("ADMIN")).toBe("/admin/dashboard");
+    expect(homeFor("TEACHER")).toBe("/teacher/items");
     expect(homeFor("STUDENT")).toBe("/");
   });
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, CircleAlert, Loader2, MailCheck } from "lucide-react";
 import { z } from "zod";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { bffRequest } from "@/lib/api/client";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import { vi } from "@/messages/vi";
 import { authInputClass } from "./auth-styles";
 import { emailSchema } from "./password-schema";
@@ -30,11 +30,9 @@ export function ForgotPasswordForm() {
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors, isSubmitting },
   } = useForm<Values>({ resolver: zodResolver(schema), defaultValues: { email: "" } });
 
-  const email = useWatch({ control, name: "email" });
   const locked = cooldown.left > 0;
 
   const onSubmit = handleSubmit(async (values) => {
@@ -44,7 +42,7 @@ export function ForgotPasswordForm() {
       setSentTo(values.email);
       cooldown.start(RESEND_LOCK_SECONDS);
     } catch (e) {
-      setServerError(errorMessage(e));
+      setServerError(notifyError(e));
     }
   });
 
@@ -102,7 +100,7 @@ export function ForgotPasswordForm() {
 
         <Button
           type="submit"
-          disabled={isSubmitting || locked || !email.trim()}
+          disabled={isSubmitting || locked}
           data-testid="fp-submit"
           className="h-12 w-full rounded-xl text-base font-semibold"
         >

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight, CircleAlert, Loader2 } from "lucide-react";
 import { z } from "zod";
@@ -11,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { bffRequest } from "@/lib/api/client";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import type { CurrentUser } from "@/lib/api/types";
 import { homeFor } from "@/lib/auth/roles";
 import { vi } from "@/messages/vi";
@@ -35,7 +36,6 @@ export function LoginForm({ next }: { next?: string }) {
   const {
     register,
     handleSubmit,
-    control,
     resetField,
     setFocus,
     formState: { errors, isSubmitting },
@@ -44,10 +44,11 @@ export function LoginForm({ next }: { next?: string }) {
     defaultValues: { email: "", password: "" },
   });
 
-  const [email, password] = useWatch({ control, name: ["email", "password"] });
-  const empty = !email.trim() || !password;
+  const onInvalid = () => {
+    toast.error(vi.login.fillAll, { id: vi.login.fillAll });
+  };
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onValid = async (values: Values) => {
     setServerError(null);
     try {
       const { user, mustChangePassword } = await bffRequest<{
@@ -60,11 +61,12 @@ export function LoginForm({ next }: { next?: string }) {
       );
       router.refresh();
     } catch (e) {
-      setServerError(errorMessage(e));
+      setServerError(notifyError(e));
       resetField("password"); // giữ nguyên Email, xóa Mật khẩu, đưa con trỏ về ô Mật khẩu
       setFocus("password");
     }
-  });
+  };
+  const onSubmit = handleSubmit(onValid, onInvalid);
 
   return (
     <div className="w-full max-w-[360px]">
@@ -132,7 +134,7 @@ export function LoginForm({ next }: { next?: string }) {
 
         <Button
           type="submit"
-          disabled={isSubmitting || empty}
+          disabled={isSubmitting}
           data-testid="login-submit"
           className="mt-1 h-12 w-full rounded-xl text-base font-semibold"
         >

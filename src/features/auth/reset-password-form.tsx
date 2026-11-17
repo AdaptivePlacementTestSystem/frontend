@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { bffRequest } from "@/lib/api/client";
-import { errorMessage } from "@/lib/api/error-message";
+import { notifyError } from "@/lib/api/notify-error";
 import { PASSWORD_MIN_LENGTH } from "@/lib/auth/password-policy";
 import { vi } from "@/messages/vi";
 import { authInputClass } from "./auth-styles";
@@ -52,15 +52,7 @@ export function ResetPasswordForm({ email: initialEmail }: { email?: string }) {
     defaultValues: { email: initialEmail ?? "", otp: "", newPassword: "", confirm: "" },
   });
 
-  const [email, otp, newPassword, confirm] = useWatch({
-    control,
-    name: ["email", "otp", "newPassword", "confirm"],
-  });
-  const ready =
-    !!email.trim() &&
-    otp.length === OTP_LENGTH &&
-    newPassword.length >= PASSWORD_MIN_LENGTH &&
-    confirm === newPassword;
+  const otp = useWatch({ control, name: "otp" });
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
@@ -72,7 +64,7 @@ export function ResetPasswordForm({ email: initialEmail }: { email?: string }) {
       toast.success(t.success);
       router.replace("/login");
     } catch (e) {
-      setServerError(errorMessage(e));
+      setServerError(notifyError(e));
       resetField("otp"); // OTP dùng một lần, sai quá 5 lần bị hủy (BR-14)
       setFocus("otp");
     }
@@ -173,7 +165,7 @@ export function ResetPasswordForm({ email: initialEmail }: { email?: string }) {
 
         <Button
           type="submit"
-          disabled={isSubmitting || !ready}
+          disabled={isSubmitting}
           data-testid="rp-submit"
           className="h-12 w-full rounded-xl text-base font-semibold"
         >

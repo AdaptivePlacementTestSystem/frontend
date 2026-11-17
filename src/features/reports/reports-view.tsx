@@ -1,8 +1,8 @@
 "use client";
 
+import { CEFR_LEVELS } from "@apt/shared-types";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/table";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { downloadCsv, getClassDistribution, getClassErrorPatterns } from "@/lib/api/endpoints";
-import { errorMessage } from "@/lib/api/error-message";
+import { ApiError } from "@/lib/api/errors";
+import { notifyError } from "@/lib/api/notify-error";
 import type { ExportType } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 
@@ -36,7 +37,15 @@ export function ReportsView() {
   });
   const errs = useQuery({
     queryKey: ["report", "errors"],
-    queryFn: ({ signal }) => getClassErrorPatterns(undefined, signal),
+    queryFn: async ({ signal }) => {
+      try {
+        return await getClassErrorPatterns(undefined, signal);
+      } catch (e) {
+        // Backend chưa có thống kê lỗi thường gặp (GET /reports/error-patterns): coi như chưa có dữ liệu, không báo lỗi
+        if (e instanceof ApiError && e.status === 404) return [];
+        throw e;
+      }
+    },
   });
   const [busy, setBusy] = useState<ExportType | null>(null);
 
@@ -46,14 +55,16 @@ export function ReportsView() {
       const { blob, filename } = await downloadCsv(type);
       saveBlob(blob, filename);
     } catch (e) {
-      toast.error(errorMessage(e));
+      notifyError(e);
     } finally {
       setBusy(null);
     }
   };
 
-  const chart =
-    dist.data?.distribution.map((d) => ({ name: vi.cefrLevel[d.cefrLevel], count: d.count })) ?? [];
+  const chart = CEFR_LEVELS.map((level) => ({
+    name: vi.cefrLevel[level],
+    count: dist.data?.cefrDistribution?.[level] ?? 0,
+  }));
 
   return (
     <div className="space-y-4">
@@ -90,12 +101,12 @@ export function ReportsView() {
             <LoadingBlock rows={3} />
           ) : dist.isError ? (
             <ErrorBlock error={dist.error} onRetry={() => dist.refetch()} />
-          ) : dist.data.total === 0 ? (
+          ) : dist.data.totalStudents === 0 ? (
             <EmptyBlock text={vi.reports.empty} />
           ) : (
             <>
               <p className="mb-2 text-sm text-muted-foreground" data-testid="report-total">
-                {vi.reports.total}: {dist.data.total}
+                {vi.reports.total}: {dist.data.totalStudents}
               </p>
               <div className="h-64 w-full" role="img" aria-label={vi.reports.distribution}>
                 <ResponsiveContainer width="100%" height="100%" minWidth={0}>
@@ -108,14 +119,6 @@ export function ReportsView() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              {dist.data.itemsByStatus && (
-                <p className="mt-3 text-sm">
-                  {vi.reports.itemsByStatus}:{" "}
-                  {dist.data.itemsByStatus
-                    .map((s) => `${vi.itemStatus[s.status]} ${s.count}`)
-                    .join(" · ")}
-                </p>
-              )}
             </>
           )}
         </CardContent>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { bffError, postUpstream } from "@/lib/api/bff-upstream";
+import { bffError, postUpstream, rateLimitedResponse } from "@/lib/api/bff-upstream";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
   const upstream = await postUpstream("/auth/forgot-password", parsed.data);
   if (!upstream) return bffError(502, "NETWORK", "Không kết nối được máy chủ.");
-  if (upstream.status === 429) return bffError(429, "RATE_LIMITED", "Quá nhiều yêu cầu."); // theo email + IP
+  if (upstream.status === 429) return rateLimitedResponse(upstream); // theo email + IP
   if (!upstream.ok) return bffError(502, "UNKNOWN", "Máy chủ gặp lỗi, vui lòng thử lại.");
   return new NextResponse(null, { status: 202 });
 }

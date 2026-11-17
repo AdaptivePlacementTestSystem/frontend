@@ -15,6 +15,14 @@ function error(status: number, code: string, message: string) {
  * BFF: nhận yêu cầu từ trình duyệt, gắn `Authorization: Bearer <token>` lấy từ cookie httpOnly rồi chuyển tới backend.
  * Trình duyệt (JavaScript) không bao giờ thấy token.
  */
+/** Thân yêu cầu: văn bản cho JSON, byte nguyên vẹn cho multipart/nhị phân. */
+async function readBody(req: NextRequest): Promise<string | ArrayBuffer> {
+  const type = req.headers.get("content-type") ?? "";
+  return type.startsWith("application/json") || type.startsWith("text/")
+    ? req.text()
+    : req.arrayBuffer();
+}
+
 async function handle(req: NextRequest, ctx: RouteContext<"/api/proxy/[...path]">) {
   const { path } = await ctx.params;
   if (!isAllowedProxyPath(path)) return error(404, "NOT_FOUND", "Không tìm thấy.");
@@ -34,7 +42,8 @@ async function handle(req: NextRequest, ctx: RouteContext<"/api/proxy/[...path]"
     upstream = await fetch(`${env.API_BASE_URL}/${path.join("/")}${req.nextUrl.search}`, {
       method: req.method,
       headers,
-      body: hasBody ? await req.text() : undefined,
+      // multipart (tải file import) là nhị phân: chuyển nguyên byte, không đọc như văn bản
+      body: hasBody ? await readBody(req) : undefined,
       cache: "no-store",
       redirect: "manual",
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
@@ -55,4 +64,4 @@ async function handle(req: NextRequest, ctx: RouteContext<"/api/proxy/[...path]"
   return res;
 }
 
-export { handle as GET, handle as POST, handle as PUT, handle as DELETE };
+export { handle as GET, handle as POST, handle as PUT, handle as PATCH, handle as DELETE };

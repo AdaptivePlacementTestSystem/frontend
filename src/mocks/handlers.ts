@@ -2,6 +2,7 @@ import { http, HttpResponse, type HttpHandler } from "msw";
 import { decodeJwtClaims } from "@/lib/auth/jwt";
 import type { CurrentUser, ItemDetail, OptionKey, StudentProfileView } from "@/lib/api/types";
 import { OPTION_KEYS } from "@/lib/api/types";
+import { createAdminHandlers } from "./admin-handlers";
 import { ITEM_STATUSES } from "@apt/shared-types";
 import {
   MOCK_DISPLAY_MAX_ITEMS,
@@ -93,6 +94,8 @@ export function createHandlers(db: MockDb): HttpHandler[] {
   };
 
   return [
+    // ───────── Khu Admin: tài khoản SV/GV, tổng quan hệ thống ─────────
+    ...createAdminHandlers({ api: API, authUser, err, now: db.now }),
     // ───────── Xác thực ─────────
     http.post(`${API}/auth/login`, async ({ request }: Req) => {
       const b = (await request.json().catch(() => null)) as {
@@ -308,7 +311,7 @@ export function createHandlers(db: MockDb): HttpHandler[] {
       const u = authUser(request);
       if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");
       if (!isStaffUser(u)) return err(403, "FORBIDDEN", "Không có quyền");
-      return HttpResponse.json(mockDistribution(u.role === "ADMIN", db));
+      return HttpResponse.json(mockDistribution());
     }),
     http.get(`${API}/reports/error-patterns`, ({ request }: Req) => {
       const u = authUser(request);
@@ -328,10 +331,7 @@ export function createHandlers(db: MockDb): HttpHandler[] {
               ["MSSV", "Họ tên", "CEFR"],
               ["SV2026001", "Nguyễn Văn An (mock)", "A2"],
             ])
-          : toCsv([
-              ["CEFR", "Số SV"],
-              ...mockDistribution(false, db).distribution.map((d) => [d.cefrLevel, d.count]),
-            ]);
+          : toCsv([["CEFR", "Số SV"], ...Object.entries(mockDistribution().cefrDistribution)]);
       return new HttpResponse(csv, {
         headers: {
           "content-type": "text/csv; charset=utf-8",

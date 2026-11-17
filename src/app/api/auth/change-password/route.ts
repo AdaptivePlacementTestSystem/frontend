@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { bffError, postUpstream, upstreamCode } from "@/lib/api/bff-upstream";
+import { bffError, postUpstream, rateLimitedResponse, upstreamCode } from "@/lib/api/bff-upstream";
 import { setTokenCookie } from "@/lib/auth/cookie";
 import { PASSWORD_MIN_LENGTH } from "@/lib/auth/password-policy";
 import { TOKEN_COOKIE } from "@/lib/auth/roles";
@@ -26,10 +26,18 @@ export async function POST(req: NextRequest) {
   if (!upstream) return bffError(502, "NETWORK", "Không kết nối được máy chủ.");
 
   if (!upstream.ok) {
+    if (upstream.status === 429) return rateLimitedResponse(upstream);
     const code = upstreamCode(upstream.data);
+    // Backend trả INVALID_CREDENTIALS khi mật khẩu hiện tại sai (change-password.use-case)
+    if (code === "INVALID_CREDENTIALS") {
+      return bffError(400, "CURRENT_PASSWORD_INVALID", "Mật khẩu hiện tại không đúng.");
+    }
     if (code) return bffError(upstream.status, code, "Không đổi được mật khẩu.");
-    // TODO-CONFIRM: backend chưa có mã riêng cho "sai mật khẩu hiện tại" (SRS X chỉ ghi POST change-password).
-    if (upstream.status === 400 || upstream.status === 401) {
+    // 400 không kèm mã là lỗi kiểm tra dữ liệu (ví dụ mật khẩu mới không đạt chính sách), KHÔNG phải sai mật khẩu hiện tại
+    if (upstream.status === 400) {
+      return bffError(400, "VALIDATION_FAILED", "Mật khẩu mới chưa đạt yêu cầu.");
+    }
+    if (upstream.status === 401) {
       return bffError(400, "CURRENT_PASSWORD_INVALID", "Mật khẩu hiện tại không đúng.");
     }
     return bffError(502, "UNKNOWN", "Máy chủ gặp lỗi, vui lòng thử lại.");

@@ -1,9 +1,20 @@
-import { apiDownload, apiRequest, type DownloadResult } from "./client";
+import { apiDownload, apiRequest, apiUpload, type DownloadResult } from "./client";
 import { normalizeNextItem } from "./normalize";
 import { type ItemStatusValue as ItemStatus } from "@apt/shared-types";
 import type {
+  AccountKind,
+  AccountPage,
+  AccountQuery,
   ActiveSessionResponse,
+  AdminAccount,
+  AssignableRole,
   ClassDistribution,
+  ImportGridRow,
+  ImportSaveStatus,
+  ImportUploadResult,
+  CreateAccountBody,
+  SystemOverview,
+  UpdateAccountBody,
   ClassErrorPattern,
   CurrentUser,
   ExplanationContent,
@@ -45,6 +56,20 @@ export const endpoints = {
   classDistribution: () => "/reports/class-distribution", // code hiện tại: /reports/distribution (G-11)
   errorPatterns: () => "/reports/error-patterns",
   exportCsv: () => "/reports/export-csv",
+  overview: () => "/reports/overview", // F-29 (S36), chỉ ADMIN
+  accounts: (kind: AccountKind) => (kind === "STUDENT" ? "/students" : "/teachers"), // F-22 (S24)
+  account: (kind: AccountKind, id: string) =>
+    `${kind === "STUDENT" ? "/students" : "/teachers"}/${encodeURIComponent(id)}`,
+  // Thao tác tài khoản dùng chung SV/GV (chốt 14/11/2026: gộp về /users/:id/...)
+  // Import tài khoản bằng file (S19): lưới tạm theo (admin, loại)
+  importUpload: () => "/users/import/upload",
+  importGrid: () => "/users/import/grid",
+  importRow: (rowKey: string) => `/users/import/grid/${encodeURIComponent(rowKey)}`,
+  importSave: () => "/users/import/save",
+  importStatus: () => "/users/import/save-status",
+  importTemplate: () => "/users/import/template",
+  accountAction: (id: string, action: "lock" | "unlock" | "resend-temporary-password" | "role") =>
+    `/users/${encodeURIComponent(id)}/${action}`,
 } as const;
 
 // ───────── Xác thực ─────────
@@ -122,3 +147,64 @@ export const getClassErrorPatterns = (examRoundId?: string, signal?: AbortSignal
 
 export const downloadCsv = (type: ExportType, examRoundId?: string): Promise<DownloadResult> =>
   apiDownload(endpoints.exportCsv(), { query: { type, examRoundId } });
+
+// ───────── Tổng quan hệ thống (Admin) ─────────
+/** `examRoundId` chỉ lọc "SV đã thi" và phân phối CEFR (BR-13); các số còn lại luôn toàn hệ thống. */
+export const getSystemOverview = (examRoundId?: string, signal?: AbortSignal) =>
+  apiRequest<SystemOverview>(endpoints.overview(), { query: { examRoundId }, signal });
+
+// ───────── Quản lý tài khoản SV/GV (Admin) ─────────
+export const listAccounts = (kind: AccountKind, query: AccountQuery, signal?: AbortSignal) =>
+  apiRequest<AccountPage>(endpoints.accounts(kind), { query: { ...query }, signal });
+
+export const createAccount = (kind: AccountKind, body: CreateAccountBody) =>
+  apiRequest<AdminAccount>(endpoints.accounts(kind), { method: "POST", body });
+
+export const updateAccount = (kind: AccountKind, id: string, body: UpdateAccountBody) =>
+  apiRequest<AdminAccount>(endpoints.account(kind, id), { method: "PATCH", body });
+
+export const lockAccount = (id: string) =>
+  apiRequest<AdminAccount>(endpoints.accountAction(id, "lock"), { method: "POST" });
+
+export const unlockAccount = (id: string) =>
+  apiRequest<AdminAccount>(endpoints.accountAction(id, "unlock"), { method: "POST" });
+
+export const resendTemporaryPassword = (id: string) =>
+  apiRequest<AdminAccount>(endpoints.accountAction(id, "resend-temporary-password"), {
+    method: "POST",
+  });
+
+export const changeAccountRole = (id: string, role: AssignableRole) =>
+  apiRequest<AdminAccount>(endpoints.accountAction(id, "role"), {
+    method: "PATCH",
+    body: { role },
+  });
+
+// ───────── Import tài khoản bằng file (Admin, S19) ─────────
+export const uploadImportFile = (kind: AccountKind, file: File, signal?: AbortSignal) => {
+  const form = new FormData();
+  form.append("file", file);
+  return apiUpload<ImportUploadResult>(endpoints.importUpload(), form, { query: { kind }, signal });
+};
+
+export const getImportGrid = (kind: AccountKind, signal?: AbortSignal) =>
+  apiRequest<{ grid: ImportGridRow[] }>(endpoints.importGrid(), { query: { kind }, signal });
+
+export const removeImportRow = (kind: AccountKind, rowKey: string) =>
+  apiRequest<{ grid: ImportGridRow[] }>(endpoints.importRow(rowKey), {
+    method: "DELETE",
+    query: { kind },
+  });
+
+export const clearImportGrid = (kind: AccountKind) =>
+  apiRequest<void>(endpoints.importGrid(), { method: "DELETE", query: { kind } });
+
+/** Nút Lưu: trả ngay (202); tạo tài khoản chạy nền, theo dõi bằng `getImportStatus`. */
+export const saveImportGrid = (kind: AccountKind) =>
+  apiRequest<{ total: number }>(endpoints.importSave(), { method: "POST", query: { kind } });
+
+export const getImportStatus = (kind: AccountKind, signal?: AbortSignal) =>
+  apiRequest<ImportSaveStatus>(endpoints.importStatus(), { query: { kind }, signal });
+
+export const downloadImportTemplate = (kind: AccountKind): Promise<DownloadResult> =>
+  apiDownload(endpoints.importTemplate(), { query: { kind } });

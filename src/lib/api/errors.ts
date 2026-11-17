@@ -17,6 +17,18 @@ export class ApiError extends Error {
     this.details = details;
   }
 
+  /**
+   * Số giây phải chờ khi bị giới hạn tần suất (429). Backend ghi thẳng vào thông điệp
+   * ("Vui lòng thử lại sau 60 giây."), BFF chuyển tiếp nguyên văn; cũng đọc `retryAfterSeconds` nếu có.
+   */
+  get retryAfterSeconds(): number | undefined {
+    const fromBody = (this.details as { retryAfterSeconds?: unknown } | null | undefined)
+      ?.retryAfterSeconds;
+    if (typeof fromBody === "number" && fromBody > 0) return Math.ceil(fromBody);
+    const m = /(\d+)\s*giây/i.exec(this.message);
+    return m ? Number(m[1]) : undefined;
+  }
+
   is(...codes: ApiErrorCode[]): boolean {
     return codes.includes(this.code);
   }

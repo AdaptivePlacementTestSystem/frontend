@@ -14,6 +14,28 @@ export function bffError(status: number, code: string, message: string) {
   return NextResponse.json({ code, message }, { status });
 }
 
+/**
+ * 429 từ backend: giữ nguyên thông điệp (có số giây phải chờ) và đính kèm `retryAfterSeconds`
+ * để giao diện báo đúng thời gian chờ thay vì "Quá nhiều yêu cầu" chung chung.
+ */
+export function rateLimitedResponse(upstream: Upstream) {
+  const raw =
+    upstream.data && typeof upstream.data === "object"
+      ? (upstream.data as Record<string, unknown>).message
+      : null;
+  const message =
+    typeof raw === "string" && raw ? raw : "Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút.";
+  const seconds = /(\d+)\s*giây/i.exec(message);
+  return NextResponse.json(
+    {
+      code: "RATE_LIMITED",
+      message,
+      ...(seconds ? { retryAfterSeconds: Number(seconds[1]) } : {}),
+    },
+    { status: 429 },
+  );
+}
+
 /** POST JSON tới backend (phía server/BFF). Trả `null` khi mất mạng/quá thời gian. */
 export async function postUpstream(
   path: string,
