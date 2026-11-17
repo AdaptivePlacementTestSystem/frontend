@@ -331,10 +331,7 @@ export function createHandlers(db: MockDb): HttpHandler[] {
               ["MSSV", "Họ tên", "CEFR"],
               ["SV2026001", "Nguyễn Văn An (mock)", "A2"],
             ])
-          : toCsv([
-              ["CEFR", "Số SV"],
-              ...Object.entries(mockDistribution().cefrDistribution),
-            ]);
+          : toCsv([["CEFR", "Số SV"], ...Object.entries(mockDistribution().cefrDistribution)]);
       return new HttpResponse(csv, {
         headers: {
           "content-type": "text/csv; charset=utf-8",
