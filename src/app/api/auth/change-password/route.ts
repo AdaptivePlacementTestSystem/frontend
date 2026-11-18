@@ -27,15 +27,26 @@ export async function POST(req: NextRequest) {
 
   if (!upstream.ok) {
     if (upstream.status === 429) return rateLimitedResponse(upstream);
+    const data =
+      upstream.data && typeof upstream.data === "object"
+        ? (upstream.data as Record<string, unknown>)
+        : null;
+    const rawMessage = data?.message;
+    const messageStr = Array.isArray(rawMessage)
+      ? rawMessage.join(". ")
+      : typeof rawMessage === "string"
+        ? rawMessage
+        : null;
+
     const code = upstreamCode(upstream.data);
     // Backend trả INVALID_CREDENTIALS khi mật khẩu hiện tại sai (change-password.use-case)
     if (code === "INVALID_CREDENTIALS") {
       return bffError(400, "CURRENT_PASSWORD_INVALID", "Mật khẩu hiện tại không đúng.");
     }
-    if (code) return bffError(upstream.status, code, "Không đổi được mật khẩu.");
+    if (code) return bffError(upstream.status, code, messageStr ?? "Không đổi được mật khẩu.");
     // 400 không kèm mã là lỗi kiểm tra dữ liệu (ví dụ mật khẩu mới không đạt chính sách), KHÔNG phải sai mật khẩu hiện tại
-    if (upstream.status === 400) {
-      return bffError(400, "VALIDATION_FAILED", "Mật khẩu mới chưa đạt yêu cầu.");
+    if (upstream.status === 400 || upstream.status === 422) {
+      return bffError(400, "VALIDATION_FAILED", messageStr ?? "Mật khẩu mới chưa đạt yêu cầu.");
     }
     if (upstream.status === 401) {
       return bffError(400, "CURRENT_PASSWORD_INVALID", "Mật khẩu hiện tại không đúng.");

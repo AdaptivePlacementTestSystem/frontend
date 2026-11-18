@@ -96,8 +96,10 @@ export function StudentLookup() {
               <TableBody>
                 {q.data.history.map((h) => (
                   <TableRow key={h.sessionId}>
-                    <TableCell>{new Date(h.completedAt).toLocaleString("vi-VN")}</TableCell>
-                    <TableCell>{vi.cefrLevel[h.cefrLevel]}</TableCell>
+                    <TableCell>
+                      {h.completedAt ? new Date(h.completedAt).toLocaleString("vi-VN") : "—"}
+                    </TableCell>
+                    <TableCell>{h.cefrLevel ? vi.cefrLevel[h.cefrLevel] : "—"}</TableCell>
                     <TableCell>{h.itemsAdministered}</TableCell>
                   </TableRow>
                 ))}

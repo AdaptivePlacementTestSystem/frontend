@@ -1,20 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
 import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { getResult } from "@/lib/api/endpoints";
 import { ApiError } from "@/lib/api/errors";
 import { vi } from "@/messages/vi";
 import { ResultCard } from "./result-card";
+import { Loader2 } from "lucide-react";
 
 export function ResultView({ sessionId }: { sessionId: string }) {
   const q = useQuery({
     queryKey: ["result", sessionId],
     queryFn: ({ signal }) => getResult(sessionId, signal),
     retry: false,
-    // Hồ sơ có thể chưa sinh xong ngay sau khi nộp câu cuối ⇒ hỏi lại mỗi 2 giây
     refetchInterval: (query) =>
       query.state.error instanceof ApiError && query.state.error.code === "PROFILE_PENDING"
         ? 2000
@@ -25,24 +23,20 @@ export function ResultView({ sessionId }: { sessionId: string }) {
   if (q.isError) {
     if (q.error instanceof ApiError && q.error.code === "PROFILE_PENDING") {
       return (
-        <p role="status" data-testid="result-pending">
-          {vi.result.pending}
-        </p>
+        <div
+          data-testid="result-pending"
+          className="flex flex-col items-center justify-center py-16 text-center space-y-3"
+        >
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-base font-medium text-on-surface">{vi.result.pending}</p>
+          <p className="text-xs text-on-surface-variant">
+            Hệ thống đang tổng hợp dữ liệu và sinh phân tích năng lực từ thuật toán CAT...
+          </p>
+        </div>
       );
     }
     return <ErrorBlock error={q.error} onRetry={() => q.refetch()} />;
   }
-  return (
-    <div className="space-y-4">
-      <ResultCard result={q.data} />
-      <div className="flex flex-wrap gap-3">
-        <Button asChild data-testid="go-review">
-          <Link href={`/results/${sessionId}/review`}>{vi.result.review}</Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href="/history">{vi.result.history}</Link>
-        </Button>
-      </div>
-    </div>
-  );
+
+  return <ResultCard result={q.data} />;
 }

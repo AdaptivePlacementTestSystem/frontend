@@ -1,7 +1,13 @@
-export default function Page() {
+import { Suspense } from "react";
+import { TakeExamContainer } from "@/features/exam/take-exam-container";
+import { LoadingBlock } from "@/components/layout/states";
+
+export default async function TakeExamPage({ params }: { params: Promise<{ roundId: string }> }) {
+  const { roundId } = await params;
+
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">take</h1>
-    </div>
+    <Suspense fallback={<LoadingBlock rows={4} />}>
+      <TakeExamContainer roundId={roundId} />
+    </Suspense>
   );
 }

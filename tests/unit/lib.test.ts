@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { ApiError, toApiError } from "@/lib/api/errors";
-import { normalizeNextItem, toExamItem } from "@/lib/api/normalize";
+import { toApiError } from "@/lib/api/errors";
+import {
+  normalizeNextItem,
+  normalizeReview,
+  normalizeSessionResult,
+  toExamItem,
+} from "@/lib/api/normalize";
 import { buildUrl } from "@/lib/api/client";
 import { isAllowedProxyPath } from "@/lib/api/proxy-policy";
 import { decodeJwtClaims, isExpired } from "@/lib/auth/jwt";
@@ -25,13 +30,104 @@ describe("normalize — chống lộ đáp án", () => {
     expect(Object.keys(toExamItem(rawItem)).sort()).toEqual(["content", "id", "options", "skill"]);
   });
 
-  it("dữ liệu cũ {message} ⇒ NO_ITEMS_AVAILABLE", () => {
-    expect(() => normalizeNextItem({ message: "Không còn câu hỏi" })).toThrowError(ApiError);
-    try {
-      normalizeNextItem({ message: "x" });
-    } catch (e) {
-      expect((e as ApiError).code).toBe("NO_ITEMS_AVAILABLE");
+  it("normalizeNextItem chuẩn hóa dữ liệu { kind: 'item' } và fallback bare item từ backend", () => {
+    // 1. Chuẩn hợp đồng
+    const itemPayload = {
+      kind: "item",
+      session: {
+        id: "sess-1",
+        itemCount: 2,
+        maxItems: 25,
+        expiresAt: "2026-11-16T18:00:00.000Z",
+        serverTime: "2026-11-16T17:15:00.000Z",
+      },
+      item: {
+        id: "item-1",
+        content: "What is this?",
+        options: { A: "1", B: "2", C: "3", D: "4" },
+        skill: "GRAMMAR",
+      },
+    };
+    const norm1 = normalizeNextItem(itemPayload);
+    expect(norm1.kind).toBe("item");
+    if (norm1.kind === "item") {
+      expect(norm1.item.id).toBe("item-1");
+      expect(norm1.session.itemCount).toBe(2);
     }
+
+    // 2. Finished
+    const finishPayload = {
+      kind: "finished",
+      reason: "SE_THRESHOLD",
+      sessionId: "sess-1",
+    };
+    const norm2 = normalizeNextItem(finishPayload);
+    expect(norm2.kind).toBe("finished");
+    if (norm2.kind === "finished") {
+      expect(norm2.reason).toBe("SE_THRESHOLD");
+      expect(norm2.sessionId).toBe("sess-1");
+    }
+
+    // 3. Fallback bare item
+    const bareItem = {
+      id: "item-bare",
+      content: "Bare question?",
+      options: { A: "1", B: "2", C: "3", D: "4" },
+      skill: "VOCABULARY",
+    };
+    const norm3 = normalizeNextItem(bareItem);
+    expect(norm3.kind).toBe("item");
+    if (norm3.kind === "item") {
+      expect(norm3.item.id).toBe("item-bare");
+      expect(norm3.item.skill).toBe("VOCABULARY");
+      expect(norm3.session.maxItems).toBe(25);
+    }
+  });
+
+  it("normalizeSessionResult chuyển đổi dữ liệu phẳng từ backend sang SessionResult đầy đủ", () => {
+    const res = normalizeSessionResult({
+      sessionId: "s1",
+      thetaFinal: 0.12,
+      seFinal: 0.3,
+      stoppingReason: "SE_REACHED",
+      totalItems: 18,
+      durationSeconds: 1200,
+    });
+    expect(res.ability.theta).toBe(0.12);
+    expect(res.ability.standardError).toBe(0.3);
+    expect(res.meta.stoppingReason).toBe("SE_REACHED");
+    expect(res.meta.itemsAdministered).toBe(18);
+    expect(res.meta.durationSeconds).toBe(1200);
+  });
+
+  it("normalizeReview chuẩn hóa câu trả lời từ backend sang ReviewEntry an toàn", () => {
+    const raw = [
+      {
+        questionNumber: 1,
+        content: "What is this?",
+        options: { A: "One", B: "Two" },
+        selectedAnswer: "A",
+        correctAnswer: "A",
+        isCorrect: true,
+        skill: "VOCABULARY",
+        explanation: "Good job",
+      },
+      {
+        content: "Second question",
+        selectedAnswer: "B",
+        correctAnswer: "C",
+      },
+    ];
+    const res = normalizeReview(raw);
+    expect(res).toHaveLength(2);
+    expect(res[0]!.order).toBe(1);
+    expect(res[0]!.chosen).toBe("A");
+    expect(res[0]!.correct).toBe("A");
+    expect(res[0]!.isCorrect).toBe(true);
+    expect(res[1]!.order).toBe(2);
+    expect(res[1]!.chosen).toBe("B");
+    expect(res[1]!.correct).toBe("C");
+    expect(res[1]!.isCorrect).toBe(false);
   });
 });
 
@@ -56,6 +152,9 @@ describe("proxy-policy", () => {
   it("cho phép route đã biết, chặn route lạ và đường dẫn nguy hiểm", () => {
     expect(isAllowedProxyPath(["sessions", "active"])).toBe(true);
     expect(isAllowedProxyPath(["sessions", "abc-1", "next-item"])).toBe(true);
+    expect(isAllowedProxyPath(["exam-rounds", "mine"])).toBe(true);
+    expect(isAllowedProxyPath(["exam-rounds", "round-uuid-1"])).toBe(true);
+    expect(isAllowedProxyPath(["exam-rounds", "round-uuid-1", "session", "current"])).toBe(true);
     expect(isAllowedProxyPath(["items", "abc", "clone"])).toBe(true);
     expect(isAllowedProxyPath(["reports", "export-csv"])).toBe(true);
     expect(isAllowedProxyPath(["admin", "users"])).toBe(false);

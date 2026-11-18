@@ -132,6 +132,66 @@ export function createHandlers(db: MockDb): HttpHandler[] {
     }),
 
     // ───────── Phiên thi ─────────
+    http.get(`${API}/exam-rounds/mine`, ({ request }: Req) => {
+      const u = authUser(request);
+      if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");
+      const active = activeSessionOf(db, u.id);
+      return HttpResponse.json([
+        {
+          id: "EX-2026-CAT-01",
+          title: "Kỳ thi xếp lớp tiếng Anh học kỳ 1 năm 2026",
+          opensAt: new Date(db.now() - 3600_000).toISOString(),
+          closesAt: new Date(db.now() + 86400_000).toISOString(),
+          durationMinutes: 45,
+          status: "OPEN",
+          effectiveStatus: "OPEN",
+          sessionStatus: active ? "IN_PROGRESS" : "NOT_STARTED",
+          sessionId: active?.id,
+        },
+      ]);
+    }),
+    http.get(`${API}/exam-rounds/:id`, ({ request, params }: Req) => {
+      const u = authUser(request);
+      if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");
+      const active = activeSessionOf(db, u.id);
+      return HttpResponse.json({
+        id: String(params.id),
+        title: "Kỳ thi xếp lớp tiếng Anh học kỳ 1 năm 2026",
+        opensAt: new Date(db.now() - 3600_000).toISOString(),
+        closesAt: new Date(db.now() + 86400_000).toISOString(),
+        durationMinutes: 45,
+        status: "OPEN",
+        effectiveStatus: "OPEN",
+        sessionStatus: active ? "IN_PROGRESS" : "NOT_STARTED",
+        sessionId: active?.id,
+        activeSessionId: active?.id,
+      });
+    }),
+    http.get(`${API}/exam-rounds/:id/session/current`, ({ request, params }: Req) => {
+      const u = authUser(request);
+      if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");
+      const roundId = String(params.id);
+      const active = activeSessionOf(db, u.id);
+      if (active) {
+        return HttpResponse.json({
+          status: "IN_PROGRESS",
+          sessionId: active.id,
+          examRoundId: roundId,
+          startedAt: new Date(active.startedAt).toISOString(),
+          expiresAt: new Date(active.expiresAt).toISOString(),
+          serverTime: new Date(db.now()).toISOString(),
+          itemCount: active.answers.length,
+          maxItems: 25,
+          currentItem: active.currentItemId
+            ? (db.items.find((i) => i.id === active.currentItemId) ?? null)
+            : null,
+        });
+      }
+      return HttpResponse.json({
+        status: "NOT_STARTED",
+        session: null,
+      });
+    }),
     http.post(`${API}/sessions`, ({ request }: Req) => {
       const u = authUser(request);
       if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");

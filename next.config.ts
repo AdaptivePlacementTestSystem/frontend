@@ -18,6 +18,28 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async rewrites() {
+    return [
+      { source: "/student", destination: "/" },
+      { source: "/student/dashboard", destination: "/" },
+      { source: "/student/exams/:path*", destination: "/exams/:path*" },
+      { source: "/student/results/:path*", destination: "/results/:path*" },
+      { source: "/student/history", destination: "/history" },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Referrer-Policy",
+            value: "same-origin",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -1,5 +1,5 @@
 import { apiDownload, apiRequest, apiUpload, type DownloadResult } from "./client";
-import { normalizeNextItem } from "./normalize";
+import { normalizeNextItem, normalizeReview, normalizeSessionResult } from "./normalize";
 import { type ItemStatusValue as ItemStatus } from "@apt/shared-types";
 import type {
   AccountKind,
@@ -8,6 +8,7 @@ import type {
   ActiveSessionResponse,
   AdminAccount,
   AssignableRole,
+  CurrentRoundSessionResponse,
   ClassDistribution,
   ImportGridRow,
   ImportSaveStatus,
@@ -17,6 +18,7 @@ import type {
   UpdateAccountBody,
   ClassErrorPattern,
   CurrentUser,
+  ExamRoundDetail,
   ExplanationContent,
   ExportType,
   HistoryRow,
@@ -27,9 +29,11 @@ import type {
   NextItemResult,
   OptionKey,
   Paged,
+  ResumeSessionResponse,
   ReviewEntry,
   SessionResult,
   StartSessionResponse,
+  StudentExamRound,
   StudentProfileView,
   SubmitResult,
 } from "./types";
@@ -50,6 +54,9 @@ export const endpoints = {
   history: (studentCode: string) =>
     `/placement-profiles/${encodeURIComponent(studentCode)}/history`,
   profile: (studentCode: string) => `/placement-profiles/${encodeURIComponent(studentCode)}`,
+  examRoundsMine: () => "/exam-rounds/mine",
+  examRoundDetail: (id: string) => `/exam-rounds/${id}`,
+  examRoundCurrentSession: (id: string) => `/exam-rounds/${id}/session/current`,
   items: () => "/items",
   item: (id: string) => `/items/${id}`,
   generateExplanation: () => "/items/generate-explanation", // TODO-CONFIRM (K4d): chưa có trong hợp đồng BE
@@ -83,8 +90,35 @@ export const startSession = (examRoundId?: string) =>
     body: { examRoundId },
   });
 
-export const getActiveSession = (signal?: AbortSignal) =>
-  apiRequest<ActiveSessionResponse>(endpoints.activeSession(), { signal });
+interface RawActiveSession {
+  session?: ActiveSessionResponse["session"];
+  activeSessionId?: string;
+  sessionId?: string;
+  id?: string;
+  examRoundId?: string;
+  itemCount?: number;
+  maxItems?: number;
+  expiresAt?: string;
+  serverTime?: string;
+  closedPrevious?: ActiveSessionResponse["closedPrevious"];
+}
+
+export async function getActiveSession(signal?: AbortSignal): Promise<ActiveSessionResponse> {
+  const raw = await apiRequest<RawActiveSession | null>(endpoints.activeSession(), { signal });
+  if (!raw) return { session: null };
+  if ("session" in raw && raw.session !== undefined) return raw as ActiveSessionResponse;
+  return {
+    session: {
+      sessionId: raw.activeSessionId ?? raw.sessionId ?? raw.id ?? "",
+      examRoundId: raw.examRoundId,
+      itemCount: raw.itemCount ?? 0,
+      maxItems: raw.maxItems ?? 25,
+      expiresAt: raw.expiresAt ?? new Date().toISOString(),
+      serverTime: raw.serverTime ?? new Date().toISOString(),
+    },
+    closedPrevious: raw.closedPrevious ?? null,
+  };
+}
 
 export async function getNextItem(
   sessionId: string,
@@ -99,11 +133,27 @@ export const submitResponse = (
   body: { itemId: string; response: OptionKey; responseTimeMs?: number },
 ) => apiRequest<SubmitResult>(endpoints.submit(sessionId), { method: "POST", body });
 
-export const getResult = (sessionId: string, signal?: AbortSignal) =>
-  apiRequest<SessionResult>(endpoints.result(sessionId), { signal });
+export async function getResult(sessionId: string, signal?: AbortSignal): Promise<SessionResult> {
+  const raw = await apiRequest<unknown>(endpoints.result(sessionId), { signal });
+  return normalizeSessionResult(raw);
+}
 
-export const getReview = (sessionId: string, signal?: AbortSignal) =>
-  apiRequest<ReviewEntry[]>(endpoints.review(sessionId), { signal });
+export async function getReview(sessionId: string, signal?: AbortSignal): Promise<ReviewEntry[]> {
+  const raw = await apiRequest<unknown>(endpoints.review(sessionId), { signal });
+  return normalizeReview(raw);
+}
+
+export const resumeSession = (sessionId: string, signal?: AbortSignal) =>
+  apiRequest<ResumeSessionResponse>(endpoints.resume(sessionId), { signal });
+
+export const getStudentExamRounds = (signal?: AbortSignal) =>
+  apiRequest<StudentExamRound[]>(endpoints.examRoundsMine(), { signal });
+
+export const getExamRoundDetail = (id: string, signal?: AbortSignal) =>
+  apiRequest<ExamRoundDetail>(endpoints.examRoundDetail(id), { signal });
+
+export const getCurrentRoundSession = (id: string, signal?: AbortSignal) =>
+  apiRequest<CurrentRoundSessionResponse>(endpoints.examRoundCurrentSession(id), { signal });
 
 export const getHistory = (studentCode: string, signal?: AbortSignal) =>
   apiRequest<HistoryRow[]>(endpoints.history(studentCode), { signal });
