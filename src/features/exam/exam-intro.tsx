@@ -115,7 +115,7 @@ export function ExamIntro({ roundId }: { roundId: string }) {
             </span>
             <span>•</span>
             <span className="flex items-center gap-1.5 font-medium text-on-surface">
-              <HelpCircle className="h-4 w-4 text-secondary" />
+              <HelpCircle className="h-4 w-4 text-primary" />
               Tối đa 25 câu hỏi (Dừng khi SE &lt; 0.35)
             </span>
           </div>

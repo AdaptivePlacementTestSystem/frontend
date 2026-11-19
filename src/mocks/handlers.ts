@@ -132,6 +132,24 @@ export function createHandlers(db: MockDb): HttpHandler[] {
     }),
 
     // ───────── Phiên thi ─────────
+    http.get(`${API}/exam-rounds`, ({ request }: Req) => {
+      const u = authUser(request);
+      if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");
+      if (!isStaffUser(u)) return err(403, "FORBIDDEN", "Không có quyền");
+      return HttpResponse.json([
+        {
+          id: "EX-2026-CAT-01",
+          name: "Kỳ thi xếp lớp tiếng Anh học kỳ 1 năm 2026",
+          status: "OPEN",
+          effectiveStatus: "OPEN",
+          opensAt: new Date(db.now() - 3600_000).toISOString(),
+          closesAt: new Date(db.now() + 86400_000).toISOString(),
+          durationMinutes: 45,
+          participantCount: 120,
+          sessionCount: 85,
+        },
+      ]);
+    }),
     http.get(`${API}/exam-rounds/mine`, ({ request }: Req) => {
       const u = authUser(request);
       if (!u) return err(401, "UNAUTHENTICATED", "Chưa đăng nhập");

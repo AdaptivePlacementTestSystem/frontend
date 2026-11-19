@@ -11,7 +11,7 @@ export function isStaff(role: string | undefined | null): boolean {
   return role === "TEACHER" || role === "ADMIN";
 }
 
-const STUDENT_PREFIXES = ["/exam", "/results", "/history"];
+const STUDENT_PREFIXES = ["/exam", "/history"];
 
 /** Trang xác thực công khai (S01, S17, S18): vào được khi chưa đăng nhập. */
 const PUBLIC_PATHS = ["/login", "/forgot-password", "/reset-password"];

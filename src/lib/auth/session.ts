@@ -38,7 +38,7 @@ export async function requireUser(audience: Audience): Promise<CurrentUser> {
       ? user.role === "ADMIN"
       : audience === "staff"
         ? isStaff(user.role)
-        : user.role === "STUDENT";
+        : user.role === "STUDENT" || isStaff(user.role);
   if (!ok) redirect(audience === "student" ? homeFor(user.role) : "/403");
   return user;
 }

@@ -69,6 +69,18 @@ export interface ExamRoundDetail {
   activeSessionId?: string;
 }
 
+export interface ExamRoundSummary {
+  id: string;
+  name: string;
+  status: string;
+  effectiveStatus: string;
+  opensAt: string;
+  closesAt: string;
+  durationMinutes: number;
+  participantCount?: number;
+  sessionCount?: number;
+}
+
 export type CurrentRoundSessionStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
 
 export interface CurrentRoundSessionResponse {
@@ -385,7 +397,7 @@ export type ImportSaveStatus =
     };
 
 export interface StudentProfileView {
-  student: { studentCode: string; fullName: string };
+  student: { id?: string; studentCode: string; fullName: string; email?: string };
   latest: SessionResult | null;
   history: HistoryRow[];
 }

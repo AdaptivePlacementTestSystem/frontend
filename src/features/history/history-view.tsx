@@ -49,7 +49,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
           <div className="w-px h-4 bg-outline-variant/40" />
 
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-secondary" />
+            <TrendingUp className="h-4 w-4 text-sky-600" />
             <span className="text-xs text-on-surface-variant font-medium">Cấp độ hiện tại:</span>
             <span className="px-2 py-0.5 rounded text-xs font-bold bg-sky-100 text-sky-900">
               {latestCompleted?.cefrLevel

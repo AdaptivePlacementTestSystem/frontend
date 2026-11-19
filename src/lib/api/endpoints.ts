@@ -19,6 +19,7 @@ import type {
   ClassErrorPattern,
   CurrentUser,
   ExamRoundDetail,
+  ExamRoundSummary,
   ExplanationContent,
   ExportType,
   HistoryRow,
@@ -54,6 +55,7 @@ export const endpoints = {
   history: (studentCode: string) =>
     `/placement-profiles/${encodeURIComponent(studentCode)}/history`,
   profile: (studentCode: string) => `/placement-profiles/${encodeURIComponent(studentCode)}`,
+  examRounds: () => "/exam-rounds",
   examRoundsMine: () => "/exam-rounds/mine",
   examRoundDetail: (id: string) => `/exam-rounds/${id}`,
   examRoundCurrentSession: (id: string) => `/exam-rounds/${id}/session/current`,
@@ -149,6 +151,9 @@ export const resumeSession = (sessionId: string, signal?: AbortSignal) =>
 export const getStudentExamRounds = (signal?: AbortSignal) =>
   apiRequest<StudentExamRound[]>(endpoints.examRoundsMine(), { signal });
 
+export const listExamRounds = (signal?: AbortSignal) =>
+  apiRequest<ExamRoundSummary[]>(endpoints.examRounds(), { signal });
+
 export const getExamRoundDetail = (id: string, signal?: AbortSignal) =>
   apiRequest<ExamRoundDetail>(endpoints.examRoundDetail(id), { signal });
 
@@ -162,8 +167,13 @@ export const getStudentProfile = (studentCode: string, signal?: AbortSignal) =>
   apiRequest<StudentProfileView>(endpoints.profile(studentCode), { signal });
 
 // ───────── Ngân hàng câu hỏi ─────────
-export const listItems = (filters: ItemFilters, signal?: AbortSignal) =>
-  apiRequest<Paged<ItemRow>>(endpoints.items(), { query: { ...filters }, signal });
+export const listItems = async (filters: ItemFilters, signal?: AbortSignal): Promise<Paged<ItemRow>> => {
+  const res = await apiRequest<any>(endpoints.items(), { query: { ...filters }, signal });
+  if (Array.isArray(res)) {
+    return { data: res, total: res.length };
+  }
+  return res ?? { data: [], total: 0 };
+};
 
 export const getItem = (id: string, signal?: AbortSignal) =>
   apiRequest<ItemDetail>(endpoints.item(id), { signal });
