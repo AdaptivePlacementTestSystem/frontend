@@ -390,4 +390,112 @@ export interface StudentProfileView {
   history: HistoryRow[];
 }
 
+// ───────── Kiểm duyệt câu hỏi cho Giảng viên (UCGV04, UCGV14, UCGV15 - S33, S11, S34, S35) ─────────
+export interface ReviewOptionMap {
+  A: string;
+  B: string;
+  C: string;
+  D: string;
+}
+
+export interface OriginalSnapshot {
+  content: string;
+  options: ReviewOptionMap;
+  correctAnswer: string;
+  explanation: string;
+}
+
+export interface FirstReviewDetail {
+  dueAt: string;
+  action: string | null;
+  reviewedAt: string | null;
+  comment: string | null;
+  originalSnapshot: OriginalSnapshot | null;
+}
+
+export interface SecondReviewDetail {
+  dueAt: string;
+  action: string | null;
+  confirmedAt: string | null;
+  comment: string | null;
+}
+
+export interface ItemFlag {
+  level: string;
+  reasonCodes: string[];
+  suspectedDuplicateId?: string | null;
+}
+
+export interface ReviewItemDetail {
+  id: string;
+  content: string;
+  options: ReviewOptionMap;
+  correctAnswer: string;
+  skill: string;
+  cefrTarget: string;
+  topicTag: string | null;
+  irtB: number;
+  status: string;
+  explanation: string;
+  firstReview: FirstReviewDetail | null;
+  secondReview?: SecondReviewDetail | null;
+  hasEdited: boolean;
+  flags: ItemFlag[];
+  reviewerName?: string;
+}
+
+export interface ReviewBatchSummary {
+  batchId: string;
+  batchName: string;
+  totalAssigned: number;
+  decidedCount: number;
+  pendingCount: number;
+  dueAt: string | null;
+  isOverdue: boolean;
+}
+
+export interface ConfirmBatchSummary {
+  batchId: string;
+  batchName: string;
+  totalAssigned: number;
+  pendingCount: number;
+  confirmedCount: number;
+  removedCount: number;
+  decidedCount: number;
+  dueAt: string | null;
+  isOverdue: boolean;
+}
+
+export interface TeacherTaskStats {
+  pendingReviews: number;
+  pendingConfirms: number;
+}
+
+export interface ReviewTasksResponse {
+  batches: ReviewBatchSummary[];
+  stats: TeacherTaskStats;
+}
+
+export interface ConfirmTasksResponse {
+  batches: ConfirmBatchSummary[];
+  stats: TeacherTaskStats;
+}
+
+export interface BatchReviewItemsResponse {
+  batch: { id: string; name: string };
+  items: ReviewItemDetail[];
+}
+
+export interface BatchConfirmItemsResponse {
+  batch: { id: string; name: string };
+  items: ReviewItemDetail[];
+}
+
+export interface EditItemInput {
+  content?: string;
+  options?: ReviewOptionMap;
+  correctAnswer?: string;
+  explanation?: string;
+}
+
 export type { SessionStatus };

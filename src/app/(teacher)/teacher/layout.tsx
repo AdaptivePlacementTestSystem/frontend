@@ -10,8 +10,8 @@ export default async function TeacherLayout({ children }: { children: ReactNode 
       <AppHeader
         user={user}
         links={[
+          { href: "/teacher/tasks/reviews", label: "Hộp việc" },
           { href: "/teacher/items", label: vi.nav.items },
-          { href: "/teacher/review-queue", label: vi.nav.reviewQueue },
           { href: "/teacher/reports", label: vi.nav.reports },
           { href: "/teacher/students", label: vi.nav.students },
         ]}

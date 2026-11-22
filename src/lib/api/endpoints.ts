@@ -36,6 +36,12 @@ import type {
   StudentExamRound,
   StudentProfileView,
   SubmitResult,
+  ReviewTasksResponse,
+  ConfirmTasksResponse,
+  BatchReviewItemsResponse,
+  BatchConfirmItemsResponse,
+  ReviewItemDetail,
+  EditItemInput,
 } from "./types";
 
 /**
@@ -77,6 +83,20 @@ export const endpoints = {
   importTemplate: () => "/users/import/template",
   accountAction: (id: string, action: "lock" | "unlock" | "resend-temporary-password" | "role") =>
     `/users/${encodeURIComponent(id)}/${action}`,
+  // Kiểm duyệt đề thi - Giảng viên (S33, S11, S34, S35)
+  teacherReviewTasks: () => "/teacher/tasks/reviews",
+  teacherBatchReviewItems: (batchId: string) =>
+    `/teacher/tasks/reviews/${encodeURIComponent(batchId)}`,
+  teacherConfirmTasks: () => "/teacher/tasks/confirms",
+  teacherBatchConfirmItems: (batchId: string) =>
+    `/teacher/tasks/confirms/${encodeURIComponent(batchId)}`,
+  teacherConfirmAllRemaining: (batchId: string) =>
+    `/teacher/tasks/confirms/${encodeURIComponent(batchId)}/confirm-all`,
+  teacherEditItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}`,
+  teacherApproveItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}/approve`,
+  teacherRejectItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}/reject`,
+  teacherConfirmItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}/confirm`,
+  teacherRemoveItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}/remove`,
 } as const;
 
 // ───────── Xác thực ─────────
@@ -258,3 +278,52 @@ export const getImportStatus = (kind: AccountKind, signal?: AbortSignal) =>
 
 export const downloadImportTemplate = (kind: AccountKind): Promise<DownloadResult> =>
   apiDownload(endpoints.importTemplate(), { query: { kind } });
+
+// ───────── Kiểm duyệt câu hỏi cho Giảng viên (S33, S11, S34, S35) ─────────
+export const getTeacherReviewTasks = (signal?: AbortSignal) =>
+  apiRequest<ReviewTasksResponse>(endpoints.teacherReviewTasks(), { signal });
+
+export const getBatchItemsForReview = (batchId: string, signal?: AbortSignal) =>
+  apiRequest<BatchReviewItemsResponse>(endpoints.teacherBatchReviewItems(batchId), { signal });
+
+export const getTeacherConfirmTasks = (signal?: AbortSignal) =>
+  apiRequest<ConfirmTasksResponse>(endpoints.teacherConfirmTasks(), { signal });
+
+export const getBatchItemsForConfirm = (batchId: string, signal?: AbortSignal) =>
+  apiRequest<BatchConfirmItemsResponse>(endpoints.teacherBatchConfirmItems(batchId), { signal });
+
+export const confirmAllRemainingItems = (batchId: string) =>
+  apiRequest<{ message: string; confirmedCount: number }>(
+    endpoints.teacherConfirmAllRemaining(batchId),
+    { method: "POST" },
+  );
+
+export const editTeacherItem = (id: string, body: EditItemInput) =>
+  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherEditItem(id), {
+    method: "PATCH",
+    body,
+  });
+
+export const approveTeacherItem = (id: string, comment?: string) =>
+  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherApproveItem(id), {
+    method: "POST",
+    body: { comment },
+  });
+
+export const rejectTeacherItem = (id: string, comment?: string) =>
+  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherRejectItem(id), {
+    method: "POST",
+    body: { comment },
+  });
+
+export const confirmTeacherItem = (id: string, comment?: string) =>
+  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherConfirmItem(id), {
+    method: "POST",
+    body: { comment },
+  });
+
+export const removeTeacherItem = (id: string, comment?: string) =>
+  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherRemoveItem(id), {
+    method: "POST",
+    body: { comment },
+  });
