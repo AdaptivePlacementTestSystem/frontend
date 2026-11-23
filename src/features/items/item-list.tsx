@@ -18,7 +18,7 @@ import {
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { NativeSelect } from "@/components/layout/native-select";
 import { listItems } from "@/lib/api/endpoints";
-import type { CefrTarget, ItemFilters } from "@/lib/api/types";
+import type { CefrTarget, ItemFilters, ItemRow } from "@/lib/api/types";
 import {
   ITEM_BATCH_SOURCES,
   ITEM_STATUSES,
@@ -44,7 +44,15 @@ export function ItemList() {
   // Đổi bộ lọc ⇒ về trang 1
   const set = (patch: Partial<ItemFilters>) => setFilters((f) => ({ ...f, ...patch, page: 1 }));
   const page = filters.page ?? 1;
-  const totalPages = q.data ? Math.max(1, Math.ceil(q.data.total / PAGE_SIZE)) : 1;
+  const items: ItemRow[] = Array.isArray(q.data)
+    ? (q.data as unknown as ItemRow[])
+    : Array.isArray(q.data?.data)
+      ? q.data.data
+      : [];
+  const total = Array.isArray(q.data)
+    ? (q.data as unknown as ItemRow[]).length
+    : (q.data?.total ?? items.length);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="space-y-4">
@@ -144,7 +152,7 @@ export function ItemList() {
         <LoadingBlock rows={5} />
       ) : q.isError ? (
         <ErrorBlock error={q.error} onRetry={() => q.refetch()} />
-      ) : q.data.data.length === 0 ? (
+      ) : items.length === 0 ? (
         <EmptyBlock text={vi.items.empty} />
       ) : (
         <div className="overflow-x-auto">
@@ -163,7 +171,7 @@ export function ItemList() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {q.data.data.map((it) => (
+              {items.map((it) => (
                 <TableRow key={it.id} data-testid="item-row">
                   <TableCell className="max-w-xs truncate">{it.content}</TableCell>
                   <TableCell>{vi.skill[it.skill]}</TableCell>
