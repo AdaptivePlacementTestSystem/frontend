@@ -27,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${beVietnamPro.variable} ${geistMono.variable} h-full antialiased font-sans`}
     >
-      <body className="min-h-full flex flex-col bg-surface text-on-surface">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-surface text-on-surface">
         <Providers>{children}</Providers>
       </body>
     </html>
