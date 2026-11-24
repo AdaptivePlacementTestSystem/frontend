@@ -1,0 +1,32 @@
+name: Check frontend against backend contract
+on:
+  workflow_dispatch:
+    inputs:
+      backend_sha:
+        description: "Full 40-character backend commit SHA containing openapi.json"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Download immutable backend contract
+        env:
+          BACKEND_SHA: ${{ inputs.backend_sha }}
+        run: |
+          [[ "$BACKEND_SHA" =~ ^[0-9a-f]{40}$ ]] || { echo 'Expected full lowercase commit SHA'; exit 1; }
+          curl -fsSL "https://raw.githubusercontent.com/AdaptivePlacementTestSystem/backend/${BACKEND_SHA}/openapi.json" -o /tmp/backend-openapi.json
+      - name: Generate candidate types and typecheck existing consumers
+        env:
+          API_BASE_URL: http://localhost:3001/api/v1
+        run: |
+          npx openapi-typescript /tmp/backend-openapi.json -o src/lib/api/schema.d.ts
+          npm run typecheck

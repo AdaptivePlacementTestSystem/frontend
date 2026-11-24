@@ -1,0 +1,21 @@
+name: OpenAPI upstream drift
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 2 * * 1-5"
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compare with backend develop (warning only)
+        run: |
+          if ! curl -fsSL https://raw.githubusercontent.com/AdaptivePlacementTestSystem/backend/develop/openapi.json -o /tmp/upstream-openapi.json; then
+            echo '::warning::Backend develop spec is not available; drift could not be checked.'
+          elif ! cmp -s openapi.json /tmp/upstream-openapi.json; then
+            echo '::warning::Backend develop spec differs from the pinned frontend snapshot; review and update it.'
+          else
+            echo 'Frontend snapshot matches backend develop.'
+          fi
