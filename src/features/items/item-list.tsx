@@ -45,7 +45,6 @@ export function ItemList() {
   const set = (patch: Partial<ItemFilters>) => setFilters((f) => ({ ...f, ...patch, page: 1 }));
   const page = filters.page ?? 1;
   const items: ItemRow[] = Array.isArray(q.data)
-  const items: ItemRow[] = Array.isArray(q.data)
     ? (q.data as unknown as ItemRow[])
     : Array.isArray(q.data?.data)
       ? q.data.data
