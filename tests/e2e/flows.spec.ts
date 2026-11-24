@@ -95,11 +95,11 @@ test("giảng viên: báo cáo và tra cứu đúng MSSV", async ({ page }) => {
   await expect(page.getByTestId("report-total")).toBeVisible();
 
   await page.goto("/teacher/students");
-  await page.getByTestId("mssv-input").fill("SV2026002"); // khác trường ⇒ không có quyền
-  await page.getByTestId("mssv-search").click();
+  await page.getByTestId("student-code-input").fill("SV2026002"); // khác trường ⇒ không có quyền
+  await page.getByTestId("student-search").click();
   await expect(page.getByTestId("student-not-found")).toBeVisible();
 
-  await page.getByTestId("mssv-input").fill("SV2026001");
-  await page.getByTestId("mssv-search").click();
+  await page.getByTestId("student-code-input").fill("SV2026001");
+  await page.getByTestId("student-search").click();
   await expect(page.getByTestId("student-name")).toContainText("SV2026001");
 });

@@ -45,6 +45,7 @@ export function ItemList() {
   const set = (patch: Partial<ItemFilters>) => setFilters((f) => ({ ...f, ...patch, page: 1 }));
   const page = filters.page ?? 1;
   const items: ItemRow[] = Array.isArray(q.data)
+  const items: ItemRow[] = Array.isArray(q.data)
     ? (q.data as unknown as ItemRow[])
     : Array.isArray(q.data?.data)
       ? q.data.data
@@ -181,8 +182,8 @@ export function ItemList() {
                       {vi.itemStatus[it.status]}
                     </Badge>
                   </TableCell>
-                  <TableCell>{vi.itemSource[it.source]}</TableCell>
-                  <TableCell>{it.irtB.toFixed(1)}</TableCell>
+                  <TableCell>{(it.source && vi.itemSource[it.source]) ?? it.source ?? "-"}</TableCell>
+                  <TableCell>{typeof it.irtB === "number" ? it.irtB.toFixed(1) : (it.irtB ?? "-")}</TableCell>
                   <TableCell>
                     <Link className="underline" href={`/teacher/items/${it.id}`}>
                       {vi.items.view}
