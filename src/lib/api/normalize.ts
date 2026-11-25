@@ -125,7 +125,7 @@ export function normalizeSessionResult(raw: unknown): SessionResult {
         ? raw.thetaFinal
         : typeof raw.theta === "number"
           ? raw.theta
-          : 0;
+          : null;
 
   const standardError =
     typeof abilityRaw.standardError === "number"
@@ -134,17 +134,14 @@ export function normalizeSessionResult(raw: unknown): SessionResult {
         ? raw.seFinal
         : typeof raw.standardError === "number"
           ? raw.standardError
-          : 0.35;
+          : null;
 
   const ci95 =
     Array.isArray(abilityRaw.ci95) && abilityRaw.ci95.length === 2
       ? (abilityRaw.ci95 as [number, number])
       : Array.isArray(raw.confidenceInterval95) && raw.confidenceInterval95.length === 2
         ? (raw.confidenceInterval95 as [number, number])
-        : [
-            parseFloat((theta - 1.96 * standardError).toFixed(4)),
-            parseFloat((theta + 1.96 * standardError).toFixed(4)),
-          ];
+        : null;
 
   const itemsAdministered =
     typeof metaRaw.itemsAdministered === "number"
@@ -228,7 +225,7 @@ export function normalizeSessionResult(raw: unknown): SessionResult {
     ability: {
       theta,
       standardError,
-      ci95: ci95 as [number, number],
+      ci95,
     },
     skillProfiles,
     errorPatterns,
@@ -272,12 +269,18 @@ export function normalizeReview(raw: unknown): ReviewEntry[] {
 
     // chosen: backend có thể trả selectedAnswer hoặc chosen
     const chosenRaw = String(entry.chosen ?? entry.selectedAnswer ?? entry.selected ?? "A");
+    if (!(OPTION_KEYS as readonly string[]).includes(chosenRaw)) {
+      throw new Error("Dữ liệu xem lại bài thi không hợp lệ.");
+    }
     const chosen: OptionKey = (OPTION_KEYS as readonly string[]).includes(chosenRaw)
       ? (chosenRaw as OptionKey)
       : "A";
 
     // correct: backend có thể trả correctAnswer hoặc correct
     const correctRaw = String(entry.correct ?? entry.correctAnswer ?? entry.answer ?? "A");
+    if (!(OPTION_KEYS as readonly string[]).includes(correctRaw)) {
+      throw new Error("Dữ liệu xem lại bài thi không hợp lệ.");
+    }
     const correct: OptionKey = (OPTION_KEYS as readonly string[]).includes(correctRaw)
       ? (correctRaw as OptionKey)
       : "A";

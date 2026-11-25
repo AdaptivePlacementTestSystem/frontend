@@ -4,3 +4,7 @@ coverage
 playwright-report
 test-results
 package-lock.json
+
+# Generated API contract artifacts; preserve byte-for-byte regeneration.
+openapi.json
+src/lib/api/schema.d.ts

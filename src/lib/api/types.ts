@@ -161,15 +161,19 @@ export interface ErrorPattern {
 
 export interface SessionResult {
   sessionId: string;
-  completedAt: string;
+  completedAt: string | null;
   cefrLevel: CefrLevel;
   cefrConfidence: CefrConfidence;
   boundaryEffect: boolean;
-  ability: { theta: number; standardError: number; ci95: [number, number] };
+  ability: { theta: number | null; standardError: number | null; ci95: [number, number] | null };
   skillProfiles: SkillProfile[];
   errorPatterns: ErrorPattern[];
   aiRecommendations: string[];
-  meta: { itemsAdministered: number; durationSeconds: number; stoppingReason: StoppingReason };
+  meta: {
+    itemsAdministered: number;
+    durationSeconds: number;
+    stoppingReason: StoppingReason | null;
+  };
 }
 
 /** Giải thích AI (quyết định #78): JSON có phiên bản trong `explanations.content`. */

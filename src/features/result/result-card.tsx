@@ -395,7 +395,11 @@ export function ResultCard({
               Điểm năng lực θ
             </span>
             <span className="font-mono text-base font-bold text-primary">
-              {ability.theta >= 0 ? `+${ability.theta.toFixed(2)}` : ability.theta.toFixed(2)}
+              {ability.theta == null
+                ? "Chưa có"
+                : ability.theta >= 0
+                  ? `+${ability.theta.toFixed(2)}`
+                  : ability.theta.toFixed(2)}
             </span>
             <span className="text-[10px] text-on-surface-variant">Thước đo logit Rasch 1PL</span>
           </div>
@@ -404,7 +408,7 @@ export function ResultCard({
               Sai số chuẩn SE
             </span>
             <span data-testid="se-value" className="font-mono text-base font-bold text-on-surface">
-              ± {ability.standardError.toFixed(2)}
+              {ability.standardError == null ? "Chưa có" : `± ${ability.standardError.toFixed(2)}`}
             </span>
             <span className="text-[10px] text-on-surface-variant">Độ hội tụ thuật toán</span>
           </div>
@@ -413,7 +417,9 @@ export function ResultCard({
               Khoảng tin cậy 95%
             </span>
             <span data-testid="ci-value" className="font-mono text-base font-bold text-on-surface">
-              [{ability.ci95[0].toFixed(2)} ; {ability.ci95[1].toFixed(2)}]
+              {ability.ci95 == null
+                ? "Chưa có"
+                : `[${ability.ci95[0].toFixed(2)} ; ${ability.ci95[1].toFixed(2)}]`}
             </span>
             <span className="text-[10px] text-on-surface-variant">Khoảng dao động tin cậy</span>
           </div>
@@ -422,8 +428,13 @@ export function ResultCard({
         <div className="pt-space-xs border-t border-outline-variant/20 flex items-center justify-between text-xs text-on-surface-variant">
           <span className="font-medium">Chỉ số ước lượng năng lực:</span>
           <span className="font-mono font-bold text-primary text-[14px] px-2.5 py-1 rounded bg-primary-fixed/40">
-            θ = {ability.theta >= 0 ? `+${ability.theta.toFixed(2)}` : ability.theta.toFixed(2)} ±{" "}
-            {ability.standardError.toFixed(2)} (SE)
+            θ ={" "}
+            {ability.theta == null
+              ? "Chưa có"
+              : ability.theta >= 0
+                ? `+${ability.theta.toFixed(2)}`
+                : ability.theta.toFixed(2)}{" "}
+            {ability.standardError == null ? "" : `± ${ability.standardError.toFixed(2)} (SE)`}
           </span>
         </div>
       </section>
