@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test:e2e": "playwright test",
-    "dup": "jscpd"
+    "dup": "jscpd",
+    "gen:api": "openapi-typescript openapi.json -o src/lib/api/schema.d.ts"
   },
   "dependencies": {
     "@apt/shared-types": "git+https://github.com/AdaptivePlacementTestSystem/shared-types.git#v3.0.0",
@@ -51,6 +52,7 @@
     "jscpd": "^5.4.1",
     "jsdom": "^30.1.2",
     "msw": "^2.15.0",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.9.9",
     "shadcn": "^4.21.4",
     "tailwindcss": "^4",

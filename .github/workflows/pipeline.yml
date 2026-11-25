@@ -33,6 +33,13 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Verify generated OpenAPI types
+        run: |
+          cp src/lib/api/schema.d.ts /tmp/apt-schema.d.ts
+          npm run gen:api
+          cmp /tmp/apt-schema.d.ts src/lib/api/schema.d.ts
+          node scripts/check-api-types.cjs
+          node --test scripts/check-api-types.test.cjs
       - run: npm run lint
       - name: Phân tích tĩnh — trùng lặp mã (jscpd, ngưỡng 3%)
         run: npm run dup
