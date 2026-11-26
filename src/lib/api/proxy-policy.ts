@@ -1,8 +1,11 @@
-/**
+﻿/**
  * Chính sách cho BFF proxy: chỉ chuyển tiếp các đường dẫn đã biết tới backend, chặn truy cập tùy ý.
  * (Không phải lớp phân quyền: backend vẫn kiểm quyền thật.)
  */
 const ALLOWED: readonly RegExp[] = [
+  /^teacher-review(\/[A-Za-z0-9-]+(\/(decision|confirm-all))?)?$/,
+  /^item-batches\/import\/(preview|save)$/,
+  /^item-batches(\/[A-Za-z0-9-]+(\/(assign|deadlines))?)?$/,
   /^auth\/me$/,
   /^sessions(\/[A-Za-z0-9-]+(\/(next-item|responses|resume|result|review))?)?$/,
   /^sessions\/active$/,
