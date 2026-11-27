@@ -21,15 +21,23 @@ interface BatchList {
 
 export function BatchListView() {
   const [page, setPage] = useState(1);
+  const [status, setStatus] = useState("");
+  const [source, setSource] = useState("");
   const q = useQuery({
-    queryKey: ["admin-item-batches", page],
+    queryKey: ["admin-item-batches", page, status, source],
     queryFn: ({ signal }) =>
-      apiRequest<BatchList>("/item-batches", { query: { page, limit: 20 }, signal }),
+      apiRequest<BatchList>("/item-batches", {
+        query: { page, limit: 20, status: status || undefined, source: source || undefined },
+        signal,
+      }),
   });
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Lô câu hỏi</h1>
+        <Link className="rounded border px-4 py-2" href="/admin/item-batches/rejected">
+          Thống kê AI loại
+        </Link>
         <Link className="rounded border px-4 py-2" href="/admin/item-batches/import">
           Nhập Excel
         </Link>
@@ -39,6 +47,53 @@ export function BatchListView() {
         >
           Tạo lô AI
         </Link>
+      </div>
+      <div className="flex flex-wrap gap-4">
+        <label>
+          Trạng thái{" "}
+          <select
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value);
+              setPage(1);
+            }}
+            className="rounded border p-2"
+          >
+            <option value="">Tất cả</option>
+            {[
+              "GENERATING",
+              "IMPORTING",
+              "CHECKING",
+              "READY_TO_ASSIGN",
+              "IN_REVIEW",
+              "READY_TO_FINALIZE",
+              "FINAL_CHECKED",
+              "PARTIALLY_IMPORTED",
+              "DONE",
+              "FAILED",
+              "PARTIAL",
+            ].map((value) => (
+              <option key={value} value={value}>
+                {batchStatusLabels[value]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Nguồn{" "}
+          <select
+            value={source}
+            onChange={(event) => {
+              setSource(event.target.value);
+              setPage(1);
+            }}
+            className="rounded border p-2"
+          >
+            <option value="">Tất cả</option>
+            <option value="AI_GENERATED">AI sinh</option>
+            <option value="IMPORTED">Import file</option>
+          </select>
+        </label>
       </div>
       {q.isLoading ? (
         <LoadingBlock />

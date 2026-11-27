@@ -1,5 +1,5 @@
 ﻿"use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/api/client";
 export function GenerateBatch() {
@@ -11,16 +11,43 @@ export function GenerateBatch() {
   const [count, setCount] = useState(5);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const operation = useRef<{ input: string; id: string } | null>(null);
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     setError("");
     setBusy(true);
     try {
+      const input = JSON.stringify({ name, skill, cefrTarget, topicTag, count });
+      const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+      const fingerprint = Array.from(new Uint8Array(bytes), (value) =>
+        value.toString(16).padStart(2, "0"),
+      ).join("");
+      try {
+        const saved = JSON.parse(sessionStorage.getItem("apt:generate-operation") ?? "null") as {
+          input: string;
+          id: string;
+        } | null;
+        if (saved?.input === fingerprint && typeof saved.id === "string") operation.current = saved;
+      } catch {
+        /* storage can be unavailable */
+      }
+      if (!operation.current || operation.current.input !== fingerprint)
+        operation.current = { input: fingerprint, id: crypto.randomUUID() };
+      try {
+        sessionStorage.setItem("apt:generate-operation", JSON.stringify(operation.current));
+      } catch {
+        /* retry remains available while this page stays open */
+      }
       const result = await apiRequest<{ batchId: string }>("/item-batches/generate", {
         method: "POST",
-        body: { name, skill, cefrTarget, topicTag, count },
+        body: { name, skill, cefrTarget, topicTag, count, operationId: operation.current.id },
         timeoutMs: 110000,
       });
+      try {
+        sessionStorage.removeItem("apt:generate-operation");
+      } catch {
+        /* no action needed */
+      }
       router.push(`/admin/item-batches/${result.batchId}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Không thể tạo lô");

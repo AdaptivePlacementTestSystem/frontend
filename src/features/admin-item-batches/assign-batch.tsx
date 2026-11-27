@@ -7,7 +7,7 @@ import { apiRequest } from "@/lib/api/client";
 
 type Teacher = { id: string; fullName: string; role: string; isActive: boolean };
 type Item = { id: string; content: string; status: string };
-type Row = { itemId: string; reviewerId: string; confirmerId: string };
+type Row = { itemId: string; content: string; reviewerId: string; confirmerId: string };
 export function AssignBatch({ batchId }: { batchId: string }) {
   const router = useRouter();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -15,6 +15,7 @@ export function AssignBatch({ batchId }: { batchId: string }) {
   const [reviewers, setReviewers] = useState<string[]>([]);
   const [confirmers, setConfirmers] = useState<string[]>([]);
   const [rows, setRows] = useState<Row[]>([]);
+  const [revision, setRevision] = useState("");
   const [firstDueAt, setFirst] = useState("");
   const [secondDueAt, setSecond] = useState("");
   const [error, setError] = useState("");
@@ -87,20 +88,32 @@ export function AssignBatch({ batchId }: { batchId: string }) {
       setReviewers((list) => list.filter((x) => x !== id));
     }
     setRows([]);
+    setRevision("");
   }
-  function preview() {
+  async function preview() {
     if (!reviewers.length || !confirmers.length || !items.length) {
       setError("Chọn ít nhất một giảng viên cho mỗi nhóm và có câu chờ duyệt.");
       return;
     }
     setError("");
-    setRows(
-      items.map((item, i) => ({
-        itemId: item.id,
-        reviewerId: reviewers[i % reviewers.length]!,
-        confirmerId: confirmers[0]!,
-      })),
-    );
+    setBusy(true);
+    try {
+      const result = await apiRequest<{
+        batchRevision: string;
+        assignments: Array<{ itemId: string; content: string; reviewerId: string }>;
+      }>(`/item-batches/${batchId}/assign-preview`, {
+        method: "POST",
+        body: { reviewerIds: reviewers },
+      });
+      setRevision(result.batchRevision);
+      setRows(result.assignments.map((entry) => ({ ...entry, confirmerId: confirmers[0]! })));
+    } catch (e) {
+      setRows([]);
+      setRevision("");
+      setError(e instanceof Error ? e.message : "Không xem trước được phân công");
+    } finally {
+      setBusy(false);
+    }
   }
   async function submit() {
     if (!firstDueAt || !secondDueAt) {
@@ -120,11 +133,11 @@ export function AssignBatch({ batchId }: { batchId: string }) {
       await apiRequest(`/item-batches/${batchId}/assign`, {
         method: "POST",
         body: {
-          reviewerIds: reviewers,
-          confirmerIds: confirmers,
+          confirmerId: confirmers[0],
           firstDueAt: new Date(firstDueAt).toISOString(),
           secondDueAt: new Date(secondDueAt).toISOString(),
-          assignments: rows,
+          assignments: rows.map(({ itemId, reviewerId }) => ({ itemId, reviewerId })),
+          batchRevision: revision,
         },
       });
       router.push(`/admin/item-batches/${batchId}`);
@@ -305,7 +318,8 @@ export function AssignBatch({ batchId }: { batchId: string }) {
               </div>
               <button
                 type="button"
-                onClick={preview}
+                disabled={busy}
+                onClick={() => void preview()}
                 className="rounded-lg bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-100"
               >
                 Xem trước phân công
@@ -324,29 +338,33 @@ export function AssignBatch({ batchId }: { batchId: string }) {
                   <tbody className="divide-y divide-slate-100">
                     {rows.map((row, index) => (
                       <tr key={row.itemId}>
-                        <td className="p-3">{items[index]?.content}</td>
-                        {(["reviewerId", "confirmerId"] as const).map((key, k) => (
-                          <td key={key} className="p-3">
-                            <select
-                              aria-label={`${k ? "Giảng viên B" : "Giảng viên A"} cho câu ${index + 1}`}
-                              value={row[key]}
-                              onChange={(e) =>
-                                setRows((old) =>
-                                  old.map((r) =>
-                                    r.itemId === row.itemId ? { ...r, [key]: e.target.value } : r,
-                                  ),
-                                )
-                              }
-                              className="max-w-52 rounded border border-slate-200 bg-white p-2"
-                            >
-                              {(k ? confirmers : reviewers).map((id) => (
-                                <option key={id} value={id}>
-                                  {teacherName(id)}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                        ))}
+                        <td className="p-3">{row.content}</td>
+                        <td className="p-3">
+                          <select
+                            aria-label={`Giảng viên A cho câu ${index + 1}`}
+                            value={row.reviewerId}
+                            onChange={(e) =>
+                              setRows((old) =>
+                                old.map((r) =>
+                                  r.itemId === row.itemId
+                                    ? { ...r, reviewerId: e.target.value }
+                                    : r,
+                                ),
+                              )
+                            }
+                            className="max-w-52 rounded border border-slate-200 bg-white p-2"
+                          >
+                            {reviewers.map((id) => (
+                              <option key={id} value={id}>
+                                {teacherName(id)}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="p-3">
+                          {teacherName(row.confirmerId)}{" "}
+                          <span className="text-slate-500">(chung cho lô)</span>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -377,7 +395,7 @@ export function AssignBatch({ batchId }: { batchId: string }) {
                 Hủy bỏ
               </Link>
               <button
-                disabled={busy || !rows.length}
+                disabled={busy || !rows.length || !revision}
                 onClick={submit}
                 className="inline-flex items-center gap-2 rounded-lg bg-blue-700 px-5 py-3 text-sm font-semibold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
               >

@@ -14,6 +14,14 @@ describe("giao việc lô câu hỏi", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     request.mockImplementation((path: string, options?: { method?: string }) => {
+      if (path.endsWith("/assign-preview"))
+        return Promise.resolve({
+          batchRevision: "revision",
+          assignments: [
+            { itemId: "i2", content: "Câu hai", reviewerId: "a" },
+            { itemId: "i1", content: "Câu một", reviewerId: "a" },
+          ],
+        });
       if (options?.method === "POST") return Promise.resolve({ assigned: 2 });
       if (path === "/teachers")
         return Promise.resolve({
@@ -48,7 +56,7 @@ describe("giao việc lô câu hỏi", () => {
       target: { value: "2099-01-02T10:00" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Xem trước phân công" }));
-    expect(screen.getByText("Câu một")).toBeInTheDocument();
+    expect(await screen.findByText("Câu một")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Xác nhận giao việc" }));
     await waitFor(() => expect(push).toHaveBeenCalledWith("/admin/item-batches/batch"));
     expect(request).toHaveBeenCalledWith(
@@ -57,9 +65,11 @@ describe("giao việc lô câu hỏi", () => {
         method: "POST",
         body: expect.objectContaining({
           assignments: [
-            { itemId: "i1", reviewerId: "a", confirmerId: "b" },
-            { itemId: "i2", reviewerId: "a", confirmerId: "b" },
+            { itemId: "i2", reviewerId: "a" },
+            { itemId: "i1", reviewerId: "a" },
           ],
+          confirmerId: "b",
+          batchRevision: "revision",
         }),
       }),
     );

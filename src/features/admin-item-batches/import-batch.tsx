@@ -1,107 +1,147 @@
-﻿"use client";
-import { useState } from "react";
+"use client";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiRequest, apiUpload } from "@/lib/api/client";
+import Link from "next/link";
+import { apiDownload, apiRequest, apiUpload } from "@/lib/api/client";
 
-const reasonLabels: Record<string, string> = {
-  CONTENT_REQUIRED: "Thi?u n?i dung c?u h?i",
-  EXPLANATION_REQUIRED: "Thi?u gi?i th?ch",
-  OPTIONS_INVALID: "C?n ?? b?n l?a ch?n",
-  OPTIONS_DUPLICATE: "C?c l?a ch?n b? tr?ng",
-  ANSWER_INVALID: "??p ?n ph?i l? A, B, C ho?c D",
-  SKILL_INVALID: "K? n?ng kh?ng h?p l?",
-  CEFR_INVALID: "M?c CEFR kh?ng h?p l?",
-  TOPIC_INVALID: "Ch? ?? kh?ng h?p l?",
-  IRT_B_INVALID: "?? kh? ph?i t? -4 ??n 4",
-  DUPLICATE_IN_FILE: "C?u b? tr?ng trong t?p",
+type Candidate = { content: string; skill: string; cefrTarget: string };
+type Entry = { rowKey: string; candidate: Candidate };
+type Grid = { rows: Entry[]; operationId: string | null; expired?: boolean };
+type Upload = Grid & {
+  added: number;
+  duplicates: number;
+  rejected: Array<{ row: number; reasons: string[] }>;
 };
-type Candidate = {
-  content: string;
-  options: Record<string, string>;
-  correctAnswer: string;
-  explanation: string;
-  skill: string;
-  cefrTarget: string;
-  topicTag: string;
-  irtB: number;
-};
-type Entry = { candidate: Candidate; row: number; file: string };
+
 export function ImportBatch() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [rows, setRows] = useState<Entry[]>([]);
+  const [grid, setGrid] = useState<Grid>({ rows: [], operationId: null });
   const [notice, setNotice] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(true);
+  const [created, setCreated] = useState<string[]>([]);
+  useEffect(() => {
+    let active = true;
+    apiRequest<Grid>("/item-batches/import/grid")
+      .then((result) => {
+        if (active) {
+          setGrid(result);
+          if (result.expired) setNotice(["Lưới đã hết hạn, vui lòng tải lại tệp."]);
+        }
+      })
+      .catch((error) => {
+        if (active) setNotice([error instanceof Error ? error.message : "Không tải được lưới"]);
+      })
+      .finally(() => {
+        if (active) setBusy(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   async function upload(files: FileList | null) {
     if (!files?.length) return;
     setBusy(true);
-    const errors: string[] = [];
-    const additions: Entry[] = [];
+    const messages: string[] = [];
     try {
       for (const file of Array.from(files)) {
         const form = new FormData();
         form.set("file", file);
-        const result = await apiUpload<{
-          rows: Array<{ row: number; candidate: Candidate }>;
-          rejected: Array<{ row: number; reasons: string[] }>;
-        }>("/item-batches/import/preview", form);
-        additions.push(...result.rows.map((r) => ({ ...r, file: file.name })));
-        errors.push(
+        const result = await apiUpload<Upload>("/item-batches/import/upload", form);
+        setGrid(result);
+        if (result.duplicates)
+          messages.push(`${file.name}: ${result.duplicates} câu đã có trong lưới.`);
+        messages.push(
           ...result.rejected.map(
-            (r) =>
-              `${file.name}, dòng ${r.row}: ${r.reasons.map((code) => reasonLabels[code] ?? code).join(", ")}`,
+            (entry) => `${file.name}, dòng ${entry.row}: ${entry.reasons.join(", ")}`,
           ),
         );
       }
-      const keys = new Set(
-        rows.map((r) =>
-          r.candidate.content.normalize("NFKC").trim().replace(/\s+/g, " ").toLowerCase(),
-        ),
+      setNotice(messages);
+    } catch (error) {
+      setNotice([error instanceof Error ? error.message : "Không đọc được tệp"]);
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function remove(rowKey?: string) {
+    setBusy(true);
+    try {
+      setGrid(
+        await apiRequest<Grid>(`/item-batches/import/grid${rowKey ? `/${rowKey}` : ""}`, {
+          method: "DELETE",
+        }),
       );
-      const unique: Entry[] = [];
-      for (const entry of additions) {
-        const key = entry.candidate.content
-          .normalize("NFKC")
-          .trim()
-          .replace(/\s+/g, " ")
-          .toLowerCase();
-        if (keys.has(key)) errors.push(`${entry.file}, dòng ${entry.row}: câu đã có trong lưới`);
-        else {
-          keys.add(key);
-          unique.push(entry);
-        }
-      }
-      setRows((old) => [...old, ...unique]);
-      setNotice(errors);
-    } catch (e) {
-      setNotice([e instanceof Error ? e.message : "Không đọc được tệp"]);
+      setNotice([]);
+    } catch (error) {
+      setNotice([error instanceof Error ? error.message : "Không cập nhật được lưới"]);
     } finally {
       setBusy(false);
     }
   }
   async function save() {
+    if (!grid.operationId || !window.confirm(`Lưu ${grid.rows.length} câu vào lô?`)) return;
     setBusy(true);
     setNotice([]);
     try {
-      const result = await apiRequest<{ batchId: string }>("/item-batches/import/save", {
-        method: "POST",
-        body: { name, rows: rows.map((r) => r.candidate) },
-        timeoutMs: 60000,
-      });
-      router.push(`/admin/item-batches/${result.batchId}`);
-    } catch (e) {
-      setNotice([e instanceof Error ? e.message : "Không thể lưu lô"]);
+      const result = await apiRequest<{ batchId: string; batchIds?: string[] }>(
+        "/item-batches/import/save",
+        {
+          method: "POST",
+          body: { name, operationId: grid.operationId },
+          timeoutMs: 60000,
+        },
+      );
+      const ids = result.batchIds ?? [result.batchId];
+      if (ids.length === 1) router.push(`/admin/item-batches/${result.batchId}`);
+      else {
+        setGrid({ rows: [], operationId: null });
+        setCreated(ids);
+      }
+    } catch (error) {
+      setNotice([error instanceof Error ? error.message : "Không thể lưu lô. Hãy thử lại."]);
     } finally {
       setBusy(false);
+    }
+  }
+  async function downloadTemplate() {
+    try {
+      const result = await apiDownload("/item-batches/import/template");
+      const url = URL.createObjectURL(result.blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.filename;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      setNotice([error instanceof Error ? error.message : "Không tải được mẫu Excel"]);
     }
   }
   return (
     <main className="space-y-4">
       <h1 className="text-2xl font-semibold">Nhập lô câu hỏi từ Excel</h1>
       <p>
-        Các cột theo thứ tự: Skill, CEFR, Topic, Câu hỏi, A, B, C, D, Đáp án, Giải thích, Độ khó.
-        Dòng đầu là tiêu đề.
+        Các cột: Skill, CEFR, Topic, Câu hỏi, A, B, C, D, Đáp án, Giải thích, Độ khó. Dòng đầu là
+        tiêu đề.
       </p>
+      <p>Danh sách trên 50 câu sẽ được chia thành nhiều lô; mỗi lô có tối đa 250 lượt gọi AI.</p>
+      {created.length > 0 && (
+        <div role="status">
+          <p>Đã tạo {created.length} lô:</p>
+          <ul>
+            {created.map((id, index) => (
+              <li key={id}>
+                <Link className="underline" href={`/admin/item-batches/${id}`}>
+                  Lô {index + 1}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <button type="button" onClick={() => void downloadTemplate()} className="underline">
+        Tải mẫu Excel
+      </button>
       <label className="block">
         Tên lô{" "}
         <input
@@ -126,26 +166,26 @@ export function ImportBatch() {
       </label>
       {notice.length > 0 && (
         <div role="alert" className="rounded bg-amber-50 p-4">
-          <p>Các dòng không được thêm:</p>
           <ul>
-            {notice.map((x, i) => (
-              <li key={i}>{x}</li>
+            {notice.map((message, i) => (
+              <li key={i}>{message}</li>
             ))}
           </ul>
         </div>
       )}
-      <p>{rows.length} câu trong lưới tạm</p>
+      <p>{grid.rows.length} câu trong lưới tạm</p>
       <div className="space-y-2">
-        {rows.map((row, index) => (
-          <div key={`${row.file}-${row.row}-${index}`} className="rounded bg-white p-3">
+        {grid.rows.map((row) => (
+          <div key={row.rowKey} className="rounded bg-white p-3">
             <p>{row.candidate.content}</p>
             <p className="text-sm">
-              {row.file}, dòng {row.row} · {row.candidate.skill} · {row.candidate.cefrTarget}
+              {row.candidate.skill} · {row.candidate.cefrTarget}
             </p>
             <button
               type="button"
+              disabled={busy}
               className="text-red-700 underline"
-              onClick={() => setRows((old) => old.filter((_, i) => i !== index))}
+              onClick={() => void remove(row.rowKey)}
             >
               Bỏ dòng
             </button>
@@ -154,7 +194,15 @@ export function ImportBatch() {
       </div>
       <button
         type="button"
-        disabled={busy || !rows.length}
+        disabled={busy || !grid.rows.length}
+        onClick={() => void remove()}
+        className="mr-3 underline disabled:opacity-50"
+      >
+        Xóa lưới
+      </button>
+      <button
+        type="button"
+        disabled={busy || !grid.rows.length}
         onClick={save}
         className="rounded bg-blue-700 p-2 text-white disabled:opacity-50"
       >

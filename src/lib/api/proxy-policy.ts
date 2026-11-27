@@ -4,8 +4,11 @@
  */
 const ALLOWED: readonly RegExp[] = [
   /^teacher-review(\/[A-Za-z0-9-]+(\/(decision|confirm-all))?)?$/,
-  /^item-batches\/import\/(preview|save)$/,
-  /^item-batches(\/[A-Za-z0-9-]+(\/(assign|deadlines))?)?$/,
+  /^teacher\/tasks\/(reviews|confirms)(\/[A-Za-z0-9-]+(\/confirm-all)?)?$/,
+  /^teacher\/items\/[A-Za-z0-9-]+(\/(approve|reject|confirm|remove))?$/,
+  /^item-batches\/import\/(preview|upload|grid|save|template)$/,
+  /^item-batches\/import\/grid\/[a-f0-9]{64}$/,
+  /^item-batches(\/[A-Za-z0-9-]+(\/(assign|assign-preview|reassign|reassign-confirmer|cancel-pending|deadlines|retry-checks|retry-generation|final-check|import|refresh-status)|\/items\/[A-Za-z0-9-]+\/flag-decision)?)?$/,
   /^auth\/me$/,
   /^sessions(\/[A-Za-z0-9-]+(\/(next-item|responses|resume|result|review))?)?$/,
   /^sessions\/active$/,

@@ -40,6 +40,6 @@ describe("BatchDetailView", () => {
     expect(screen.getByText("A sample question")).toBeInTheDocument();
     expect(screen.getByText("Giảng viên A")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Giao việc" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Kiểm tra cuối" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Kiểm tra cuối" })).not.toBeInTheDocument();
   });
 });

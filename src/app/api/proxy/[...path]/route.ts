@@ -58,6 +58,7 @@ async function handle(req: NextRequest, ctx: RouteContext<"/api/proxy/[...path]"
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
   const isUpload =
     path.join("/") === "users/import/upload" ||
+    path.join("/") === "item-batches/import/upload" ||
     /^exam-rounds\/[A-Za-z0-9-]+\/participants\/import\/upload$/.test(path.join("/"));
   if (
     isUpload &&

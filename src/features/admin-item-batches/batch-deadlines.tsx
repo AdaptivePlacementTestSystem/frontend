@@ -4,11 +4,12 @@ import { apiRequest } from "@/lib/api/client";
 export function BatchDeadlines({ batchId, onSaved }: { batchId: string; onSaved: () => void }) {
   const [first, setFirst] = useState("");
   const [second, setSecond] = useState("");
+  const [reason, setReason] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   async function save() {
-    if (!first || !second) {
-      setMessage("Chọn ngày giờ cho cả hai vòng.");
+    if (!first || !second || !reason.trim()) {
+      setMessage("Chọn ngày giờ cho cả hai vòng và nhập lý do đổi hạn.");
       return;
     }
     setBusy(true);
@@ -19,6 +20,7 @@ export function BatchDeadlines({ batchId, onSaved }: { batchId: string; onSaved:
         body: {
           firstDueAt: new Date(first).toISOString(),
           secondDueAt: new Date(second).toISOString(),
+          reason: reason.trim(),
         },
       });
       setMessage("Đã cập nhật hạn cho các công việc chưa hoàn tất.");
@@ -53,6 +55,7 @@ export function BatchDeadlines({ batchId, onSaved }: { batchId: string; onSaved:
           />
         </label>
       </div>
+      <label className="block">Lý do đổi hạn <input required value={reason} onChange={(e) => setReason(e.target.value)} className="border p-2" /></label>
       <button
         onClick={save}
         disabled={busy}

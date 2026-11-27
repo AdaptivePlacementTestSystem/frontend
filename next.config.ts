@@ -22,8 +22,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/student", destination: "/" },
       { source: "/student/dashboard", destination: "/" },
-      { source: "/student/exams/:path*", destination: "/exams/:path*" },
-      { source: "/student/results/:path*", destination: "/results/:path*" },
+      { source: "/student/exams", destination: "/exams" },
+      { source: "/student/exams/:roundId", destination: "/exams/:roundId" },
       { source: "/student/history", destination: "/history" },
     ];
   },
