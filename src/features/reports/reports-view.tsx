@@ -3,15 +3,7 @@
 import { CEFR_LEVELS, type CefrLevelValue as CefrLevel } from "@apt/shared-types";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "@/components/ui/button";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import {
@@ -89,22 +81,18 @@ export function ReportsView() {
     staleTime: 60_000,
   });
 
-  // Phân phối CEFR toàn lớp (UCGV07, BR-13)
+  // Phân phối CEFR toàn trường / theo kỳ (UCGV07, BR-13)
   const dist = useQuery({
     queryKey: ["report", "distribution", selectedRoundId],
-    queryFn: ({ signal }) =>
-      getClassDistribution(selectedRoundId || undefined, signal),
+    queryFn: ({ signal }) => getClassDistribution(selectedRoundId || undefined, signal),
   });
 
-  // Error patterns toàn lớp (UCGV07)
+  // Error patterns thống kê (UCGV07)
   const errs = useQuery({
     queryKey: ["report", "errors", selectedRoundId],
     queryFn: async ({ signal }) => {
       try {
-        return await getClassErrorPatterns(
-          selectedRoundId || undefined,
-          signal,
-        );
+        return await getClassErrorPatterns(selectedRoundId || undefined, signal);
       } catch (e) {
         if (e instanceof ApiError && e.status === 404) return [];
         throw e;
@@ -116,10 +104,7 @@ export function ReportsView() {
     setBusy(type);
     setShowExportMenu(false);
     try {
-      const { blob, filename } = await downloadCsv(
-        type,
-        selectedRoundId || undefined,
-      );
+      const { blob, filename } = await downloadCsv(type, selectedRoundId || undefined);
       saveBlob(blob, filename);
     } catch (e) {
       notifyError(e);
@@ -156,7 +141,7 @@ export function ReportsView() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface-container-lowest p-space-lg rounded-xl border border-outline-variant shadow-sm">
         <div>
           <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface">
-            Báo cáo Kết quả & Phân tích Năng lực Lớp học
+            Báo cáo Thống kê Kết quả & Phân tích Năng lực
           </h1>
           <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
             Tổng hợp dữ liệu trắc nghiệm thích ứng CAT và phân phối trình độ CEFR
@@ -206,9 +191,7 @@ export function ReportsView() {
                   onClick={() => exportCsv("profiles")}
                 >
                   <span>Hồ sơ từng sinh viên</span>
-                  <span className="text-xs text-on-surface-variant font-mono">
-                    .csv
-                  </span>
+                  <span className="text-xs text-on-surface-variant font-mono">.csv</span>
                 </button>
                 <button
                   className="w-full text-left px-4 py-2 hover:bg-surface-container text-on-surface flex items-center justify-between border-t border-outline-variant/50"
@@ -217,9 +200,7 @@ export function ReportsView() {
                   onClick={() => exportCsv("distribution")}
                 >
                   <span>Phân phối mức CEFR</span>
-                  <span className="text-xs text-on-surface-variant font-mono">
-                    .csv
-                  </span>
+                  <span className="text-xs text-on-surface-variant font-mono">.csv</span>
                 </button>
               </div>
             )}
@@ -261,19 +242,14 @@ export function ReportsView() {
                   >
                     {totalStudents}
                   </span>
-                  <span className="font-body-sm text-on-surface-variant">
-                    thí sinh
-                  </span>
+                  <span className="font-body-sm text-on-surface-variant">thí sinh</span>
                 </div>
                 <div className="flex items-center justify-between mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                   <span>Trạng thái: Hoàn tất chẩn đoán</span>
                   <span>100%</span>
                 </div>
                 <div className="w-full bg-surface-container h-1.5 rounded-full mt-1.5 overflow-hidden">
-                  <div
-                    className="bg-emerald-600 h-full rounded-full"
-                    style={{ width: "100%" }}
-                  />
+                  <div className="bg-emerald-600 h-full rounded-full" style={{ width: "100%" }} />
                 </div>
               </div>
             </div>
@@ -298,11 +274,8 @@ export function ReportsView() {
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-on-surface-variant">
-                  Chiếm{" "}
-                  {totalStudents > 0
-                    ? ((maxCount / totalStudents) * 100).toFixed(1)
-                    : 0}
-                  % tổng quy mô khảo thí
+                  Chiếm {totalStudents > 0 ? ((maxCount / totalStudents) * 100).toFixed(1) : 0}%
+                  tổng quy mô khảo thí
                 </p>
               </div>
             </div>
@@ -323,9 +296,7 @@ export function ReportsView() {
                     {dist.data.averageTheta >= 0 ? "+" : ""}
                     {dist.data.averageTheta.toFixed(2)}
                   </span>
-                  <span className="font-body-sm text-on-surface-variant">
-                    logit
-                  </span>
+                  <span className="font-body-sm text-on-surface-variant">logit</span>
                 </div>
                 <p className="mt-2 text-xs text-on-surface-variant">
                   Thang đo chuẩn hóa IRT Rasch [-4.0, +4.0]
@@ -389,8 +360,7 @@ export function ReportsView() {
                 <div className="w-full h-6 rounded-lg overflow-hidden flex bg-surface-container shadow-inner">
                   {CEFR_LEVELS.map((lvl) => {
                     const count = dist.data.cefrDistribution[lvl] ?? 0;
-                    const pct =
-                      totalStudents > 0 ? (count / totalStudents) * 100 : 0;
+                    const pct = totalStudents > 0 ? (count / totalStudents) * 100 : 0;
                     if (pct === 0) return null;
                     return (
                       <div
@@ -410,8 +380,7 @@ export function ReportsView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 pt-2">
                   {CEFR_LEVELS.map((lvl) => {
                     const count = dist.data.cefrDistribution[lvl] ?? 0;
-                    const pct =
-                      totalStudents > 0 ? (count / totalStudents) * 100 : 0;
+                    const pct = totalStudents > 0 ? (count / totalStudents) * 100 : 0;
                     return (
                       <div key={lvl} className="flex flex-col gap-1.5">
                         <div className="flex items-center justify-between font-body-sm text-body-sm">
@@ -428,12 +397,8 @@ export function ReportsView() {
                             </span>
                           </div>
                           <div className="flex items-center gap-2 font-label-primary text-xs">
-                            <span className="text-on-surface font-semibold">
-                              {count} SV
-                            </span>
-                            <span className="text-on-surface-variant">
-                              {pct.toFixed(1)}%
-                            </span>
+                            <span className="text-on-surface font-semibold">{count} SV</span>
+                            <span className="text-on-surface-variant">{pct.toFixed(1)}%</span>
                           </div>
                         </div>
                         <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
@@ -451,11 +416,7 @@ export function ReportsView() {
                 </div>
 
                 {/* Recharts BarChart */}
-                <div
-                  aria-label={vi.reports.distribution}
-                  className="h-56 w-full pt-4"
-                  role="img"
-                >
+                <div aria-label={vi.reports.distribution} className="h-56 w-full pt-4" role="img">
                   <ResponsiveContainer height="100%" minWidth={0} width="100%">
                     <BarChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -476,23 +437,16 @@ export function ReportsView() {
                       <th className="py-3 px-4 rounded-l-lg">CẤP ĐỘ CEFR</th>
                       <th className="py-3 px-4">SỐ LƯỢNG SINH VIÊN</th>
                       <th className="py-3 px-4">TỈ LỆ CHIẾM</th>
-                      <th className="py-3 px-4 rounded-r-lg">
-                        GHI CHÚ HỌC THUẬT
-                      </th>
+                      <th className="py-3 px-4 rounded-r-lg">GHI CHÚ HỌC THUẬT</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-surface-container text-sm">
                     {CEFR_LEVELS.map((lvl) => {
                       const count = dist.data.cefrDistribution[lvl] ?? 0;
                       const pct =
-                        totalStudents > 0
-                          ? ((count / totalStudents) * 100).toFixed(1)
-                          : "0.0";
+                        totalStudents > 0 ? ((count / totalStudents) * 100).toFixed(1) : "0.0";
                       return (
-                        <tr
-                          key={lvl}
-                          className="hover:bg-surface-container-low transition-colors"
-                        >
+                        <tr key={lvl} className="hover:bg-surface-container-low transition-colors">
                           <td className="py-3 px-4 flex items-center gap-2">
                             <span
                               className="w-3 h-3 rounded-sm shrink-0"
@@ -502,9 +456,7 @@ export function ReportsView() {
                               {vi.cefrLevel[lvl]}
                             </span>
                           </td>
-                          <td className="py-3 px-4 font-semibold text-on-surface">
-                            {count}
-                          </td>
+                          <td className="py-3 px-4 font-semibold text-on-surface">{count}</td>
                           <td className="py-3 px-4 text-on-surface">{pct}%</td>
                           <td className="py-3 px-4 text-on-surface-variant">
                             {CEFR_DESCRIPTIONS[lvl]}
@@ -531,8 +483,7 @@ export function ReportsView() {
                     Phân tích chủ đề sai nhiều nhất
                   </h2>
                   <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
-                    Xác định các lỗ hổng kiến thức cốt lõi dựa trên tỉ lệ phản
-                    hồi không chính xác
+                    Xác định các lỗ hổng kiến thức cốt lõi dựa trên tỉ lệ phản hồi không chính xác
                   </p>
                 </div>
                 <span className="w-8 h-8 rounded-full bg-amber-50 dark:bg-amber-950/40 flex items-center justify-center text-amber-600">
@@ -556,22 +507,17 @@ export function ReportsView() {
                   >
                     <thead>
                       <tr className="bg-surface-container-low text-on-surface-variant font-label-tag text-xs font-semibold">
-                        <th className="py-3 px-4 rounded-l-lg">
-                          CHỦ ĐỀ KIẾN THỨC
-                        </th>
+                        <th className="py-3 px-4 rounded-l-lg">CHỦ ĐỀ KIẾN THỨC</th>
                         <th className="py-3 px-3">PHÂN LOẠI</th>
                         <th className="py-3 px-3 text-center">TỈ LỆ SAI</th>
                         <th className="py-3 px-3 text-center">SỐ LƯỢNG</th>
-                        <th className="py-3 px-4 text-right rounded-r-lg">
-                          MỨC ĐỘ
-                        </th>
+                        <th className="py-3 px-4 text-right rounded-r-lg">MỨC ĐỘ</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-surface-container font-body-sm text-sm">
                       {errs.data.map((item) => {
                         const isSevere = item.errorRate >= 60;
-                        const isMedium =
-                          item.errorRate >= 35 && item.errorRate < 60;
+                        const isMedium = item.errorRate >= 35 && item.errorRate < 60;
                         return (
                           <tr
                             key={item.topicTag}
@@ -582,9 +528,7 @@ export function ReportsView() {
                             </td>
                             <td className="py-3.5 px-3">
                               <span className="px-2 py-0.5 rounded bg-surface-container text-xs text-on-surface-variant">
-                                {item.skill === "VOCABULARY"
-                                  ? "Từ vựng"
-                                  : "Ngữ pháp"}
+                                {item.skill === "VOCABULARY" ? "Từ vựng" : "Ngữ pháp"}
                               </span>
                             </td>
                             <td className="py-3.5 px-3 text-center font-bold text-error">
@@ -603,11 +547,7 @@ export function ReportsView() {
                                       : "bg-secondary-container text-on-secondary-container"
                                 }`}
                               >
-                                {isSevere
-                                  ? "Nghiêm trọng"
-                                  : isMedium
-                                    ? "Trung bình"
-                                    : "Nhẹ"}
+                                {isSevere ? "Nghiêm trọng" : isMedium ? "Trung bình" : "Nhẹ"}
                               </span>
                             </td>
                           </tr>
@@ -635,22 +575,22 @@ export function ReportsView() {
                   <li className="flex items-start gap-2 bg-surface-container-low p-2.5 rounded-lg">
                     <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                     <span>
-                      Tổ chức 2 buổi chuyên đề bổ trợ về cụm từ cố định và cấu
-                      trúc câu điều kiện nâng cao.
+                      Tổ chức 2 buổi chuyên đề bổ trợ về cụm từ cố định và cấu trúc câu điều kiện
+                      nâng cao.
                     </span>
                   </li>
                   <li className="flex items-start gap-2 bg-surface-container-low p-2.5 rounded-lg">
                     <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                     <span>
-                      Phân bổ thêm bài tập trắc nghiệm vi mô (micro-practice) cho
-                      nhóm đạt trình độ A2 và B1.
+                      Phân bổ thêm bài tập trắc nghiệm vi mô (micro-practice) cho nhóm đạt trình độ
+                      A2 và B1.
                     </span>
                   </li>
                   <li className="flex items-start gap-2 bg-surface-container-low p-2.5 rounded-lg">
                     <CheckCircle2 className="h-4 w-4 text-sky-600 shrink-0 mt-0.5" />
                     <span>
-                      Khuyến nghị sinh viên xem kỹ phần giải thích chi tiết câu
-                      sai từ mô hình AI Explainer.
+                      Khuyến nghị sinh viên xem kỹ phần giải thích chi tiết câu sai từ mô hình AI
+                      Explainer.
                     </span>
                   </li>
                 </ul>

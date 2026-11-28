@@ -34,7 +34,7 @@ const MAIN: NavItem[] = [
   },
 ];
 
-// Báo cáo lớp và hồ sơ sinh viên: dùng chung thành phần với giảng viên (R-2) nhưng nằm trong khung Admin
+// Báo cáo thống kê và hồ sơ sinh viên: dùng chung thành phần với giảng viên (R-2) nhưng nằm trong khung Admin
 const SHARED: NavItem[] = [
   { href: "/admin/reports", label: vi.adminNav.reports, icon: "bar_chart" },
   { href: "/admin/students", label: vi.adminNav.students, icon: "person_search" },

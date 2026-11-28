@@ -198,7 +198,7 @@ export const vi = {
     history: "Lịch sử",
     items: "Ngân hàng câu hỏi",
     reviewQueue: "Duyệt câu hỏi",
-    reports: "Báo cáo lớp",
+    reports: "Báo cáo thống kê",
     students: "Tra cứu sinh viên",
     logout: "Đăng xuất",
   },
@@ -211,7 +211,7 @@ export const vi = {
     itemBatches: "Lô câu hỏi",
     examRounds: "Kỳ thi",
     accounts: "Tài khoản",
-    reports: "Báo cáo lớp học",
+    reports: "Báo cáo thống kê",
     students: "Hồ sơ sinh viên",
     adminBadge: "Quản trị viên",
     topbarBadge: "HỆ THỐNG CAT-RASCH",
@@ -524,7 +524,7 @@ export const vi = {
   },
 
   reports: {
-    title: "Báo cáo lớp",
+    title: "Báo cáo thống kê",
     distribution: "Phân bố trình độ CEFR",
     errorPatterns: "Chủ đề sai nhiều",
     total: "Tổng số sinh viên",
@@ -576,7 +576,8 @@ export const vi = {
     dueAtLabel: "Hạn:",
     confirmAll: "Xác nhận tất cả câu còn lại",
     confirmAllTitle: "Xác nhận tất cả câu còn lại trong lô?",
-    confirmAllDesc: "Toàn bộ câu hỏi chưa quyết định trong lô sẽ được chuyển sang trạng thái Đã xác nhận (SECOND_APPROVED).",
+    confirmAllDesc:
+      "Toàn bộ câu hỏi chưa quyết định trong lô sẽ được chuyển sang trạng thái Đã xác nhận (SECOND_APPROVED).",
     confirmAllSuccess: "Đã xác nhận tất cả các câu còn lại.",
     approveSuccess: "Đã duyệt câu hỏi.",
     rejectSuccess: "Đã từ chối câu hỏi.",

@@ -8,21 +8,18 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { ApiError } from "@/lib/api/errors";
 import { getStudentProfile } from "@/lib/api/endpoints";
 import { ResultCard } from "@/features/result/result-card";
-import { ReviewView } from "@/features/result/review-view";
 import { vi } from "@/messages/vi";
-import { Search, UserCheck, ArrowRight, UserX, AlertCircle, FileText } from "lucide-react";
+import { Search, UserCheck, ArrowRight, UserX, AlertCircle } from "lucide-react";
 
 export function StudentLookup() {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [code, setCode] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [reviewSessionId, setReviewSessionId] = useState<string | null>(null);
 
   const q = useQuery({
     queryKey: ["profile", code],
@@ -51,9 +48,7 @@ export function StudentLookup() {
       {/* S13 Header & Card Căn giữa ≤ 560px */}
       <div className="bg-card border rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
         <div className="space-y-1.5 text-center sm:text-left">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            {vi.students.title}
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">{vi.students.title}</h1>
           <p className="text-sm text-muted-foreground">
             Nhập chính xác mã số sinh viên (MSSV) để xem hồ sơ năng lực và lịch sử kiểm tra CAT.
           </p>
@@ -107,11 +102,13 @@ export function StudentLookup() {
         q.isError &&
         !q.isFetching &&
         (notFound ? (
-          <Alert variant="destructive" data-testid="student-not-found" className="rounded-xl border">
+          <Alert
+            variant="destructive"
+            data-testid="student-not-found"
+            className="rounded-xl border"
+          >
             <UserX className="h-4 w-4" />
-            <AlertDescription className="font-medium">
-              {vi.students.notFound}
-            </AlertDescription>
+            <AlertDescription className="font-medium">{vi.students.notFound}</AlertDescription>
           </Alert>
         ) : (
           <ErrorBlock error={q.error} onRetry={() => q.refetch()} />
@@ -145,7 +142,9 @@ export function StudentLookup() {
               variant="default"
               size="sm"
               className="gap-1.5 self-start sm:self-auto"
-              onClick={() => router.push(`/teacher/students/${encodeURIComponent(q.data.student.studentCode)}`)}
+              onClick={() =>
+                router.push(`/teacher/students/${encodeURIComponent(q.data.student.studentCode)}`)
+              }
             >
               <span>Xem chi tiết hồ sơ (S14)</span>
               <ArrowRight className="h-4 w-4" />
@@ -165,11 +164,7 @@ export function StudentLookup() {
                     : ""}
                 </span>
               </div>
-              <ResultCard
-                result={q.data.latest}
-                onOpenReview={(sid) => setReviewSessionId(sid)}
-                showBackHome={false}
-              />
+              <ResultCard result={q.data.latest} showFooter={false} showBackHome={false} />
             </div>
           ) : (
             <Alert className="rounded-xl border">
@@ -188,23 +183,6 @@ export function StudentLookup() {
             </Link>
           </div>
         </div>
-      )}
-
-      {/* Dialog xem chi tiết đáp án cho Giảng viên */}
-      {reviewSessionId && (
-        <Dialog open={!!reviewSessionId} onOpenChange={(open) => !open && setReviewSessionId(null)}>
-          <DialogContent className="w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-                <FileText className="h-4 w-4 text-primary" />
-                <span>Chi tiết câu hỏi &amp; giải thích đáp án bài thi CAT</span>
-              </DialogTitle>
-            </DialogHeader>
-            <div className="pt-2">
-              <ReviewView sessionId={reviewSessionId} embedded={true} />
-            </div>
-          </DialogContent>
-        </Dialog>
       )}
     </div>
   );

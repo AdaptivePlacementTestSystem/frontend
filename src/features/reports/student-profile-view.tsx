@@ -13,12 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { ApiError } from "@/lib/api/errors";
 import { getStudentProfile } from "@/lib/api/endpoints";
 import { ResultCard } from "@/features/result/result-card";
-import { ReviewView } from "@/features/result/review-view";
 import { vi } from "@/messages/vi";
 import {
   ArrowLeft,
@@ -31,8 +29,6 @@ import {
   FileEdit,
   Save,
   GraduationCap,
-  Eye,
-  FileText,
 } from "lucide-react";
 
 interface StudentProfileViewProps {
@@ -42,7 +38,6 @@ interface StudentProfileViewProps {
 export function StudentProfileView({ studentId }: StudentProfileViewProps) {
   const [academicNote, setAcademicNote] = useState("");
   const [noteSaved, setNoteSaved] = useState(false);
-  const [reviewSessionId, setReviewSessionId] = useState<string | null>(null);
 
   const q = useQuery({
     queryKey: ["profile", studentId],
@@ -241,26 +236,12 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
                 <span>Kết quả khảo thí gần nhất</span>
               </h2>
               <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5 text-xs rounded-lg h-8"
-                  type="button"
-                  onClick={() => setReviewSessionId(latest.sessionId)}
-                >
-                  <FileText className="h-3.5 w-3.5 text-primary" />
-                  <span>Xem chi tiết đáp án</span>
-                </Button>
                 <span className="text-xs text-muted-foreground font-mono">
                   {latest.completedAt ? new Date(latest.completedAt).toLocaleString("vi-VN") : ""}
                 </span>
               </div>
             </div>
-            <ResultCard
-              result={latest}
-              onOpenReview={(sid) => setReviewSessionId(sid)}
-              showBackHome={false}
-            />
+            <ResultCard result={latest} showFooter={false} showBackHome={false} />
           </div>
 
           {/* Section 2: History of CAT Assessment Sessions */}
@@ -289,7 +270,6 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
                       <TableHead className="text-center">Trình độ CEFR</TableHead>
                       <TableHead className="text-center">Năng lực (Rasch θ ± SE)</TableHead>
                       <TableHead className="text-center">Trạng thái</TableHead>
-                      <TableHead className="text-right">Thao tác</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -332,18 +312,6 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
                             <CheckCircle2 className="h-3 w-3" />
                             {row.status ? vi.sessionStatus[row.status] || row.status : "Hoàn thành"}
                           </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 text-xs text-primary hover:text-primary gap-1"
-                            type="button"
-                            onClick={() => setReviewSessionId(row.sessionId)}
-                          >
-                            <Eye className="h-3.5 w-3.5" />
-                            <span>Xem vết thi</span>
-                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -402,22 +370,6 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
             {vi.students.noProfile}
           </AlertDescription>
         </Alert>
-      )}
-      {/* Dialog xem vết thi / giải thích chi tiết đáp án cho Giảng viên */}
-      {reviewSessionId && (
-        <Dialog open={!!reviewSessionId} onOpenChange={(open) => !open && setReviewSessionId(null)}>
-          <DialogContent className="w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-                <FileText className="h-4 w-4 text-primary" />
-                <span>Chi tiết câu hỏi & giải thích đáp án bài thi CAT</span>
-              </DialogTitle>
-            </DialogHeader>
-            <div className="pt-2">
-              <ReviewView sessionId={reviewSessionId} embedded={true} />
-            </div>
-          </DialogContent>
-        </Dialog>
       )}
     </div>
   );
