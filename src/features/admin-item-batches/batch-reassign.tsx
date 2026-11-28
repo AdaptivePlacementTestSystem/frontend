@@ -72,13 +72,28 @@ export function BatchReassign({
     }
   }
   async function changeConfirmer() {
-    if (!newConfirmer || !confirmerReason.trim() || !window.confirm("Đổi giảng viên xác nhận cho lô này?")) return;
-    setBusy(true); setMessage("");
+    if (
+      !newConfirmer ||
+      !confirmerReason.trim() ||
+      !window.confirm("Đổi giảng viên xác nhận cho lô này?")
+    )
+      return;
+    setBusy(true);
+    setMessage("");
     try {
-      await apiRequest(`/item-batches/${batchId}/reassign-confirmer`, { method: "POST", body: { toConfirmerId: newConfirmer, reason: confirmerReason.trim() } });
-      setMessage("Đã đổi giảng viên B; thông báo đang chờ gửi."); setNewConfirmer(""); setConfirmerReason(""); onSaved();
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Không thể đổi giảng viên B."); }
-    finally { setBusy(false); }
+      await apiRequest(`/item-batches/${batchId}/reassign-confirmer`, {
+        method: "POST",
+        body: { toConfirmerId: newConfirmer, reason: confirmerReason.trim() },
+      });
+      setMessage("Đã đổi giảng viên B; thông báo đang chờ gửi.");
+      setNewConfirmer("");
+      setConfirmerReason("");
+      onSaved();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Không thể đổi giảng viên B.");
+    } finally {
+      setBusy(false);
+    }
   }
   return (
     <section className="space-y-3 rounded-xl bg-white p-4">
@@ -137,10 +152,44 @@ export function BatchReassign({
         Giao lại câu DRAFT
       </button>
       <h3 className="font-semibold">Đổi giảng viên xác nhận B</h3>
-      <p className="text-sm">Giảng viên B mới phải khác mọi giảng viên A trong lô; hạn và kết quả đã duyệt được giữ nguyên.</p>
-      <label className="block">GV B mới <select value={newConfirmer} onChange={(event) => setNewConfirmer(event.target.value)} className="rounded border p-2"><option value="">Chọn giảng viên</option>{teachers.filter((teacher) => teacher.isActive && teacher.id !== confirmerId).map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.fullName}</option>)}</select></label>
-      <label className="block">Lý do đổi B <textarea maxLength={500} value={confirmerReason} onChange={(event) => setConfirmerReason(event.target.value)} className="block w-full rounded border p-2" /></label>
-      <button type="button" disabled={busy || !newConfirmer || !confirmerReason.trim()} onClick={() => void changeConfirmer()} className="rounded border px-3 py-2 disabled:opacity-50">Đổi giảng viên B</button>
+      <p className="text-sm">
+        Giảng viên B mới phải khác mọi giảng viên A trong lô; hạn và kết quả đã duyệt được giữ
+        nguyên.
+      </p>
+      <label className="block">
+        GV B mới{" "}
+        <select
+          value={newConfirmer}
+          onChange={(event) => setNewConfirmer(event.target.value)}
+          className="rounded border p-2"
+        >
+          <option value="">Chọn giảng viên</option>
+          {teachers
+            .filter((teacher) => teacher.isActive && teacher.id !== confirmerId)
+            .map((teacher) => (
+              <option key={teacher.id} value={teacher.id}>
+                {teacher.fullName}
+              </option>
+            ))}
+        </select>
+      </label>
+      <label className="block">
+        Lý do đổi B{" "}
+        <textarea
+          maxLength={500}
+          value={confirmerReason}
+          onChange={(event) => setConfirmerReason(event.target.value)}
+          className="block w-full rounded border p-2"
+        />
+      </label>
+      <button
+        type="button"
+        disabled={busy || !newConfirmer || !confirmerReason.trim()}
+        onClick={() => void changeConfirmer()}
+        className="rounded border px-3 py-2 disabled:opacity-50"
+      >
+        Đổi giảng viên B
+      </button>
       {message && <p role="status">{message}</p>}
     </section>
   );

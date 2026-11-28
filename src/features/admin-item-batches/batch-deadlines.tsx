@@ -55,7 +55,15 @@ export function BatchDeadlines({ batchId, onSaved }: { batchId: string; onSaved:
           />
         </label>
       </div>
-      <label className="block">Lý do đổi hạn <input required value={reason} onChange={(e) => setReason(e.target.value)} className="border p-2" /></label>
+      <label className="block">
+        Lý do đổi hạn{" "}
+        <input
+          required
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          className="border p-2"
+        />
+      </label>
       <button
         onClick={save}
         disabled={busy}

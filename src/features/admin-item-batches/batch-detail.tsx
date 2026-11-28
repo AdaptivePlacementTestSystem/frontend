@@ -278,7 +278,11 @@ export function BatchDetailView({ batchId }: { batchId: string }) {
           </div>
         ))}
       </section>
-      {(q.data.administrativelyCancelledCount ?? 0) > 0 && <p>Đã hủy hành chính: {q.data.administrativelyCancelledCount} câu (nằm trong số câu đã loại).</p>}
+      {(q.data.administrativelyCancelledCount ?? 0) > 0 && (
+        <p>
+          Đã hủy hành chính: {q.data.administrativelyCancelledCount} câu (nằm trong số câu đã loại).
+        </p>
+      )}
       <section className="overflow-hidden rounded-xl bg-white shadow-sm">
         <div className="flex items-center justify-between border-b p-4">
           <h2 className="font-semibold">Câu hỏi trong lô</h2>
@@ -387,7 +391,11 @@ export function BatchDetailView({ batchId }: { batchId: string }) {
                           </div>
                         )}
                     </td>
-                    <td className="p-4">{item.administrativelyCancelled ? "Hủy hành chính" : batchStatusLabels[item.status] || item.status}</td>
+                    <td className="p-4">
+                      {item.administrativelyCancelled
+                        ? "Hủy hành chính"
+                        : batchStatusLabels[item.status] || item.status}
+                    </td>
                     <td className="p-4">{item.reviewer?.fullName || "Chưa giao"}</td>
                     <td className="p-4">{item.confirmer?.fullName || "Chưa giao"}</td>
                   </tr>

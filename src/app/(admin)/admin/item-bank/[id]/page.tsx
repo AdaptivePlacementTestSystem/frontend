@@ -1,7 +1,6 @@
-export default function Page() {
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">[id]</h1>
-    </div>
-  );
+﻿import { AdminItemDetail } from "@/features/admin-item-batches/admin-item-detail";
+
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <AdminItemDetail id={id} />;
 }

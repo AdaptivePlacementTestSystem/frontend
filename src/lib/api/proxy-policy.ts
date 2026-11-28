@@ -3,7 +3,6 @@
  * (Không phải lớp phân quyền: backend vẫn kiểm quyền thật.)
  */
 const ALLOWED: readonly RegExp[] = [
-  /^teacher-review(\/[A-Za-z0-9-]+(\/(decision|confirm-all))?)?$/,
   /^teacher\/tasks\/(reviews|confirms)(\/[A-Za-z0-9-]+(\/confirm-all)?)?$/,
   /^teacher\/items\/[A-Za-z0-9-]+(\/(approve|reject|confirm|remove))?$/,
   /^item-batches\/import\/(preview|upload|grid|save|template)$/,
