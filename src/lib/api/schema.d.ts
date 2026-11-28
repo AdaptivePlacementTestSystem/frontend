@@ -1398,6 +1398,10 @@ export interface components {
             errorRate: number;
             totalAttempted: number;
             totalIncorrect: number;
+            itemsAttempted: number;
+            correctCount: number;
+            accuracyRate: number;
+            severity: string;
         };
         ReviewBatchSummaryDto: {
             batchId: string;

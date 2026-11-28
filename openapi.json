@@ -8859,6 +8859,18 @@
           },
           "totalIncorrect": {
             "type": "number"
+          },
+          "itemsAttempted": {
+            "type": "number"
+          },
+          "correctCount": {
+            "type": "number"
+          },
+          "accuracyRate": {
+            "type": "number"
+          },
+          "severity": {
+            "type": "string"
           }
         },
         "required": [
@@ -8867,7 +8879,11 @@
           "studentCount",
           "errorRate",
           "totalAttempted",
-          "totalIncorrect"
+          "totalIncorrect",
+          "itemsAttempted",
+          "correctCount",
+          "accuracyRate",
+          "severity"
         ]
       },
       "ReviewBatchSummaryDto": {
