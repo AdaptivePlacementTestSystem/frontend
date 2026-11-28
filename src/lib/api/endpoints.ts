@@ -42,6 +42,8 @@ import type {
 
 type ExamRoundsListApi =
   paths["/api/v1/exam-rounds"]["get"]["responses"][200]["content"]["application/json"];
+type ReportExamRoundsListApi =
+  paths["/api/v1/reports/exam-rounds"]["get"]["responses"][200]["content"]["application/json"];
 type PagedItemsApi = paths["/api/v1/items"]["get"]["responses"][200]["content"]["application/json"];
 type TeacherReviewTasksApi =
   paths["/api/v1/teacher/tasks/reviews"]["get"]["responses"][200]["content"]["application/json"];
@@ -202,7 +204,7 @@ export const listExamRounds = async (signal?: AbortSignal) => {
       ((err as { status?: number }).status === 403 ||
         (err as { statusCode?: number }).statusCode === 403)
     ) {
-      return (await apiRequest<Array<{ id: string; name: string }>>(endpoints.examRoundsReport(), {
+      return (await apiRequest<ReportExamRoundsListApi>(endpoints.examRoundsReport(), {
         signal,
       })) as unknown as ExamRoundsListApi;
     }
