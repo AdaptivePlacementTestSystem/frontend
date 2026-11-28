@@ -13,12 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { ApiError } from "@/lib/api/errors";
 import { getStudentProfile } from "@/lib/api/endpoints";
@@ -33,10 +28,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   User,
-  SlidersHorizontal,
   FileEdit,
   Save,
-  BookOpen,
   GraduationCap,
   Eye,
   FileText,
@@ -128,13 +121,14 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
   }
 
   const { student, latest, history } = q.data!;
-  const initials = student.fullName
-    .split(" ")
-    .filter(Boolean)
-    .slice(-2)
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase() || "SV";
+  const initials =
+    student.fullName
+      .split(" ")
+      .filter(Boolean)
+      .slice(-2)
+      .map((w) => w[0])
+      .join("")
+      .toUpperCase() || "SV";
 
   return (
     <div className="max-w-[1120px] mx-auto py-6 space-y-8 animate-in fade-in-50 duration-300">
@@ -184,7 +178,10 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
           </div>
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground" data-testid="student-profile-name">
+              <h1
+                className="text-2xl font-bold tracking-tight text-foreground"
+                data-testid="student-profile-name"
+              >
                 {student.fullName}
               </h1>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
@@ -194,12 +191,17 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
               <span>
-                MSSV: <strong className="font-semibold text-foreground font-mono">{student.studentCode}</strong>
+                MSSV:{" "}
+                <strong className="font-semibold text-foreground font-mono">
+                  {student.studentCode}
+                </strong>
               </span>
               <span>•</span>
               <span>{student.email || "Chưa cập nhật email"}</span>
               <span>•</span>
-              <span>Lớp: <strong className="font-semibold text-foreground">K2026-CNTT</strong></span>
+              <span>
+                Lớp: <strong className="font-semibold text-foreground">K2026-CNTT</strong>
+              </span>
               <span>•</span>
               <span>Khoa: Công nghệ thông tin</span>
             </div>
@@ -209,14 +211,18 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
         {/* Quick Metrics Summary on Profile */}
         <div className="flex items-center gap-6 w-full lg:w-auto pt-2 lg:pt-0 justify-between lg:justify-end bg-muted/40 lg:bg-transparent p-4 lg:p-0 rounded-xl">
           <div>
-            <p className="text-xs font-medium text-muted-foreground">{vi.students.evaluationHistory}</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              {vi.students.evaluationHistory}
+            </p>
             <p className="text-base font-bold text-primary font-mono">
               {vi.students.catSessionsCount(history.length)}
             </p>
           </div>
           <div className="w-px h-8 bg-border hidden lg:block" />
           <div className="text-right lg:text-left">
-            <p className="text-xs font-medium text-muted-foreground">{vi.students.learningPathway}</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              {vi.students.learningPathway}
+            </p>
             <p className="text-base font-bold text-emerald-600 dark:text-emerald-400">
               {getRecommendedPathway(latest?.cefrLevel)}
             </p>
@@ -258,13 +264,14 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
           </div>
 
           {/* Section 2: History of CAT Assessment Sessions */}
-          <div className="bg-card border rounded-2xl p-6 shadow-sm space-y-4" data-testid="history-table">
+          <div
+            className="bg-card border rounded-2xl p-6 shadow-sm space-y-4"
+            data-testid="history-table"
+          >
             <div className="flex items-center justify-between pb-2 border-b">
               <div className="flex items-center gap-2">
                 <History className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold text-lg text-foreground">
-                  {vi.students.catHistory}
-                </h3>
+                <h3 className="font-semibold text-lg text-foreground">{vi.students.catHistory}</h3>
               </div>
               <span className="text-xs text-muted-foreground font-medium">
                 Tổng cộng: {history.length} phiên thi
@@ -296,7 +303,9 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="font-semibold text-foreground">
-                              {(row as any).examRoundName || "Kỳ thi Xếp lớp Tiếng Anh"}
+                              {(row as { examRoundName?: string }).examRoundName ||
+                                row.examRoundTitle ||
+                                "Kỳ thi Xếp lớp Tiếng Anh"}
                             </span>
                             <span className="text-xs text-muted-foreground">Khảo sát năng lực</span>
                           </div>
@@ -352,9 +361,7 @@ export function StudentProfileView({ studentId }: StudentProfileViewProps) {
           <div className="bg-card border rounded-2xl p-6 shadow-sm space-y-4">
             <div className="flex items-center gap-2 pb-2 border-b">
               <FileEdit className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold text-lg text-foreground">
-                {vi.students.academicNotes}
-              </h3>
+              <h3 className="font-semibold text-lg text-foreground">{vi.students.academicNotes}</h3>
             </div>
             <div className="space-y-4">
               <textarea

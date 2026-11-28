@@ -113,15 +113,18 @@ export function ResultCard({
   };
   const rawRes = result as ExtendedResult;
 
-  const rawCi =
-    (result.ability as any)?.confidenceInterval95 ??
-    (result.ability as any)?.ci95 ??
-    rawRes.confidenceInterval95 ??
-    [0, 0];
+  const abilityObj = result.ability as
+    | (SessionResult["ability"] & {
+        confidenceInterval95?: [number, number] | null;
+        ci95?: [number, number] | null;
+      })
+    | undefined;
+  const rawCi = abilityObj?.confidenceInterval95 ??
+    abilityObj?.ci95 ??
+    rawRes.confidenceInterval95 ?? [0, 0];
   const ability = {
     theta: result.ability?.theta ?? rawRes.thetaFinal ?? rawRes.theta ?? 0,
-    standardError:
-      result.ability?.standardError ?? rawRes.seFinal ?? rawRes.standardError ?? 0.35,
+    standardError: result.ability?.standardError ?? rawRes.seFinal ?? rawRes.standardError ?? 0.35,
     ci95: rawCi,
   };
   const meta = result.meta ?? {
@@ -152,7 +155,9 @@ export function ResultCard({
           ? "Hết thời gian làm bài"
           : "Đã hoàn tất quy trình khảo thí thích ứng");
 
-  const rawSkills: any[] = Array.isArray(result.skillProfiles)
+  const rawSkills: Array<
+    SessionResult["skillProfiles"][number] & { questionsCount?: number; total?: number }
+  > = Array.isArray(result.skillProfiles)
     ? result.skillProfiles
     : Object.values(result.skillProfiles ?? {});
   const vocabProfile = rawSkills.find((s) => s?.skill === "VOCABULARY");
@@ -619,7 +624,7 @@ export function ResultCard({
               data-testid="open-review"
               className="w-full h-12 rounded-lg bg-primary-container text-on-primary font-semibold flex items-center justify-center gap-2 hover:bg-primary shadow-sm active:scale-[0.99] transition-all cursor-pointer text-base"
             >
-              <Link href={`/results/${result.sessionId}/review`}>
+              <Link href={`/student/results/${result.sessionId}/review`}>
                 <FileText className="w-5 h-5" />
                 <span>Xem giải thích chi tiết đáp án</span>
               </Link>
@@ -633,7 +638,7 @@ export function ResultCard({
               data-testid="back-home"
               className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 py-space-xs font-medium"
             >
-              <Link href="/">
+              <Link href="/student/dashboard">
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 <span>Về trang chủ sinh viên</span>
               </Link>

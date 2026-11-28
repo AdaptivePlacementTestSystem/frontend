@@ -76,4 +76,29 @@ describe("S03 - ExamIntro Component", () => {
       expect(startSpy).toHaveBeenCalledWith("round-cat-01");
     });
   });
+
+  it("chặn hiển thị nút disable 'Hủy bài cũ và bắt đầu lại' (O4) khi đang có phiên dở", async () => {
+    vi.spyOn(endpoints, "startSession").mockRejectedValue(
+      new (await import("@/lib/api/errors")).ApiError(409, "SESSION_IN_PROGRESS", "In progress", {
+        sessionId: "sess-in-progress-1",
+      }),
+    );
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ExamIntro roundId="round-cat-01" />
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("confirm-start")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("confirm-start"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Tiếp tục bài thi")).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/Hủy bài cũ và bắt đầu lại/i)).not.toBeInTheDocument();
+  });
 });

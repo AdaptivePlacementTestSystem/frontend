@@ -14,8 +14,8 @@ export default async function StudentLayout({ children }: { children: ReactNode 
         { href: "/teacher/students", label: vi.nav.students },
       ]
     : [
-        { href: "/", label: vi.nav.home },
-        { href: "/history", label: vi.nav.history },
+        { href: "/student/dashboard", label: vi.nav.home },
+        { href: "/student/history", label: vi.nav.history },
       ];
 
   return (

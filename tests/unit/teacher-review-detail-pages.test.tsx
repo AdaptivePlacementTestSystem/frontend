@@ -5,6 +5,9 @@ import BatchReviewPage from "@/app/(teacher)/teacher/tasks/reviews/[batchId]/pag
 import BatchConfirmPage from "@/app/(teacher)/teacher/tasks/confirms/[batchId]/page";
 import * as endpoints from "@/lib/api/endpoints";
 
+type BatchReviewItems = Awaited<ReturnType<typeof endpoints.getBatchItemsForReview>>["items"];
+type BatchConfirmItems = Awaited<ReturnType<typeof endpoints.getBatchItemsForConfirm>>["items"];
+
 vi.mock("next/navigation", () => ({
   useParams: () => ({ batchId: "batch-101" }),
   useSearchParams: () => ({ get: vi.fn(() => null) }),
@@ -20,10 +23,9 @@ describe("S11 - BatchReviewPage (GV vai A)", () => {
     });
   });
 
-  const mockReviewItems = [
+  const mockReviewItems: BatchReviewItems = [
     {
       id: "item-1",
-      batchId: "batch-101",
       content: "What is the capital of Vietnam?",
       options: { A: "Hanoi", B: "HCM", C: "Danang", D: "Hue" },
       correctAnswer: "A",
@@ -45,7 +47,6 @@ describe("S11 - BatchReviewPage (GV vai A)", () => {
     },
     {
       id: "item-2",
-      batchId: "batch-101",
       content: "Second question content here",
       options: { A: "One", B: "Two", C: "Three", D: "Four" },
       correctAnswer: "B",
@@ -74,8 +75,11 @@ describe("S11 - BatchReviewPage (GV vai A)", () => {
 
   it("renders item list and details of current item", async () => {
     vi.spyOn(endpoints, "getBatchItemsForReview").mockResolvedValue({
-      batch: { id: "batch-101", name: "Lô A1" },
-      items: mockReviewItems as any,
+      batchId: "batch-101",
+      batchName: "Lô A1",
+      totalCount: mockReviewItems.length,
+      decidedCount: 1,
+      items: mockReviewItems,
     });
 
     render(
@@ -95,12 +99,17 @@ describe("S11 - BatchReviewPage (GV vai A)", () => {
 
   it("calls approveTeacherItem when Duyệt button is clicked", async () => {
     vi.spyOn(endpoints, "getBatchItemsForReview").mockResolvedValue({
-      batch: { id: "batch-101", name: "Lô A1" },
-      items: mockReviewItems as any,
+      batchId: "batch-101",
+      batchName: "Lô A1",
+      totalCount: mockReviewItems.length,
+      decidedCount: 1,
+      items: mockReviewItems,
     });
     const approveSpy = vi.spyOn(endpoints, "approveTeacherItem").mockResolvedValue({
-      message: "Approved",
-      item: { ...mockReviewItems[0], status: "FIRST_APPROVED" } as any,
+      success: true,
+      itemId: "item-1",
+      status: "FIRST_APPROVED",
+      batchFinalized: false,
     });
 
     render(
@@ -120,14 +129,19 @@ describe("S11 - BatchReviewPage (GV vai A)", () => {
     });
   });
 
-  it("opens reject confirmation dialog and calls rejectTeacherItem", async () => {
+  it("opens reject confirmation dialog, requires trimmed comment, and calls rejectTeacherItem", async () => {
     vi.spyOn(endpoints, "getBatchItemsForReview").mockResolvedValue({
-      batch: { id: "batch-101", name: "Lô A1" },
-      items: mockReviewItems as any,
+      batchId: "batch-101",
+      batchName: "Lô A1",
+      totalCount: mockReviewItems.length,
+      decidedCount: 1,
+      items: mockReviewItems,
     });
     const rejectSpy = vi.spyOn(endpoints, "rejectTeacherItem").mockResolvedValue({
-      message: "Rejected",
-      item: { ...mockReviewItems[0], status: "REJECTED" } as any,
+      success: true,
+      itemId: "item-1",
+      status: "REJECTED",
+      batchFinalized: false,
     });
 
     render(
@@ -142,18 +156,24 @@ describe("S11 - BatchReviewPage (GV vai A)", () => {
 
     fireEvent.click(screen.getByTestId("review-reject"));
 
-    // Check dialog opens
+    // Check dialog opens and confirm button is disabled when comment is empty/whitespace
     expect(screen.getByText("Từ chối câu hỏi này?")).toBeInTheDocument();
+    const targetRejectBtn = screen.getByTestId("confirm-reject-submit");
+    expect(targetRejectBtn).toBeDisabled();
 
-    // Confirm rejection
-    const confirmButtons = screen.getAllByRole("button", { name: /Từ chối/i });
-    // The second button is the one inside DialogFooter
-    const targetRejectBtn = confirmButtons[confirmButtons.length - 1];
-    expect(targetRejectBtn).toBeDefined();
-    if (targetRejectBtn) fireEvent.click(targetRejectBtn);
+    fireEvent.change(screen.getByTestId("reject-comment-input"), {
+      target: { value: "   " },
+    });
+    expect(targetRejectBtn).toBeDisabled();
+
+    fireEvent.change(screen.getByTestId("reject-comment-input"), {
+      target: { value: "  Câu hỏi sai kiến thức  " },
+    });
+    expect(targetRejectBtn).toBeEnabled();
+    fireEvent.click(targetRejectBtn);
 
     await waitFor(() => {
-      expect(rejectSpy).toHaveBeenCalledWith("item-1");
+      expect(rejectSpy).toHaveBeenCalledWith("item-1", "Câu hỏi sai kiến thức");
     });
   });
 });
@@ -167,10 +187,9 @@ describe("S35 - BatchConfirmPage (GV vai B)", () => {
     });
   });
 
-  const mockConfirmItems = [
+  const mockConfirmItems: BatchConfirmItems = [
     {
       id: "item-1",
-      batchId: "batch-101",
       content: "What is the capital of Vietnam?",
       options: { A: "Hanoi", B: "HCM", C: "Danang", D: "Hue" },
       correctAnswer: "A",
@@ -206,8 +225,11 @@ describe("S35 - BatchConfirmPage (GV vai B)", () => {
 
   it("renders confirm page with reviewer name, tag 'A đã sửa', and confirm buttons", async () => {
     vi.spyOn(endpoints, "getBatchItemsForConfirm").mockResolvedValue({
-      batch: { id: "batch-101", name: "Lô A1" },
-      items: mockConfirmItems as any,
+      batchId: "batch-101",
+      batchName: "Lô A1",
+      totalCount: mockConfirmItems.length,
+      decidedCount: 0,
+      items: mockConfirmItems,
     });
 
     render(
@@ -227,12 +249,17 @@ describe("S35 - BatchConfirmPage (GV vai B)", () => {
 
   it("calls confirmTeacherItem when Xác nhận is clicked", async () => {
     vi.spyOn(endpoints, "getBatchItemsForConfirm").mockResolvedValue({
-      batch: { id: "batch-101", name: "Lô A1" },
-      items: mockConfirmItems as any,
+      batchId: "batch-101",
+      batchName: "Lô A1",
+      totalCount: mockConfirmItems.length,
+      decidedCount: 0,
+      items: mockConfirmItems,
     });
     const confirmSpy = vi.spyOn(endpoints, "confirmTeacherItem").mockResolvedValue({
-      message: "Confirmed",
-      item: { ...mockConfirmItems[0], status: "SECOND_APPROVED" } as any,
+      success: true,
+      itemId: "item-1",
+      status: "SECOND_APPROVED",
+      batchFinalized: false,
     });
 
     render(
@@ -254,12 +281,16 @@ describe("S35 - BatchConfirmPage (GV vai B)", () => {
 
   it("calls confirmAllRemainingItems when Xác nhận tất cả is confirmed in dialog", async () => {
     vi.spyOn(endpoints, "getBatchItemsForConfirm").mockResolvedValue({
-      batch: { id: "batch-101", name: "Lô A1" },
-      items: mockConfirmItems as any,
+      batchId: "batch-101",
+      batchName: "Lô A1",
+      totalCount: mockConfirmItems.length,
+      decidedCount: 0,
+      items: mockConfirmItems,
     });
     const confirmAllSpy = vi.spyOn(endpoints, "confirmAllRemainingItems").mockResolvedValue({
-      message: "Confirmed all",
+      success: true,
       confirmedCount: 1,
+      batchFinalized: true,
     });
 
     render(
@@ -283,6 +314,48 @@ describe("S35 - BatchConfirmPage (GV vai B)", () => {
 
     await waitFor(() => {
       expect(confirmAllSpy).toHaveBeenCalledWith("batch-101");
+    });
+  });
+
+  it("opens remove dialog, requires trimmed comment, and calls removeTeacherItem (WP-7.3)", async () => {
+    vi.spyOn(endpoints, "getBatchItemsForConfirm").mockResolvedValue({
+      batchId: "batch-101",
+      batchName: "Lô A1",
+      totalCount: mockConfirmItems.length,
+      decidedCount: 0,
+      items: mockConfirmItems,
+    });
+    const removeSpy = vi.spyOn(endpoints, "removeTeacherItem").mockResolvedValue({
+      success: true,
+      itemId: "item-1",
+      status: "REJECTED",
+      batchFinalized: false,
+    });
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <BatchConfirmPage />
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("remove-item-item-1")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("remove-item-item-1"));
+    expect(screen.getByText("Loại bỏ câu hỏi này?")).toBeInTheDocument();
+
+    const submitRemoveBtn = screen.getByTestId("confirm-remove-submit");
+    expect(submitRemoveBtn).toBeDisabled();
+
+    fireEvent.change(screen.getByTestId("remove-comment-input"), {
+      target: { value: "  Đáp án nhiễu gây hiểu nhầm  " },
+    });
+    expect(submitRemoveBtn).toBeEnabled();
+    fireEvent.click(submitRemoveBtn);
+
+    await waitFor(() => {
+      expect(removeSpy).toHaveBeenCalledWith("item-1", "Đáp án nhiễu gây hiểu nhầm");
     });
   });
 });

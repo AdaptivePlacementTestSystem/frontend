@@ -498,12 +498,18 @@ export interface ConfirmTasksResponse {
 }
 
 export interface BatchReviewItemsResponse {
-  batch: { id: string; name: string };
+  batchId: string;
+  batchName: string;
+  totalCount: number;
+  decidedCount: number;
   items: ReviewItemDetail[];
 }
 
 export interface BatchConfirmItemsResponse {
-  batch: { id: string; name: string };
+  batchId: string;
+  batchName: string;
+  totalCount: number;
+  decidedCount: number;
   items: ReviewItemDetail[];
 }
 

@@ -25,13 +25,13 @@ export function TakeExamContainer({ roundId }: { roundId: string }) {
 
     // 1. Nếu kỳ thi đã hoàn tất -> chuyển hướng ngay sang màn kết quả S05
     if (data.status === "COMPLETED" && data.sessionId) {
-      router.replace(`/results/${data.sessionId}`);
+      router.replace(`/student/results/${data.sessionId}`);
       return;
     }
 
     // 2. Nếu phiên thi bị hủy hoặc chưa bắt đầu -> chuyển hướng về màn giới thiệu S03
     if (data.status === "NOT_STARTED" || data.status === "ABANDONED") {
-      router.replace(`/exams/${roundId}`);
+      router.replace(`/student/exams/${roundId}`);
       return;
     }
   }, [data, roundId, router]);

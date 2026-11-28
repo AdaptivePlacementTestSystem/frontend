@@ -1,6 +1,7 @@
 import { apiDownload, apiRequest, apiUpload, type DownloadResult } from "./client";
 import { normalizeNextItem, normalizeReview, normalizeSessionResult } from "./normalize";
 import { type ItemStatusValue as ItemStatus } from "@apt/shared-types";
+import type { paths } from "./schema";
 import type {
   AccountKind,
   AccountPage,
@@ -19,7 +20,6 @@ import type {
   ClassErrorPattern,
   CurrentUser,
   ExamRoundDetail,
-  ExamRoundSummary,
   ExplanationContent,
   ExportType,
   HistoryRow,
@@ -37,13 +37,33 @@ import type {
   StudentExamRound,
   StudentProfileView,
   SubmitResult,
-  ReviewTasksResponse,
-  ConfirmTasksResponse,
-  BatchReviewItemsResponse,
-  BatchConfirmItemsResponse,
-  ReviewItemDetail,
   EditItemInput,
 } from "./types";
+
+type ExamRoundsListApi =
+  paths["/api/v1/exam-rounds"]["get"]["responses"][200]["content"]["application/json"];
+type PagedItemsApi =
+  paths["/api/v1/items"]["get"]["responses"][200]["content"]["application/json"];
+type TeacherReviewTasksApi =
+  paths["/api/v1/teacher/tasks/reviews"]["get"]["responses"][200]["content"]["application/json"];
+type BatchReviewItemsApi =
+  paths["/api/v1/teacher/tasks/reviews/{batchId}"]["get"]["responses"][200]["content"]["application/json"];
+type TeacherConfirmTasksApi =
+  paths["/api/v1/teacher/tasks/confirms"]["get"]["responses"][200]["content"]["application/json"];
+type BatchConfirmItemsApi =
+  paths["/api/v1/teacher/tasks/confirms/{batchId}"]["get"]["responses"][200]["content"]["application/json"];
+type ConfirmAllApi =
+  paths["/api/v1/teacher/tasks/confirms/{batchId}/confirm-all"]["post"]["responses"][201]["content"]["application/json"];
+type EditTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}"]["patch"]["responses"][200]["content"]["application/json"];
+type ApproveTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}/approve"]["post"]["responses"][201]["content"]["application/json"];
+type RejectTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}/reject"]["post"]["responses"][201]["content"]["application/json"];
+type ConfirmTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}/confirm"]["post"]["responses"][201]["content"]["application/json"];
+type RemoveTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}/remove"]["post"]["responses"][201]["content"]["application/json"];
 
 /**
  * MỘT nơi duy nhất liệt kê route API (đổi tên route ở backend chỉ sửa ở đây). Đường dẫn tính từ prefix `api/v1`
@@ -172,7 +192,7 @@ export const getStudentExamRounds = (signal?: AbortSignal) =>
   apiRequest<StudentExamRound[]>(endpoints.examRoundsMine(), { signal });
 
 export const listExamRounds = (signal?: AbortSignal) =>
-  apiRequest<ExamRoundSummary[]>(endpoints.examRounds(), { signal });
+  apiRequest<ExamRoundsListApi>(endpoints.examRounds(), { signal });
 
 export const getExamRoundDetail = (id: string, signal?: AbortSignal) =>
   apiRequest<ExamRoundDetail>(endpoints.examRoundDetail(id), { signal });
@@ -188,11 +208,11 @@ export const getStudentProfile = (studentCode: string, signal?: AbortSignal) =>
 
 // ───────── Ngân hàng câu hỏi ─────────
 export const listItems = async (filters: ItemFilters, signal?: AbortSignal): Promise<Paged<ItemRow>> => {
-  const res = await apiRequest<any>(endpoints.items(), { query: { ...filters }, signal });
+  const res = await apiRequest<PagedItemsApi>(endpoints.items(), { query: { ...filters }, signal });
   if (Array.isArray(res)) {
-    return { data: res, total: res.length };
+    return { data: res as unknown as ItemRow[], total: res.length };
   }
-  return res ?? { data: [], total: 0 };
+  return (res as unknown as Paged<ItemRow>) ?? { data: [], total: 0 };
 };
 
 export const getItem = (id: string, signal?: AbortSignal) =>
@@ -291,49 +311,46 @@ export const downloadImportTemplate = (kind: AccountKind): Promise<DownloadResul
 
 // ───────── Kiểm duyệt câu hỏi cho Giảng viên (S33, S11, S34, S35) ─────────
 export const getTeacherReviewTasks = (signal?: AbortSignal) =>
-  apiRequest<ReviewTasksResponse>(endpoints.teacherReviewTasks(), { signal });
+  apiRequest<TeacherReviewTasksApi>(endpoints.teacherReviewTasks(), { signal });
 
 export const getBatchItemsForReview = (batchId: string, signal?: AbortSignal) =>
-  apiRequest<BatchReviewItemsResponse>(endpoints.teacherBatchReviewItems(batchId), { signal });
+  apiRequest<BatchReviewItemsApi>(endpoints.teacherBatchReviewItems(batchId), { signal });
 
 export const getTeacherConfirmTasks = (signal?: AbortSignal) =>
-  apiRequest<ConfirmTasksResponse>(endpoints.teacherConfirmTasks(), { signal });
+  apiRequest<TeacherConfirmTasksApi>(endpoints.teacherConfirmTasks(), { signal });
 
 export const getBatchItemsForConfirm = (batchId: string, signal?: AbortSignal) =>
-  apiRequest<BatchConfirmItemsResponse>(endpoints.teacherBatchConfirmItems(batchId), { signal });
+  apiRequest<BatchConfirmItemsApi>(endpoints.teacherBatchConfirmItems(batchId), { signal });
 
 export const confirmAllRemainingItems = (batchId: string) =>
-  apiRequest<{ message: string; confirmedCount: number }>(
-    endpoints.teacherConfirmAllRemaining(batchId),
-    { method: "POST" },
-  );
+  apiRequest<ConfirmAllApi>(endpoints.teacherConfirmAllRemaining(batchId), { method: "POST" });
 
 export const editTeacherItem = (id: string, body: EditItemInput) =>
-  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherEditItem(id), {
+  apiRequest<EditTeacherItemApi>(endpoints.teacherEditItem(id), {
     method: "PATCH",
     body,
   });
 
 export const approveTeacherItem = (id: string, comment?: string) =>
-  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherApproveItem(id), {
+  apiRequest<ApproveTeacherItemApi>(endpoints.teacherApproveItem(id), {
     method: "POST",
     body: { comment },
   });
 
 export const rejectTeacherItem = (id: string, comment?: string) =>
-  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherRejectItem(id), {
+  apiRequest<RejectTeacherItemApi>(endpoints.teacherRejectItem(id), {
     method: "POST",
     body: { comment },
   });
 
 export const confirmTeacherItem = (id: string, comment?: string) =>
-  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherConfirmItem(id), {
+  apiRequest<ConfirmTeacherItemApi>(endpoints.teacherConfirmItem(id), {
     method: "POST",
     body: { comment },
   });
 
 export const removeTeacherItem = (id: string, comment?: string) =>
-  apiRequest<{ message: string; item: ReviewItemDetail }>(endpoints.teacherRemoveItem(id), {
+  apiRequest<RemoveTeacherItemApi>(endpoints.teacherRemoveItem(id), {
     method: "POST",
     body: { comment },
   });

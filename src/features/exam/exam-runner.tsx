@@ -75,7 +75,7 @@ function Question({ sessionId, item, session, receivedAt, onExpired }: QuestionP
     onSuccess: async (res) => {
       setNetworkError(false);
       if (res.shouldStop) {
-        router.replace(`/results/${sessionId}`);
+        router.replace(`/student/results/${sessionId}`);
         return;
       }
       setChoice(null);
@@ -87,7 +87,7 @@ function Question({ sessionId, item, session, receivedAt, onExpired }: QuestionP
         await qc.invalidateQueries({ queryKey: ["next-item", sessionId] });
       } else if (e instanceof ApiError && e.code === "SESSION_EXPIRED") {
         toast.info("Thời gian làm bài đã kết thúc.");
-        router.replace(`/results/${sessionId}`);
+        router.replace(`/student/results/${sessionId}`);
       } else {
         setNetworkError(true);
         notifyError(e); // lỗi mạng: giữ nguyên lựa chọn để thử nộp lại
@@ -339,13 +339,13 @@ export function ExamRunner({ sessionId }: { sessionId: string }) {
 
   const onExpired = useCallback(() => {
     toast.info("Đã hết thời gian làm bài.");
-    router.replace(`/results/${sessionId}`);
+    router.replace(`/student/results/${sessionId}`);
   }, [sessionId, router]);
 
   const finishedId = next.data?.kind === "finished" ? next.data.sessionId : null;
   useEffect(() => {
     if (finishedId) {
-      router.replace(`/results/${finishedId}`);
+      router.replace(`/student/results/${finishedId}`);
     }
   }, [finishedId, router]);
 
@@ -354,7 +354,7 @@ export function ExamRunner({ sessionId }: { sessionId: string }) {
     next.error instanceof ApiError &&
     (next.error.code === "NOT_FOUND" || next.error.code === "FORBIDDEN");
   useEffect(() => {
-    if (goHome) router.replace("/");
+    if (goHome) router.replace("/student/dashboard");
   }, [goHome, router]);
 
   if (next.isPending) return <LoadingBlock rows={4} />;

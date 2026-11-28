@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useState, useMemo } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -31,13 +31,13 @@ import {
   approveTeacherItem,
   rejectTeacherItem,
 } from "@/lib/api/endpoints";
+import { errorMessage } from "@/lib/api/error-message";
 import type { ReviewItemDetail, ReviewOptionMap } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 
 export default function BatchReviewPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const batchId = params.batchId as string;
@@ -48,56 +48,97 @@ export default function BatchReviewPage() {
     queryFn: ({ signal }) => getBatchItemsForReview(batchId, signal),
   });
 
-  const items = data?.items || [];
-  const batch = data?.batch;
+  const items = useMemo(() => data?.items ?? [], [data?.items]);
+  const batchName = data?.batchName;
 
-  // Selected item index
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
-
-  // Form state for current item
-  const [content, setContent] = useState<string>("");
-  const [options, setOptions] = useState<ReviewOptionMap>({ A: "", B: "", C: "", D: "" });
-  const [correctAnswer, setCorrectAnswer] = useState<string>("A");
-  const [explanation, setExplanation] = useState<string>("");
-
-  // Edit validation / error states
-  const [editError, setEditError] = useState<string | null>(null);
-  const [isDiffOpen, setIsDiffOpen] = useState<boolean>(false);
-  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState<boolean>(false);
-
-  // Set initial selected item when items load or query param changes
-  useEffect(() => {
-    if (items.length === 0) return;
-
+  // Selected item index (derived default unless manually changed)
+  const [manualSelectedIndex, setManualSelectedIndex] = useState<number | null>(null);
+  const defaultIndex = useMemo(() => {
+    if (items.length === 0) return 0;
     if (itemParam) {
       const idx = items.findIndex((it) => it.id === itemParam);
-      if (idx !== -1) {
-        setSelectedIndex(idx);
-        return;
-      }
+      if (idx !== -1) return idx;
     }
-
-    // Default to the first undecided (DRAFT) item, or item 0
     const firstUndecided = items.findIndex((it) => it.status === "DRAFT");
-    setSelectedIndex(firstUndecided !== -1 ? firstUndecided : 0);
+    return firstUndecided !== -1 ? firstUndecided : 0;
   }, [items, itemParam]);
+
+  const selectedIndex =
+    manualSelectedIndex !== null && manualSelectedIndex < items.length
+      ? manualSelectedIndex
+      : defaultIndex;
+
+  const setSelectedIndex = (updater: number | ((prev: number) => number)) => {
+    setManualSelectedIndex((prev) => {
+      const current = prev !== null && prev < items.length ? prev : defaultIndex;
+      return typeof updater === "function" ? updater(current) : updater;
+    });
+  };
+
+  const [isDiffOpen, setIsDiffOpen] = useState<boolean>(false);
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState<boolean>(false);
+  const [rejectComment, setRejectComment] = useState<string>("");
 
   const currentItem: ReviewItemDetail | undefined = items[selectedIndex];
 
-  // Sync form state when selectedItem changes
-  useEffect(() => {
-    if (!currentItem) return;
-    setContent(currentItem.content);
-    setOptions({
-      A: currentItem.options.A || "",
-      B: currentItem.options.B || "",
-      C: currentItem.options.C || "",
-      D: currentItem.options.D || "",
+  const currentItemKey = currentItem
+    ? JSON.stringify([
+        currentItem.id,
+        currentItem.content,
+        currentItem.options.A ?? "",
+        currentItem.options.B ?? "",
+        currentItem.options.C ?? "",
+        currentItem.options.D ?? "",
+        currentItem.correctAnswer ?? "A",
+        currentItem.explanation ?? "",
+      ])
+    : "";
+
+  const baseFormState = currentItem
+    ? {
+        itemKey: currentItemKey,
+        content: currentItem.content,
+        options: {
+          A: currentItem.options.A || "",
+          B: currentItem.options.B || "",
+          C: currentItem.options.C || "",
+          D: currentItem.options.D || "",
+        },
+        correctAnswer: currentItem.correctAnswer || "A",
+        explanation: currentItem.explanation || "",
+        editError: null as string | null,
+      }
+    : {
+        itemKey: "",
+        content: "",
+        options: { A: "", B: "", C: "", D: "" },
+        correctAnswer: "A",
+        explanation: "",
+        editError: null as string | null,
+      };
+
+  const [formDraft, setFormDraft] = useState<typeof baseFormState | null>(null);
+  const activeDraft = formDraft && formDraft.itemKey === currentItemKey ? formDraft : baseFormState;
+
+  const { content, options, correctAnswer, explanation, editError } = activeDraft;
+
+  const updateDraft = (updater: (prev: typeof baseFormState) => typeof baseFormState) => {
+    setFormDraft((prev) => {
+      const current = prev && prev.itemKey === currentItemKey ? prev : baseFormState;
+      return { ...updater(current), itemKey: currentItemKey };
     });
-    setCorrectAnswer(currentItem.correctAnswer || "A");
-    setExplanation(currentItem.explanation || "");
-    setEditError(null);
-  }, [currentItem]);
+  };
+
+  const setContent = (val: string) => updateDraft((prev) => ({ ...prev, content: val }));
+  const setOptions = (updater: ReviewOptionMap | ((prev: ReviewOptionMap) => ReviewOptionMap)) =>
+    updateDraft((prev) => ({
+      ...prev,
+      options: typeof updater === "function" ? updater(prev.options) : updater,
+    }));
+  const setCorrectAnswer = (val: string) =>
+    updateDraft((prev) => ({ ...prev, correctAnswer: val }));
+  const setExplanation = (val: string) => updateDraft((prev) => ({ ...prev, explanation: val }));
+  const setEditError = (val: string | null) => updateDraft((prev) => ({ ...prev, editError: val }));
 
   // Check if form has unsaved modifications
   const hasUnsavedChanges = useMemo(() => {
@@ -121,9 +162,7 @@ export default function BatchReviewPage() {
 
   // Jump to next undecided question
   const advanceToNext = (startIndex: number) => {
-    const nextUndecided = items.findIndex(
-      (it, idx) => idx > startIndex && it.status === "DRAFT",
-    );
+    const nextUndecided = items.findIndex((it, idx) => idx > startIndex && it.status === "DRAFT");
     if (nextUndecided !== -1) {
       setSelectedIndex(nextUndecided);
     } else {
@@ -157,8 +196,8 @@ export default function BatchReviewPage() {
       setEditError(null);
       queryClient.invalidateQueries({ queryKey: ["teacher", "tasks", "reviews"] });
     },
-    onError: (err: any) => {
-      const msg = err?.message || "Lỗi khi lưu chỉnh sửa câu hỏi.";
+    onError: (err: unknown) => {
+      const msg = errorMessage(err);
       setEditError(msg);
       toast.error(msg);
     },
@@ -174,24 +213,25 @@ export default function BatchReviewPage() {
       queryClient.invalidateQueries({ queryKey: ["teacher", "tasks", "reviews"] });
       advanceToNext(selectedIndex);
     },
-    onError: (err: any) => {
-      toast.error(err?.message || "Lỗi khi duyệt câu hỏi.");
+    onError: (err: unknown) => {
+      toast.error(errorMessage(err));
     },
   });
 
   const rejectMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (reason: string) => {
       if (!currentItem) return;
-      return rejectTeacherItem(currentItem.id);
+      return rejectTeacherItem(currentItem.id, reason);
     },
     onSuccess: () => {
       toast.success(vi.tasks.rejectSuccess);
       setIsRejectDialogOpen(false);
+      setRejectComment("");
       queryClient.invalidateQueries({ queryKey: ["teacher", "tasks", "reviews"] });
       advanceToNext(selectedIndex);
     },
-    onError: (err: any) => {
-      toast.error(err?.message || "Lỗi khi từ chối câu hỏi.");
+    onError: (err: unknown) => {
+      toast.error(errorMessage(err));
     },
   });
 
@@ -217,9 +257,7 @@ export default function BatchReviewPage() {
               ← Quay lại Hộp việc
             </Link>
           </div>
-          <h1 className="text-xl font-bold tracking-tight">
-            Lô: {batch?.name || batchId}
-          </h1>
+          <h1 className="text-xl font-bold tracking-tight">Lô: {batchName || batchId}</h1>
         </div>
 
         <div className="flex items-center gap-4" data-testid="review-progress">
@@ -264,25 +302,35 @@ export default function BatchReviewPage() {
                 >
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-muted-foreground">
-                        #{idx + 1}
-                      </span>
+                      <span className="font-bold text-xs text-muted-foreground">#{idx + 1}</span>
                       {it.status === "FIRST_APPROVED" ? (
-                        <Badge variant="outline" className="text-emerald-700 bg-emerald-50 border-emerald-300 text-[10px] py-0 px-1">
+                        <Badge
+                          variant="outline"
+                          className="text-emerald-700 bg-emerald-50 border-emerald-300 text-[10px] py-0 px-1"
+                        >
                           ✓ Đã duyệt
                         </Badge>
                       ) : it.status === "REJECTED" ? (
-                        <Badge variant="outline" className="text-red-700 bg-red-50 border-red-300 text-[10px] py-0 px-1">
+                        <Badge
+                          variant="outline"
+                          className="text-red-700 bg-red-50 border-red-300 text-[10px] py-0 px-1"
+                        >
                           ✕ Đã từ chối
                         </Badge>
                       ) : (
-                        <Badge variant="outline" className="text-amber-700 bg-amber-50 border-amber-300 text-[10px] py-0 px-1">
+                        <Badge
+                          variant="outline"
+                          className="text-amber-700 bg-amber-50 border-amber-300 text-[10px] py-0 px-1"
+                        >
                           • Chưa quyết
                         </Badge>
                       )}
 
                       {hasFlags && (
-                        <span className="text-amber-600 font-bold text-xs" title="Có cờ cảnh báo mềm">
+                        <span
+                          className="text-amber-600 font-bold text-xs"
+                          title="Có cờ cảnh báo mềm"
+                        >
                           (!)
                         </span>
                       )}
@@ -293,9 +341,7 @@ export default function BatchReviewPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs truncate text-muted-foreground">
-                      {it.content}
-                    </p>
+                    <p className="text-xs truncate text-muted-foreground">{it.content}</p>
                   </div>
                   {isSelected && <span className="text-primary font-bold">◄</span>}
                 </button>
@@ -311,7 +357,9 @@ export default function BatchReviewPage() {
               <CardHeader className="pb-3 flex flex-row items-center justify-between border-b">
                 <div className="space-y-0.5">
                   <CardTitle className="text-base font-semibold flex items-center gap-2">
-                    <span>Câu hỏi #{selectedIndex + 1} / {items.length}</span>
+                    <span>
+                      Câu hỏi #{selectedIndex + 1} / {items.length}
+                    </span>
                     <span className="font-mono text-xs text-muted-foreground font-normal">
                       (ID: {currentItem.id})
                     </span>
@@ -505,11 +553,7 @@ export default function BatchReviewPage() {
                         type="button"
                         className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
                         size="sm"
-                        disabled={
-                          hasUnsavedChanges ||
-                          !!editError ||
-                          approveMutation.isPending
-                        }
+                        disabled={hasUnsavedChanges || !!editError || approveMutation.isPending}
                         onClick={() => approveMutation.mutate()}
                         data-testid="review-approve"
                       >
@@ -518,35 +562,73 @@ export default function BatchReviewPage() {
                     )}
 
                     {!isCurrentDraft && (
-                      <Badge variant="outline" className="text-muted-foreground py-1 px-3">
-                        Câu đã được quyết định ({currentItem.status})
-                      </Badge>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="text-muted-foreground py-1 px-3">
+                          Câu đã được quyết định ({currentItem.status})
+                        </Badge>
+                        {currentItem.firstReview && (
+                          <span
+                            className="text-xs text-muted-foreground italic"
+                            data-testid="review-decided-comment"
+                          >
+                            {currentItem.firstReview.comment?.trim()
+                              ? `Ghi chú: ${currentItem.firstReview.comment}`
+                              : "Không có ghi chú (dữ liệu trước khi bắt buộc lý do)"}
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Dialog: Reject confirmation (no reason required) */}
-            <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+            {/* Dialog: Reject confirmation (WP-7.3: bắt buộc nhập comment sau trim) */}
+            <Dialog
+              open={isRejectDialogOpen}
+              onOpenChange={(open) => {
+                setIsRejectDialogOpen(open);
+                if (!open) setRejectComment("");
+              }}
+            >
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>{vi.tasks.rejectConfirmTitle}</DialogTitle>
-                  <DialogDescription>
-                    {vi.tasks.rejectConfirmDesc}
-                  </DialogDescription>
+                  <DialogDescription>{vi.tasks.rejectConfirmDesc}</DialogDescription>
                 </DialogHeader>
+                <div className="space-y-2 py-2">
+                  <Label htmlFor="reject-reason-input" className="text-sm font-semibold">
+                    Lý do từ chối *
+                  </Label>
+                  <Textarea
+                    id="reject-reason-input"
+                    data-testid="reject-comment-input"
+                    placeholder="Nhập lý do từ chối câu hỏi (bắt buộc)..."
+                    value={rejectComment}
+                    onChange={(e) => setRejectComment(e.target.value)}
+                    className="min-h-[90px]"
+                  />
+                  {rejectComment.trim().length === 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Vui lòng nhập nội dung lý do trước khi xác nhận từ chối.
+                    </p>
+                  )}
+                </div>
                 <DialogFooter className="gap-2 sm:gap-0">
                   <Button
                     variant="outline"
-                    onClick={() => setIsRejectDialogOpen(false)}
+                    onClick={() => {
+                      setIsRejectDialogOpen(false);
+                      setRejectComment("");
+                    }}
                   >
                     {vi.tasks.cancel}
                   </Button>
                   <Button
                     variant="destructive"
-                    disabled={rejectMutation.isPending}
-                    onClick={() => rejectMutation.mutate()}
+                    data-testid="confirm-reject-submit"
+                    disabled={rejectMutation.isPending || rejectComment.trim().length === 0}
+                    onClick={() => rejectMutation.mutate(rejectComment.trim())}
                   >
                     {rejectMutation.isPending ? "Đang xử lý..." : "Từ chối"}
                   </Button>

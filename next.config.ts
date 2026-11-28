@@ -18,14 +18,8 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  async rewrites() {
-    return [
-      { source: "/student", destination: "/" },
-      { source: "/student/dashboard", destination: "/" },
-      { source: "/student/exams/:path*", destination: "/exams/:path*" },
-      { source: "/student/results/:path*", destination: "/results/:path*" },
-      { source: "/student/history", destination: "/history" },
-    ];
+  async redirects() {
+    return [{ source: "/student", destination: "/student/dashboard", permanent: false }];
   },
   async headers() {
     return [

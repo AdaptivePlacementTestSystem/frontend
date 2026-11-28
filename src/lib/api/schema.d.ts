@@ -164,6 +164,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/exam-rounds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ExamRoundController_listExamRounds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/exam-rounds/mine": {
         parameters: {
             query?: never;
@@ -388,6 +404,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reports/error-patterns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ReportingController_getErrorPatterns"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/reports/export-csv": {
         parameters: {
             query?: never;
@@ -398,6 +430,176 @@ export interface paths {
         get: operations["ReportingController_exportCsv"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/tasks/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách lô cần duyệt của GV vai A (S33) */
+        get: operations["TeacherReviewController_getReviewTasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/tasks/reviews/{batchId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách câu hỏi cần duyệt trong lô của GV vai A (S11) */
+        get: operations["TeacherReviewController_getBatchItemsForReview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/tasks/confirms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách lô cần xác nhận của GV vai B (S34, Q2) */
+        get: operations["TeacherReviewController_getConfirmTasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/tasks/confirms/{batchId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Danh sách câu hỏi cần xác nhận trong lô của GV vai B (S35, Q2) */
+        get: operations["TeacherReviewController_getBatchItemsForConfirm"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/tasks/confirms/{batchId}/confirm-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** GV vai B xác nhận tất cả câu FIRST_APPROVED trong lô (Q3) */
+        post: operations["TeacherReviewController_confirmAllRemaining"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/items/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** GV vai A chỉnh sửa câu hỏi DRAFT được giao (Q7) */
+        patch: operations["TeacherReviewController_editItem"];
+        trace?: never;
+    };
+    "/api/v1/teacher/items/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** GV vai A duyệt câu hỏi (FIRST_APPROVED) */
+        post: operations["TeacherReviewController_approveItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/items/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** GV vai A từ chối câu hỏi (REJECTED, bắt buộc lý do Q1) */
+        post: operations["TeacherReviewController_rejectItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/items/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** GV vai B xác nhận câu hỏi (SECOND_APPROVED) */
+        post: operations["TeacherReviewController_confirmItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teacher/items/{id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** GV vai B loại bỏ câu hỏi (REJECTED, bắt buộc lý do Q1) */
+        post: operations["TeacherReviewController_removeItem"];
         delete?: never;
         options?: never;
         head?: never;
@@ -750,6 +952,19 @@ export interface components {
             otp: string;
             newPassword: string;
         };
+        ExamRoundSummaryResponseDto: {
+            id: string;
+            name: string;
+            status: string;
+            effectiveStatus: string;
+            /** Format: date-time */
+            opensAt: string;
+            /** Format: date-time */
+            closesAt: string;
+            durationMinutes: number;
+            participantCount: number;
+            sessionCount: number;
+        };
         StudentExamRoundResponseDto: {
             id: string;
             title: string;
@@ -853,6 +1068,13 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            source?: string;
+            reviewerId?: string | null;
+            confirmerId?: string | null;
+        };
+        PagedItemsResponseDto: {
+            data: components["schemas"]["ItemResponseDto"][];
+            total: number;
         };
         GenerateExplanationDto: {
             content: string;
@@ -880,34 +1102,42 @@ export interface components {
             source: string;
             topicTag: string | null;
             timesUsed: number;
+            reviewerId?: string | null;
+            confirmerId?: string | null;
             explanation: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
         };
+        ProfileStudentInfoDto: {
+            id: string;
+            studentCode: string;
+            fullName: string;
+            email: string;
+        };
         AbilityResponseDto: {
             theta: number;
             standardError: number;
             confidenceInterval95: number[];
         };
-        LanguageProfileResponseDto: {
-            id: string;
-            studentId: string;
-            testSessionId: string;
+        ProfileMetaDto: {
+            stoppingReason: string | null;
+            totalItems: number | null;
+            itemsAdministered: number | null;
+        };
+        LatestProfileDto: {
+            sessionId: string;
             /** Format: date-time */
             completedAt: string;
-            abilityEstimate: components["schemas"]["AbilityResponseDto"];
             cefrLevel: string;
             cefrConfidence: string;
             boundaryEffect: boolean;
+            ability: components["schemas"]["AbilityResponseDto"];
+            meta: components["schemas"]["ProfileMetaDto"];
             skillProfiles: unknown[];
             errorPatterns: unknown[];
-            testMetadata: {
-                [key: string]: unknown;
-            };
-            aiRecommendations: string[];
-            schemaVersion: string;
+            aiRecommendations?: string[];
         };
         StudentHistoryResponseDto: {
             sessionId: string;
@@ -923,6 +1153,11 @@ export interface components {
             standardError: number | null;
             status: string;
             stoppingReason: string | null;
+        };
+        LanguageProfileResponseDto: {
+            student: components["schemas"]["ProfileStudentInfoDto"];
+            latest: components["schemas"]["LatestProfileDto"] | null;
+            history: components["schemas"]["StudentHistoryResponseDto"][];
         };
         EduZOverallDto: {
             theta: number;
@@ -984,6 +1219,137 @@ export interface components {
             averageTheta: number;
             /** Format: date-time */
             generatedAt: string;
+        };
+        ClassErrorPatternDto: {
+            topicTag: string;
+            skill: string;
+            studentCount: number;
+            errorRate: number;
+            totalAttempted: number;
+            totalIncorrect: number;
+        };
+        ReviewBatchSummaryDto: {
+            batchId: string;
+            batchName: string;
+            totalAssigned: number;
+            decidedCount: number;
+            pendingCount: number;
+            /** Format: date-time */
+            dueAt: string | null;
+            isOverdue: boolean;
+        };
+        TeacherTaskStatsDto: {
+            pendingReviews: number;
+            pendingConfirms: number;
+        };
+        ReviewTasksResponseDto: {
+            batches: components["schemas"]["ReviewBatchSummaryDto"][];
+            stats: components["schemas"]["TeacherTaskStatsDto"];
+        };
+        OptionMap: {
+            A: string;
+            B: string;
+            C: string;
+            D: string;
+        };
+        OriginalSnapshotDto: {
+            content: string;
+            options: components["schemas"]["OptionMap"];
+            correctAnswer: string;
+            explanation: string;
+        };
+        FirstReviewDetailDto: {
+            /** Format: date-time */
+            dueAt: string;
+            /** @enum {string|null} */
+            action: "APPROVE" | "REJECT" | "CONFIRM" | "REMOVE" | "CONFIRM_ALL" | "IMPORT" | "ASSIGN" | "REASSIGN" | "REASSIGN_CONFIRMER" | "UPDATE_DUE_DATE" | "ACCEPT_FLAG" | "CANCEL_PENDING" | null;
+            /** Format: date-time */
+            reviewedAt: string | null;
+            comment: string | null;
+            originalSnapshot: components["schemas"]["OriginalSnapshotDto"] | null;
+        };
+        SecondReviewDetailDto: {
+            /** Format: date-time */
+            dueAt: string;
+            /** @enum {string|null} */
+            action: "APPROVE" | "REJECT" | "CONFIRM" | "REMOVE" | "CONFIRM_ALL" | "IMPORT" | "ASSIGN" | "REASSIGN" | "REASSIGN_CONFIRMER" | "UPDATE_DUE_DATE" | "ACCEPT_FLAG" | "CANCEL_PENDING" | null;
+            /** Format: date-time */
+            confirmedAt: string | null;
+            comment: string | null;
+        };
+        ItemFlagDto: {
+            level: string;
+            reasonCodes: string[];
+            suspectedDuplicateId?: string | null;
+        };
+        ReviewItemDetailDto: {
+            id: string;
+            content: string;
+            options: components["schemas"]["OptionMap"];
+            correctAnswer: string;
+            /** @enum {string} */
+            skill: "VOCABULARY" | "GRAMMAR";
+            /** @enum {string} */
+            cefrTarget: "PRE_A1" | "A1" | "A2" | "B1" | "B2" | "C1_PLUS";
+            topicTag: string | null;
+            irtB: number;
+            /** @enum {string} */
+            status: "DRAFT" | "FIRST_APPROVED" | "SECOND_APPROVED" | "FINAL_APPROVED" | "REJECTED" | "AI_REJECTED";
+            explanation: string;
+            firstReview: components["schemas"]["FirstReviewDetailDto"] | null;
+            secondReview?: components["schemas"]["SecondReviewDetailDto"] | null;
+            hasEdited: boolean;
+            flags: components["schemas"]["ItemFlagDto"][];
+            reviewerName?: string;
+        };
+        BatchItemsResponseDto: {
+            batchId: string;
+            batchName: string;
+            totalCount: number;
+            decidedCount: number;
+            items: components["schemas"]["ReviewItemDetailDto"][];
+        };
+        ConfirmBatchSummaryDto: {
+            batchId: string;
+            batchName: string;
+            totalAssigned: number;
+            pendingCount: number;
+            confirmedCount: number;
+            removedCount: number;
+            decidedCount: number;
+            /** Format: date-time */
+            dueAt: string | null;
+            isOverdue: boolean;
+        };
+        ConfirmTasksResponseDto: {
+            batches: components["schemas"]["ConfirmBatchSummaryDto"][];
+            stats: components["schemas"]["TeacherTaskStatsDto"];
+        };
+        ConfirmAllResultDto: {
+            success: boolean;
+            confirmedCount: number;
+            batchFinalized: boolean;
+        };
+        EditItemDto: {
+            content?: string;
+            options?: components["schemas"]["OptionMap"];
+            correctAnswer?: string;
+            explanation?: string;
+        };
+        ReviewCommentDto: {
+            /** @description Ghi chú tùy chọn khi duyệt / xác nhận câu hỏi */
+            comment?: string | null;
+        };
+        ReviewActionResultDto: {
+            success: boolean;
+            itemId: string;
+            /** @enum {string} */
+            status: "DRAFT" | "FIRST_APPROVED" | "SECOND_APPROVED" | "FINAL_APPROVED" | "REJECTED" | "AI_REJECTED";
+            batchFinalized: boolean;
+        };
+        RequiredReviewCommentDto: {
+            /** @description Lý do bắt buộc khi từ chối hoặc loại bỏ câu hỏi (Q1) */
+            comment: string;
         };
         SessionMetaDto: {
             id: string;
@@ -1825,6 +2191,70 @@ export interface operations {
             };
         };
     };
+    ExamRoundController_listExamRounds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamRoundSummaryResponseDto"][];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
     ExamRoundController_getMyExamRounds: {
         parameters: {
             query?: never;
@@ -2072,6 +2502,11 @@ export interface operations {
             query?: {
                 status?: "DRAFT" | "FIRST_APPROVED" | "SECOND_APPROVED" | "FINAL_APPROVED" | "REJECTED" | "AI_REJECTED";
                 skill?: "VOCABULARY" | "GRAMMAR";
+                cefr?: "PRE_A1" | "A1" | "A2" | "B1" | "B2" | "C1_PLUS";
+                source?: "AI_GENERATED" | "IMPORTED";
+                q?: string;
+                page?: number;
+                limit?: number;
             };
             header?: never;
             path?: never;
@@ -2084,7 +2519,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ItemResponseDto"][];
+                    "application/json": components["schemas"]["PagedItemsResponseDto"];
                 };
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
@@ -2664,9 +3099,76 @@ export interface operations {
             };
         };
     };
+    ReportingController_getErrorPatterns: {
+        parameters: {
+            query?: {
+                examRoundId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClassErrorPatternDto"][];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
     ReportingController_exportCsv: {
         parameters: {
             query?: {
+                type?: "profiles" | "distribution";
                 examRoundId?: string;
             };
             header?: never;
@@ -2722,6 +3224,952 @@ export interface operations {
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_getReviewTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewTasksResponseDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_getBatchItemsForReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchItemsResponseDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_getConfirmTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmTasksResponseDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_getBatchItemsForConfirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BatchItemsResponseDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_confirmAllRemaining: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                batchId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmAllResultDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_editItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditItemDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewItemDetailDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_approveItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewActionResultDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_rejectItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequiredReviewCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewActionResultDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_confirmItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewActionResultDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    TeacherReviewController_removeItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RequiredReviewCommentDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewActionResultDto"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3664,6 +5112,15 @@ export interface operations {
                 };
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -3748,6 +5205,15 @@ export interface operations {
                 };
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -3822,6 +5288,15 @@ export interface operations {
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3916,6 +5391,15 @@ export interface operations {
                 };
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -3992,6 +5476,15 @@ export interface operations {
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4084,6 +5577,15 @@ export interface operations {
                 };
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -4161,6 +5663,15 @@ export interface operations {
             };
             /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

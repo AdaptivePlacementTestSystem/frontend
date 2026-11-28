@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +33,7 @@ export function safeNext(next: string | undefined): string | null {
 
 export function LoginForm({ next }: { next?: string }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
@@ -55,6 +57,7 @@ export function LoginForm({ next }: { next?: string }) {
         user: CurrentUser;
         mustChangePassword: boolean;
       }>("/api/auth/login", { method: "POST", body: values });
+      queryClient.clear();
       // Mật khẩu tạm (BR-05): bắt buộc đổi trước khi vào bất cứ đâu
       router.replace(
         mustChangePassword ? "/change-password?first=1" : (safeNext(next) ?? homeFor(user.role)),

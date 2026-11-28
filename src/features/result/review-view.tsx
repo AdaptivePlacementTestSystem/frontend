@@ -107,7 +107,7 @@ export function ReviewView({
       variant="outline"
       className="h-10 px-4 rounded-xl font-semibold border-outline-variant/30 hover:bg-surface-container-low transition-colors"
     >
-      <Link href={`/results/${sessionId}`}>
+      <Link href={`/student/results/${sessionId}`}>
         <ArrowLeft className="mr-2 h-4 w-4" />
         <span>Quay lại kết quả</span>
       </Link>
@@ -158,7 +158,7 @@ export function ReviewView({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-sm">
         {!embedded ? (
           <Link
-            href={`/results/${sessionId}`}
+            href={`/student/results/${sessionId}`}
             className="inline-flex items-center gap-space-xs text-primary-container font-medium hover:underline group w-fit text-sm"
           >
             <ArrowLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
@@ -276,141 +276,143 @@ export function ReviewView({
         </Alert>
       ) : (
         <div className="flex flex-col gap-space-sm" data-testid="review-list">
-        {filteredEntries.map((e, idx) => {
-          const entryOrder = typeof e.order === "number" && e.order > 0 ? e.order : idx + 1;
-          const isOpen = openItems[entryOrder] ?? idx === 0;
-          const skillLabel = e.skill === "VOCABULARY" ? "Từ vựng" : "Ngữ pháp";
+          {filteredEntries.map((e, idx) => {
+            const entryOrder = typeof e.order === "number" && e.order > 0 ? e.order : idx + 1;
+            const isOpen = openItems[entryOrder] ?? idx === 0;
+            const skillLabel = e.skill === "VOCABULARY" ? "Từ vựng" : "Ngữ pháp";
 
-          return (
-            <article
-              key={`review-${entryOrder}-${idx}`}
-              data-testid={`review-item-${entryOrder}`}
-              className="bg-surface-container-lowest rounded-xl shadow-xs overflow-hidden transition-all duration-200 border border-outline-variant/30"
-            >
-              {/* Accordion Header */}
-              <header
-                onClick={() => toggleAccordion(entryOrder)}
-                className="p-space-md sm:p-space-lg flex items-center justify-between cursor-pointer select-none hover:bg-surface-container-low/50 transition-colors"
+            return (
+              <article
+                key={`review-${entryOrder}-${idx}`}
+                data-testid={`review-item-${entryOrder}`}
+                className="bg-surface-container-lowest rounded-xl shadow-xs overflow-hidden transition-all duration-200 border border-outline-variant/30"
               >
-                <div className="flex items-center gap-space-md min-w-0 pr-2">
-                  <span className="w-8 h-8 rounded-full bg-surface-container-high text-on-surface font-semibold text-xs flex items-center justify-center shrink-0">
-                    {entryOrder}
-                  </span>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold shrink-0 w-fit ${
-                        e.skill === "VOCABULARY"
-                          ? "bg-surface-container-highest text-primary-container"
-                          : "bg-primary-fixed text-primary-container"
-                      }`}
-                    >
-                      {skillLabel}
+                {/* Accordion Header */}
+                <header
+                  onClick={() => toggleAccordion(entryOrder)}
+                  className="p-space-md sm:p-space-lg flex items-center justify-between cursor-pointer select-none hover:bg-surface-container-low/50 transition-colors"
+                >
+                  <div className="flex items-center gap-space-md min-w-0 pr-2">
+                    <span className="w-8 h-8 rounded-full bg-surface-container-high text-on-surface font-semibold text-xs flex items-center justify-center shrink-0">
+                      {entryOrder}
                     </span>
-                    <p className="text-sm font-medium text-on-surface truncate max-w-[280px] sm:max-w-[450px]">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold shrink-0 w-fit ${
+                          e.skill === "VOCABULARY"
+                            ? "bg-surface-container-highest text-primary-container"
+                            : "bg-primary-fixed text-primary-container"
+                        }`}
+                      >
+                        {skillLabel}
+                      </span>
+                      <p className="text-sm font-medium text-on-surface truncate max-w-[280px] sm:max-w-[450px]">
+                        {e.content}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-space-sm shrink-0 ml-2">
+                    {e.isCorrect ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-semibold border border-emerald-200">
+                        <Check className="h-3.5 w-3.5" />
+                        <span>Đúng</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-semibold border border-error/20">
+                        <XCircle className="h-3.5 w-3.5 text-error" />
+                        <span>Sai</span>
+                      </span>
+                    )}
+                    {isOpen ? (
+                      <ChevronUp className="h-4 w-4 text-outline" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-outline" />
+                    )}
+                  </div>
+                </header>
+
+                {/* Accordion Body */}
+                {isOpen && (
+                  <div className="px-space-md sm:px-space-lg pb-space-lg pt-2 flex flex-col gap-space-md border-t border-outline-variant/15">
+                    <div className="text-base font-medium text-on-surface leading-relaxed pt-2">
                       {e.content}
-                    </p>
-                  </div>
-                </div>
+                    </div>
 
-                <div className="flex items-center gap-space-sm shrink-0 ml-2">
-                  {e.isCorrect ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-semibold border border-emerald-200">
-                      <Check className="h-3.5 w-3.5" />
-                      <span>Đúng</span>
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-semibold border border-error/20">
-                      <XCircle className="h-3.5 w-3.5 text-error" />
-                      <span>Sai</span>
-                    </span>
-                  )}
-                  {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-outline" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-outline" />
-                  )}
-                </div>
-              </header>
+                    {/* Options Grid */}
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {OPTION_KEYS.map((key: OptionKey) => {
+                        const isChosen = key === e.chosen;
+                        const isCorrect = key === e.correct;
 
-              {/* Accordion Body */}
-              {isOpen && (
-                <div className="px-space-md sm:px-space-lg pb-space-lg pt-2 flex flex-col gap-space-md border-t border-outline-variant/15">
-                  <div className="text-base font-medium text-on-surface leading-relaxed pt-2">
-                    {e.content}
-                  </div>
+                        let containerClass =
+                          "p-3.5 sm:p-4 rounded-xl bg-surface-container-low flex items-center justify-between border border-outline-variant/15";
+                        let badgeClass =
+                          "w-7 h-7 rounded-lg bg-surface-container text-on-surface-variant font-bold text-xs flex items-center justify-center shrink-0";
+                        let textClass = "text-sm text-on-surface-variant";
 
-                  {/* Options Grid */}
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {OPTION_KEYS.map((key: OptionKey) => {
-                      const isChosen = key === e.chosen;
-                      const isCorrect = key === e.correct;
+                        if (isCorrect && isChosen) {
+                          containerClass =
+                            "p-3.5 sm:p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 flex items-center justify-between border border-emerald-500/40";
+                          badgeClass =
+                            "w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs";
+                          textClass =
+                            "text-sm text-emerald-950 dark:text-emerald-100 font-semibold";
+                        } else if (isCorrect) {
+                          containerClass =
+                            "p-3.5 sm:p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 flex items-center justify-between border border-emerald-500/40";
+                          badgeClass =
+                            "w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs";
+                          textClass =
+                            "text-sm text-emerald-950 dark:text-emerald-100 font-semibold";
+                        } else if (isChosen) {
+                          containerClass =
+                            "p-3.5 sm:p-4 rounded-xl bg-error-container/40 flex items-center justify-between border border-error/30";
+                          badgeClass =
+                            "w-7 h-7 rounded-lg bg-error text-on-error font-bold text-xs flex items-center justify-center shrink-0";
+                          textClass = "text-sm text-on-surface font-medium";
+                        }
 
-                      let containerClass =
-                        "p-3.5 sm:p-4 rounded-xl bg-surface-container-low flex items-center justify-between border border-outline-variant/15";
-                      let badgeClass =
-                        "w-7 h-7 rounded-lg bg-surface-container text-on-surface-variant font-bold text-xs flex items-center justify-center shrink-0";
-                      let textClass = "text-sm text-on-surface-variant";
+                        return (
+                          <div key={key} className={containerClass}>
+                            <div className="flex items-center gap-3 min-w-0 pr-2">
+                              <span className={badgeClass}>{key}</span>
+                              <span className={textClass}>{e.options ? e.options[key] : ""}</span>
+                            </div>
 
-                      if (isCorrect && isChosen) {
-                        containerClass =
-                          "p-3.5 sm:p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 flex items-center justify-between border border-emerald-500/40";
-                        badgeClass =
-                          "w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs";
-                        textClass = "text-sm text-emerald-950 dark:text-emerald-100 font-semibold";
-                      } else if (isCorrect) {
-                        containerClass =
-                          "p-3.5 sm:p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 flex items-center justify-between border border-emerald-500/40";
-                        badgeClass =
-                          "w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs";
-                        textClass = "text-sm text-emerald-950 dark:text-emerald-100 font-semibold";
-                      } else if (isChosen) {
-                        containerClass =
-                          "p-3.5 sm:p-4 rounded-xl bg-error-container/40 flex items-center justify-between border border-error/30";
-                        badgeClass =
-                          "w-7 h-7 rounded-lg bg-error text-on-error font-bold text-xs flex items-center justify-center shrink-0";
-                        textClass = "text-sm text-on-surface font-medium";
-                      }
-
-                      return (
-                        <div key={key} className={containerClass}>
-                          <div className="flex items-center gap-3 min-w-0 pr-2">
-                            <span className={badgeClass}>{key}</span>
-                            <span className={textClass}>{e.options ? e.options[key] : ""}</span>
+                            <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                              {isChosen && (
+                                <span
+                                  data-testid="chosen-mark"
+                                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-surface-container-lowest text-error text-xs font-semibold shadow-xs border border-outline-variant/20"
+                                >
+                                  <User className="h-3 w-3 text-error" />
+                                  <span>Bạn đã chọn</span>
+                                </span>
+                              )}
+                              {isCorrect && (
+                                <span
+                                  data-testid="correct-mark"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold shadow-xs border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-700"
+                                >
+                                  <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                                  <span>Đáp án đúng</span>
+                                </span>
+                              )}
+                            </div>
                           </div>
+                        );
+                      })}
+                    </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                            {isChosen && (
-                              <span
-                                data-testid="chosen-mark"
-                                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-surface-container-lowest text-error text-xs font-semibold shadow-xs border border-outline-variant/20"
-                              >
-                                <User className="h-3 w-3 text-error" />
-                                <span>Bạn đã chọn</span>
-                              </span>
-                            )}
-                            {isCorrect && (
-                              <span
-                                data-testid="correct-mark"
-                                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold shadow-xs border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-700"
-                              >
-                                <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                                <span>Đáp án đúng</span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {/* AI Explanation Block */}
+                    <ExplanationPanel entry={e} index={entryOrder} />
                   </div>
-
-                  {/* AI Explanation Block */}
-                  <ExplanationPanel entry={e} index={entryOrder} />
-                </div>
-              )}
-            </article>
-          );
-        })}
-      </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
       )}
 
       {/* 6. Bottom Navigation Footer Link */}
@@ -426,7 +428,7 @@ export function ReviewView({
               asChild
               className="h-10 px-5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold shadow-xs"
             >
-              <Link href="/history">
+              <Link href="/student/history">
                 <span>Đến lịch sử bài thi</span>
               </Link>
             </Button>

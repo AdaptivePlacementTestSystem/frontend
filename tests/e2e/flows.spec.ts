@@ -35,12 +35,12 @@ test.describe("đăng nhập và phân quyền", () => {
 test("sinh viên: làm bài đến khi có kết quả rồi xem lại đáp án", async ({ page }) => {
   await login(page, "sv002@example.test");
   await page.getByTestId("start-exam").click();
-  await expect(page).toHaveURL(/\/exam\//);
+  await expect(page).toHaveURL(/\/student\/exams\//);
   // Khi thi không có thanh điều hướng
   await expect(page.getByTestId("logout")).toHaveCount(0);
 
   for (let i = 0; i < 30; i++) {
-    if (/\/results\//.test(page.url())) break;
+    if (/\/student\/results\//.test(page.url())) break;
     const submit = page.getByTestId("submit-answer");
     await expect(submit.or(page.getByTestId("cefr-level"))).toBeVisible();
     if (!(await submit.isVisible())) break;

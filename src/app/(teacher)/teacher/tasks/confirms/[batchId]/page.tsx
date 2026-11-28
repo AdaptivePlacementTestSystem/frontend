@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useState, useMemo } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
@@ -27,6 +29,7 @@ import {
   removeTeacherItem,
   confirmAllRemainingItems,
 } from "@/lib/api/endpoints";
+import { errorMessage } from "@/lib/api/error-message";
 import type { ReviewItemDetail } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 
@@ -43,30 +46,36 @@ export default function BatchConfirmPage() {
     queryFn: ({ signal }) => getBatchItemsForConfirm(batchId, signal),
   });
 
-  const items = data?.items || [];
-  const batch = data?.batch;
+  const items = useMemo(() => data?.items ?? [], [data?.items]);
+  const batchName = data?.batchName;
 
-  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [manualSelectedIndex, setManualSelectedIndex] = useState<number | null>(null);
+  const defaultIndex = useMemo(() => {
+    if (items.length === 0) return 0;
+    if (itemParam) {
+      const idx = items.findIndex((it) => it.id === itemParam);
+      if (idx !== -1) return idx;
+    }
+    const firstUndecided = items.findIndex((it) => it.status === "FIRST_APPROVED");
+    return firstUndecided !== -1 ? firstUndecided : 0;
+  }, [items, itemParam]);
+
+  const selectedIndex =
+    manualSelectedIndex !== null && manualSelectedIndex < items.length
+      ? manualSelectedIndex
+      : defaultIndex;
+
+  const setSelectedIndex = (updater: number | ((prev: number) => number)) => {
+    setManualSelectedIndex((prev) => {
+      const current = prev !== null && prev < items.length ? prev : defaultIndex;
+      return typeof updater === "function" ? updater(current) : updater;
+    });
+  };
+
   const [isConfirmAllOpen, setIsConfirmAllOpen] = useState<boolean>(false);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState<boolean>(false);
   const [itemToRemoveId, setItemToRemoveId] = useState<string | null>(null);
-
-  // Set initial selected item
-  useEffect(() => {
-    if (items.length === 0) return;
-
-    if (itemParam) {
-      const idx = items.findIndex((it) => it.id === itemParam);
-      if (idx !== -1) {
-        setSelectedIndex(idx);
-        return;
-      }
-    }
-
-    // Default to first undecided (FIRST_APPROVED) item
-    const firstUndecided = items.findIndex((it) => it.status === "FIRST_APPROVED");
-    setSelectedIndex(firstUndecided !== -1 ? firstUndecided : 0);
-  }, [items, itemParam]);
+  const [removeComment, setRemoveComment] = useState<string>("");
 
   const currentItem: ReviewItemDetail | undefined = items[selectedIndex];
 
@@ -103,24 +112,25 @@ export default function BatchConfirmPage() {
       queryClient.invalidateQueries({ queryKey: ["teacher", "tasks", "confirms"] });
       advanceToNext(selectedIndex);
     },
-    onError: (err: any) => {
-      toast.error(err?.message || "Lỗi khi xác nhận câu hỏi.");
+    onError: (err: unknown) => {
+      toast.error(errorMessage(err));
     },
   });
 
   const removeMutation = useMutation({
-    mutationFn: async (itemId: string) => {
-      return removeTeacherItem(itemId);
+    mutationFn: async ({ itemId, comment }: { itemId: string; comment: string }) => {
+      return removeTeacherItem(itemId, comment);
     },
     onSuccess: () => {
       toast.success(vi.tasks.removeSuccess);
       setIsRemoveDialogOpen(false);
       setItemToRemoveId(null);
+      setRemoveComment("");
       queryClient.invalidateQueries({ queryKey: ["teacher", "tasks", "confirms"] });
       advanceToNext(selectedIndex);
     },
-    onError: (err: any) => {
-      toast.error(err?.message || "Lỗi khi loại bỏ câu hỏi.");
+    onError: (err: unknown) => {
+      toast.error(errorMessage(err));
     },
   });
 
@@ -128,13 +138,13 @@ export default function BatchConfirmPage() {
     mutationFn: async () => {
       return confirmAllRemainingItems(batchId);
     },
-    onSuccess: (res) => {
-      toast.success(res?.message || vi.tasks.confirmAllSuccess);
+    onSuccess: () => {
+      toast.success(vi.tasks.confirmAllSuccess);
       setIsConfirmAllOpen(false);
       queryClient.invalidateQueries({ queryKey: ["teacher", "tasks", "confirms"] });
     },
-    onError: (err: any) => {
-      toast.error(err?.message || "Lỗi khi xác nhận tất cả.");
+    onError: (err: unknown) => {
+      toast.error(errorMessage(err));
     },
   });
 
@@ -150,7 +160,10 @@ export default function BatchConfirmPage() {
   return (
     <div className="space-y-6">
       {/* Header bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b" data-testid="confirm-header">
+      <div
+        className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b"
+        data-testid="confirm-header"
+      >
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Link
@@ -160,9 +173,7 @@ export default function BatchConfirmPage() {
               ← Quay lại Hộp việc
             </Link>
           </div>
-          <h1 className="text-xl font-bold tracking-tight">
-            Thẩm định lô: {batch?.name || batchId}
-          </h1>
+          <h1 className="text-xl font-bold tracking-tight">Thẩm định lô: {batchName || batchId}</h1>
         </div>
 
         <div className="flex items-center gap-4">
@@ -170,9 +181,7 @@ export default function BatchConfirmPage() {
             <p className="text-sm font-semibold">
               {vi.tasks.processedProgress} {decidedCount} / {items.length}
             </p>
-            <p className="text-xs text-muted-foreground">
-              Còn {undecidedCount} câu cần thẩm định
-            </p>
+            <p className="text-xs text-muted-foreground">Còn {undecidedCount} câu cần thẩm định</p>
           </div>
           <DueBadge dueAt={dueAt} />
 
@@ -191,7 +200,10 @@ export default function BatchConfirmPage() {
 
       {/* Done Banner */}
       {isAllDecided && (
-        <Alert className="border-emerald-300 bg-emerald-50 text-emerald-900" data-testid="confirm-done">
+        <Alert
+          className="border-emerald-300 bg-emerald-50 text-emerald-900"
+          data-testid="confirm-done"
+        >
           <AlertDescription className="font-semibold text-sm flex items-center gap-2">
             <span>✓</span> {vi.tasks.allDone}
           </AlertDescription>
@@ -229,20 +241,27 @@ export default function BatchConfirmPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="space-y-1 min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="font-bold text-xs text-muted-foreground">
-                          #{idx + 1}
-                        </span>
+                        <span className="font-bold text-xs text-muted-foreground">#{idx + 1}</span>
 
                         {it.status === "SECOND_APPROVED" ? (
-                          <Badge variant="outline" className="text-emerald-700 bg-emerald-50 border-emerald-300 text-[10px] py-0 px-1">
+                          <Badge
+                            variant="outline"
+                            className="text-emerald-700 bg-emerald-50 border-emerald-300 text-[10px] py-0 px-1"
+                          >
                             ✓ Đã xác nhận
                           </Badge>
                         ) : it.status === "REJECTED" ? (
-                          <Badge variant="outline" className="text-red-700 bg-red-50 border-red-300 text-[10px] py-0 px-1">
+                          <Badge
+                            variant="outline"
+                            className="text-red-700 bg-red-50 border-red-300 text-[10px] py-0 px-1"
+                          >
                             ✕ Đã loại
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="text-blue-700 bg-blue-50 border-blue-300 text-[10px] py-0 px-1">
+                          <Badge
+                            variant="outline"
+                            className="text-blue-700 bg-blue-50 border-blue-300 text-[10px] py-0 px-1"
+                          >
                             • Chờ xác nhận
                           </Badge>
                         )}
@@ -258,15 +277,16 @@ export default function BatchConfirmPage() {
                         )}
 
                         {hasFlags && (
-                          <span className="text-amber-600 font-bold text-xs" title="Có cờ cảnh báo mềm">
+                          <span
+                            className="text-amber-600 font-bold text-xs"
+                            title="Có cờ cảnh báo mềm"
+                          >
                             (!)
                           </span>
                         )}
                       </div>
 
-                      <p className="text-xs truncate text-muted-foreground">
-                        {it.content}
-                      </p>
+                      <p className="text-xs truncate text-muted-foreground">{it.content}</p>
 
                       <p className="text-[11px] text-muted-foreground/80">
                         {vi.tasks.reviewerLabel} {it.reviewerName || "GV A"}
@@ -322,7 +342,9 @@ export default function BatchConfirmPage() {
               <CardHeader className="pb-3 flex flex-row items-center justify-between border-b">
                 <div className="space-y-0.5">
                   <CardTitle className="text-base font-semibold flex items-center gap-2">
-                    <span>Thẩm định câu #{selectedIndex + 1} / {items.length}</span>
+                    <span>
+                      Thẩm định câu #{selectedIndex + 1} / {items.length}
+                    </span>
                     {currentItem.hasEdited && (
                       <Badge className="bg-amber-100 text-amber-900 border border-amber-300 text-xs">
                         {vi.tasks.teacherAEdited}
@@ -420,7 +442,10 @@ export default function BatchConfirmPage() {
                             <span className="font-bold">{opt}.</span>
                             <span className="flex-1">{currentItem.options[opt]}</span>
                             {currentItem.correctAnswer === opt && (
-                              <Badge variant="outline" className="text-emerald-700 border-emerald-400 bg-emerald-50 text-[10px] py-0 px-1">
+                              <Badge
+                                variant="outline"
+                                className="text-emerald-700 border-emerald-400 bg-emerald-50 text-[10px] py-0 px-1"
+                              >
                                 Đáp án đúng
                               </Badge>
                             )}
@@ -465,39 +490,84 @@ export default function BatchConfirmPage() {
                       </Button>
                     </>
                   ) : (
-                    <Badge variant="outline" className="text-muted-foreground py-1.5 px-3 text-xs">
-                      Câu hỏi đã có quyết định thẩm định ({currentItem.status})
-                    </Badge>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="text-muted-foreground py-1.5 px-3 text-xs"
+                      >
+                        Câu hỏi đã có quyết định thẩm định ({currentItem.status})
+                      </Badge>
+                      {currentItem.secondReview && (
+                        <span
+                          className="text-xs text-muted-foreground italic"
+                          data-testid="confirm-decided-comment"
+                        >
+                          {currentItem.secondReview.comment?.trim()
+                            ? `Ghi chú: ${currentItem.secondReview.comment}`
+                            : "Không có ghi chú (dữ liệu trước khi bắt buộc lý do)"}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Dialog: Remove confirmation (no reason required) */}
-            <Dialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
+            {/* Dialog: Remove confirmation (WP-7.3: bắt buộc nhập comment sau trim) */}
+            <Dialog
+              open={isRemoveDialogOpen}
+              onOpenChange={(open) => {
+                setIsRemoveDialogOpen(open);
+                if (!open) {
+                  setItemToRemoveId(null);
+                  setRemoveComment("");
+                }
+              }}
+            >
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>{vi.tasks.removeConfirmTitle}</DialogTitle>
-                  <DialogDescription>
-                    {vi.tasks.removeConfirmDesc}
-                  </DialogDescription>
+                  <DialogDescription>{vi.tasks.removeConfirmDesc}</DialogDescription>
                 </DialogHeader>
+                <div className="space-y-2 py-2">
+                  <Label htmlFor="remove-reason-input" className="text-sm font-semibold">
+                    Lý do loại bỏ *
+                  </Label>
+                  <Textarea
+                    id="remove-reason-input"
+                    data-testid="remove-comment-input"
+                    placeholder="Nhập lý do loại bỏ câu hỏi (bắt buộc)..."
+                    value={removeComment}
+                    onChange={(e) => setRemoveComment(e.target.value)}
+                    className="min-h-[90px]"
+                  />
+                  {removeComment.trim().length === 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Vui lòng nhập nội dung lý do trước khi xác nhận loại bỏ.
+                    </p>
+                  )}
+                </div>
                 <DialogFooter className="gap-2 sm:gap-0">
                   <Button
                     variant="outline"
                     onClick={() => {
                       setIsRemoveDialogOpen(false);
                       setItemToRemoveId(null);
+                      setRemoveComment("");
                     }}
                   >
                     {vi.tasks.cancel}
                   </Button>
                   <Button
                     variant="destructive"
-                    disabled={removeMutation.isPending}
+                    data-testid="confirm-remove-submit"
+                    disabled={removeMutation.isPending || removeComment.trim().length === 0}
                     onClick={() => {
-                      if (itemToRemoveId) {
-                        removeMutation.mutate(itemToRemoveId);
+                      if (itemToRemoveId && removeComment.trim().length > 0) {
+                        removeMutation.mutate({
+                          itemId: itemToRemoveId,
+                          comment: removeComment.trim(),
+                        });
                       }
                     }}
                   >
@@ -513,14 +583,13 @@ export default function BatchConfirmPage() {
                 <DialogHeader>
                   <DialogTitle>{vi.tasks.confirmAllTitle}</DialogTitle>
                   <DialogDescription>
-                    Toàn bộ {undecidedCount} câu hỏi đang chờ xác nhận trong lô này sẽ được duyệt đạt và chuyển sang trạng thái Đã xác nhận (SECOND_APPROVED). Thao tác này sẽ ghi nhận log kiểm toán CONFIRM_ALL.
+                    Toàn bộ {undecidedCount} câu hỏi đang chờ xác nhận trong lô này sẽ được duyệt
+                    đạt và chuyển sang trạng thái Đã xác nhận (SECOND_APPROVED). Thao tác này sẽ ghi
+                    nhận log kiểm toán CONFIRM_ALL.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="gap-2 sm:gap-0">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsConfirmAllOpen(false)}
-                  >
+                  <Button variant="outline" onClick={() => setIsConfirmAllOpen(false)}>
                     {vi.tasks.cancel}
                   </Button>
                   <Button
