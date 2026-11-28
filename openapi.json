@@ -2343,8 +2343,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -2443,81 +2442,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -2628,8 +2597,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -2697,81 +2665,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -2796,8 +2734,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -2865,81 +2802,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -3046,8 +2953,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           },
           {
@@ -3222,81 +3128,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -6605,8 +6481,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -6706,81 +6581,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -6805,8 +6650,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -6855,81 +6699,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -6954,8 +6768,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -6972,81 +6785,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -7071,8 +6854,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -7122,81 +6904,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -7219,8 +6971,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -7229,81 +6980,51 @@
             "description": ""
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -7328,8 +7049,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           },
           {
@@ -7337,8 +7057,7 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "string",
-              "format": "uuid"
+              "type": "string"
             }
           }
         ],
@@ -7388,81 +7107,51 @@
             }
           },
           "400": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "401": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "403": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "404": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
           },
           "409": {
-            "description": "Lỗi xử lý hoặc phân quyền",
+            "description": "Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "410": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Lỗi xử lý hoặc phân quyền",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminExamHttpError"
+                  "$ref": "#/components/schemas/HttpErrorResponse"
                 }
               }
             }
@@ -13288,45 +12977,7 @@
             "type": "string"
           }
         }
-      },
-      "AdminExamHttpError": {
-        "type": "object",
-        "required": [
-          "statusCode",
-          "message"
-        ],
-        "properties": {
-          "statusCode": {
-            "type": "integer"
-          },
-          "message": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            ]
-          },
-          "error": {
-            "type": "string"
-          },
-          "code": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          }
-        }
       }
     }
-  },
-  "x-admin-exam-contract-sha256": "c5e9ab84d8a58d305e894f024232c4b0701a8b5b507f9419fea748551149103f"
+  }
 }

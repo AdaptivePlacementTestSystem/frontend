@@ -2086,14 +2086,6 @@ export interface components {
             timestamp: string;
             path: string;
         };
-        AdminExamHttpError: {
-            statusCode: number;
-            message: string | string[];
-            error?: string;
-            code?: string;
-            timestamp?: string;
-            path?: string;
-        };
     };
     responses: never;
     parameters: never;
@@ -3739,76 +3731,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -3849,76 +3814,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -3959,76 +3897,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -4151,76 +4062,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -6468,76 +6352,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -6572,76 +6429,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -6665,76 +6495,49 @@ export interface operations {
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -6767,76 +6570,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -6858,76 +6634,49 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
@@ -6961,76 +6710,49 @@ export interface operations {
                     };
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             400: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             401: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
-            /** @description Lỗi xử lý hoặc phân quyền */
+            /** @description Lỗi HTTP có thể xảy ra; không phải mọi trạng thái áp dụng cho mọi trường hợp. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            410: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            413: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
-                };
-            };
-            /** @description Lỗi xử lý hoặc phân quyền */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminExamHttpError"];
+                    "application/json": components["schemas"]["HttpErrorResponse"];
                 };
             };
         };
