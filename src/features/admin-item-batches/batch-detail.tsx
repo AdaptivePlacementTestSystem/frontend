@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { BatchDeadlines } from "./batch-deadlines";
@@ -6,47 +6,11 @@ import { BatchReassign } from "./batch-reassign";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 
-interface BatchDetail {
-  batch: {
-    id: string;
-    name: string | null;
-    source: string;
-    status: string;
-    skill: string | null;
-    cefrTarget: string | null;
-    requestedCount: number | null;
-    aiCallCount?: number;
-    aiCallLimit?: number;
-    confirmer?: { id: string } | null;
-    jobs?: Array<{ kind: string; status: string; attempts: number; lastError: string | null }>;
-  };
-  items: Array<{
-    id: string;
-    content: string;
-    status: string;
-    administrativelyCancelled?: boolean;
-    options?: Record<string, string>;
-    correctAnswer?: string;
-    explanation?: { content: string } | null;
-    checkResults?: Array<{
-      checkpoint: string;
-      level: string;
-      reasonCodes: string[];
-      suspectedDuplicateId: string | null;
-      checkedAt: string;
-    }>;
-    reviewEvents?: Array<{ createdAt: string }>;
-    reviewer: { fullName: string | null } | null;
-    confirmer: { fullName: string | null } | null;
-  }>;
-  total: number;
-  page: number;
-  limit: number;
-  statusCounts: Array<{ status: string; count: number }>;
-  administrativelyCancelledCount?: number;
-}
+type BatchDetail =
+  paths["/api/v1/item-batches/{id}"]["get"]["responses"][200]["content"]["application/json"];
 
 export const batchStatusLabels: Record<string, string> = {
   DRAFT: "Chờ duyệt vòng 1",
@@ -104,7 +68,15 @@ export function BatchDetailView({ batchId }: { batchId: string }) {
     setActionBusy(true);
     setActionError("");
     try {
-      await apiRequest(path, { method: "POST", body });
+      await apiRequest<
+        paths[
+          | "/api/v1/item-batches/{id}/final-check"
+          | "/api/v1/item-batches/{id}/import"
+          | "/api/v1/item-batches/{id}/cancel-pending"
+          | "/api/v1/item-batches/{id}/retry-generation"
+          | "/api/v1/item-batches/{id}/retry-checks"
+          | "/api/v1/item-batches/{id}/items/{itemId}/flag-decision"]["post"]["responses"][201]["content"]["application/json"]
+      >(path, { method: "POST", body });
       await q.refetch();
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "Không thể thực hiện thao tác");

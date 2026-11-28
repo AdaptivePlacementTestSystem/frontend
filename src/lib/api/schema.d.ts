@@ -2058,7 +2058,21 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        data: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string | null;
+                            source: string;
+                            status: string;
+                            /** Format: date-time */
+                            createdAt: string;
+                            _count: {
+                                items: number;
+                            };
+                        }[];
+                        total: number;
+                        page: number;
+                        limit: number;
                     };
                 };
             };
@@ -2127,7 +2141,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        data: {
+                            key: string;
+                            label: string;
+                            count: number;
+                        }[];
+                        page: number;
+                        limit: number;
+                        hasMore: boolean;
                     };
                 };
             };
@@ -2198,7 +2219,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        batch: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string | null;
+                            source: string;
+                            status: string;
+                            skill: string | null;
+                            cefrTarget: string | null;
+                            topicTag: string | null;
+                            requestedCount: number | null;
+                            aiCallCount: number;
+                            aiCallLimit: number;
+                            /** Format: date-time */
+                            createdAt: string;
+                            confirmer: {
+                                /** Format: uuid */
+                                id: string;
+                                fullName: string;
+                            } | null;
+                            jobs: {
+                                kind: string;
+                                status: string;
+                                attempts: number;
+                                lastError: string | null;
+                            }[];
+                        };
+                        items: {
+                            /** Format: uuid */
+                            id: string;
+                            content: string;
+                            options: {
+                                [key: string]: string;
+                            };
+                            correctAnswer: string;
+                            explanation: {
+                                content: string;
+                            } | null;
+                            checkResults: {
+                                checkpoint: string;
+                                level: string;
+                                reasonCodes: string[];
+                                /** Format: date-time */
+                                checkedAt: string;
+                                /** Format: uuid */
+                                suspectedDuplicateId: string | null;
+                            }[];
+                            status: string;
+                            skill: string;
+                            cefrTarget: string;
+                            topicTag: string | null;
+                            irtB: number;
+                            generatedFromRefIds: string[];
+                            /** @description Stored review JSON; null until review or assignment. */
+                            firstReview: unknown;
+                            /** @description Stored review JSON; null until review or assignment. */
+                            secondReview: unknown;
+                            reviewEvents: {
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reviewer: {
+                                /** Format: uuid */
+                                id: string;
+                                fullName: string;
+                            } | null;
+                            confirmer: {
+                                /** Format: uuid */
+                                id: string;
+                                fullName: string;
+                            } | null;
+                            administrativelyCancelled: boolean;
+                        }[];
+                        administrativelyCancelledCount: number;
+                        total: number;
+                        page: number;
+                        limit: number;
+                        statusCounts: {
+                            status: string;
+                            count: number;
+                        }[];
                     };
                 };
             };
@@ -2332,7 +2432,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        /** Format: uuid */
+                        confirmerId: string;
+                        affected: number;
                     };
                 };
             };
@@ -2400,7 +2502,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        batchRevision: string;
+                        assignments: {
+                            /** Format: uuid */
+                            itemId: string;
+                            content: string;
+                            /** Format: uuid */
+                            reviewerId: string;
+                        }[];
                     };
                 };
             };
@@ -2468,7 +2577,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        /** Format: date-time */
+                        firstDueAt: string;
+                        /** Format: date-time */
+                        secondDueAt: string;
                     };
                 };
             };
@@ -2536,7 +2648,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        assigned: number;
                     };
                 };
             };
@@ -2604,7 +2716,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        reassigned: number;
                     };
                 };
             };
@@ -2959,7 +3071,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        /** Format: uuid */
+                        batchId: string;
+                        status: string;
                     };
                 };
             };
@@ -3889,7 +4003,12 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        cancelled: number;
+                        counts: {
+                            DRAFT: number;
+                            FIRST_APPROVED: number;
+                        };
+                        status: string;
                     };
                 };
             };
@@ -3957,7 +4076,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        status: string;
+                        changed: boolean;
+                        open: number;
+                        approved: number;
                     };
                 };
             };
@@ -4025,7 +4147,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        /** Format: uuid */
+                        batchId: string;
+                        status: string;
+                        stale: boolean;
+                        items: {
+                            /** Format: uuid */
+                            id: string;
+                            status: string;
+                            stale: boolean;
+                            checks: {
+                                contentHash: string;
+                                level: string;
+                                reasonCodes: string[];
+                                /** Format: date-time */
+                                checkedAt: string;
+                                /** Format: uuid */
+                                suspectedDuplicateId: string | null;
+                            }[];
+                        }[];
                     };
                 };
             };
@@ -4093,7 +4233,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        status: string;
+                        checked: number;
+                        hardRejected: number;
+                        softFlagged: number;
                     };
                 };
             };
@@ -4162,7 +4305,9 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        /** Format: uuid */
+                        itemId: string;
+                        decision: string;
                     };
                 };
             };
@@ -4230,7 +4375,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        status: string;
+                        imported: number;
                     };
                 };
             };
@@ -4406,7 +4552,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        added: number;
+                        duplicates: number;
+                        rejected: {
+                            row: number;
+                            reasons: string[];
+                        }[];
+                        rows: {
+                            rowKey: string;
+                            candidate: {
+                                content: string;
+                                options: {
+                                    [key: string]: string;
+                                };
+                                correctAnswer: string;
+                                explanation: string;
+                                skill: string;
+                                cefrTarget: string;
+                                topicTag: string;
+                                irtB: number;
+                            };
+                        }[];
+                        /** Format: uuid */
+                        operationId: string | null;
                     };
                 };
             };
@@ -4472,7 +4640,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        rows: {
+                            rowKey: string;
+                            candidate: {
+                                content: string;
+                                options: {
+                                    [key: string]: string;
+                                };
+                                correctAnswer: string;
+                                explanation: string;
+                                skill: string;
+                                cefrTarget: string;
+                                topicTag: string;
+                                irtB: number;
+                            };
+                        }[];
+                        /** Format: uuid */
+                        operationId: string | null;
+                        expired: boolean;
                     };
                 };
             };
@@ -4538,7 +4723,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        rows: {
+                            rowKey: string;
+                            candidate: {
+                                content: string;
+                                options: {
+                                    [key: string]: string;
+                                };
+                                correctAnswer: string;
+                                explanation: string;
+                                skill: string;
+                                cefrTarget: string;
+                                topicTag: string;
+                                irtB: number;
+                            };
+                        }[];
+                        /** Format: uuid */
+                        operationId: string | null;
+                        expired: boolean;
                     };
                 };
             };
@@ -4606,7 +4808,24 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        rows: {
+                            rowKey: string;
+                            candidate: {
+                                content: string;
+                                options: {
+                                    [key: string]: string;
+                                };
+                                correctAnswer: string;
+                                explanation: string;
+                                skill: string;
+                                cefrTarget: string;
+                                topicTag: string;
+                                irtB: number;
+                            };
+                        }[];
+                        /** Format: uuid */
+                        operationId: string | null;
+                        expired: boolean;
                     };
                 };
             };
@@ -4672,7 +4891,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        rows: {
+                            row: number;
+                            candidate: {
+                                content: string;
+                                options: {
+                                    [key: string]: string;
+                                };
+                                correctAnswer: string;
+                                explanation: string;
+                                skill: string;
+                                cefrTarget: string;
+                                topicTag: string;
+                                irtB: number;
+                            };
+                        }[];
+                        rejected: {
+                            row: number;
+                            reasons: string[];
+                        }[];
                     };
                 };
             };
@@ -4738,7 +4975,17 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        /** Format: uuid */
+                        batchId: string;
+                        status: string;
+                        count: number;
+                        batches: {
+                            /** Format: uuid */
+                            batchId: string;
+                            status: string;
+                            count: number;
+                        }[];
+                        batchIds: string[];
                     };
                 };
             };
@@ -5611,7 +5858,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        status: string;
+                        jobStatus: string;
                     };
                 };
             };
@@ -5679,7 +5927,17 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        status: string;
+                        jobStatus: string;
+                    } | {
+                        status: string;
+                        remaining: number;
+                        exactRejected: number;
+                        nearRejected: number;
+                        nearFlagged: number;
+                        semanticSkipped: boolean;
+                        semanticFlagged: number;
+                        answerFlagged: number;
                     };
                 };
             };

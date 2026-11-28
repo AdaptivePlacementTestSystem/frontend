@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 
-type Teacher = { id: string; fullName: string; role: string; isActive: boolean };
+type Teachers = paths["/api/v1/teachers"]["get"]["responses"][200]["content"]["application/json"];
+type Teacher = Teachers["items"][number];
 
 export function BatchReassign({
   batchId,
@@ -26,13 +28,13 @@ export function BatchReassign({
     const abort = new AbortController();
     async function load() {
       try {
-        const first = await apiRequest<{ items: Teacher[]; total: number }>("/teachers", {
+        const first = await apiRequest<Teachers>("/teachers", {
           query: { page: 1, pageSize: 100 },
           signal: abort.signal,
         });
         const pages = await Promise.all(
           Array.from({ length: Math.max(0, Math.ceil(first.total / 100) - 1) }, (_, i) =>
-            apiRequest<{ items: Teacher[] }>("/teachers", {
+            apiRequest<Teachers>("/teachers", {
               query: { page: i + 2, pageSize: 100 },
               signal: abort.signal,
             }),
@@ -59,7 +61,9 @@ export function BatchReassign({
     setBusy(true);
     setMessage("");
     try {
-      const result = await apiRequest<{ reassigned: number }>(`/item-batches/${batchId}/reassign`, {
+      const result = await apiRequest<
+        paths["/api/v1/item-batches/{id}/reassign"]["post"]["responses"][201]["content"]["application/json"]
+      >(`/item-batches/${batchId}/reassign`, {
         method: "POST",
         body: { fromAssigneeId: from, toAssigneeId: to, reason: reason.trim() },
       });
@@ -81,7 +85,9 @@ export function BatchReassign({
     setBusy(true);
     setMessage("");
     try {
-      await apiRequest(`/item-batches/${batchId}/reassign-confirmer`, {
+      await apiRequest<
+        paths["/api/v1/item-batches/{id}/reassign-confirmer"]["post"]["responses"][201]["content"]["application/json"]
+      >(`/item-batches/${batchId}/reassign-confirmer`, {
         method: "POST",
         body: { toConfirmerId: newConfirmer, reason: confirmerReason.trim() },
       });

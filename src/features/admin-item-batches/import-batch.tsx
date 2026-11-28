@@ -3,20 +3,18 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiDownload, apiRequest, apiUpload } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 
-type Candidate = { content: string; skill: string; cefrTarget: string };
-type Entry = { rowKey: string; candidate: Candidate };
-type Grid = { rows: Entry[]; operationId: string | null; expired?: boolean };
-type Upload = Grid & {
-  added: number;
-  duplicates: number;
-  rejected: Array<{ row: number; reasons: string[] }>;
-};
+type Grid =
+  paths["/api/v1/item-batches/import/grid"]["get"]["responses"][200]["content"]["application/json"];
+type Upload =
+  paths["/api/v1/item-batches/import/upload"]["post"]["responses"][201]["content"]["application/json"];
+type GridState = Pick<Grid, "rows" | "operationId"> & { expired?: boolean };
 
 export function ImportBatch() {
   const router = useRouter();
   const [name, setName] = useState("");
-  const [grid, setGrid] = useState<Grid>({ rows: [], operationId: null });
+  const [grid, setGrid] = useState<GridState>({ rows: [], operationId: null });
   const [notice, setNotice] = useState<string[]>([]);
   const [busy, setBusy] = useState(true);
   const [created, setCreated] = useState<string[]>([]);
@@ -84,14 +82,13 @@ export function ImportBatch() {
     setBusy(true);
     setNotice([]);
     try {
-      const result = await apiRequest<{ batchId: string; batchIds?: string[] }>(
-        "/item-batches/import/save",
-        {
-          method: "POST",
-          body: { name, operationId: grid.operationId },
-          timeoutMs: 60000,
-        },
-      );
+      const result = await apiRequest<
+        paths["/api/v1/item-batches/import/save"]["post"]["responses"][201]["content"]["application/json"]
+      >("/item-batches/import/save", {
+        method: "POST",
+        body: { name, operationId: grid.operationId },
+        timeoutMs: 60000,
+      });
       const ids = result.batchIds ?? [result.batchId];
       if (ids.length === 1) router.push(`/admin/item-batches/${result.batchId}`);
       else {

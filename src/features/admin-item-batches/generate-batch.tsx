@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 export function GenerateBatch() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -38,7 +39,9 @@ export function GenerateBatch() {
       } catch {
         /* retry remains available while this page stays open */
       }
-      const result = await apiRequest<{ batchId: string }>("/item-batches/generate", {
+      const result = await apiRequest<
+        paths["/api/v1/item-batches/generate"]["post"]["responses"][201]["content"]["application/json"]
+      >("/item-batches/generate", {
         method: "POST",
         body: { name, skill, cefrTarget, topicTag, count, operationId: operation.current.id },
         timeoutMs: 110000,

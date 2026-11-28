@@ -3,19 +3,12 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { batchStatusLabels } from "./batch-detail";
 
-interface BankItem {
-  id: string;
-  content: string;
-  status: string;
-  skill: string;
-  cefrTarget: string;
-  irtB: number;
-  options: Record<string, string>;
-  correctAnswer: string;
-}
+type BankItems = paths["/api/v1/items"]["get"]["responses"][200]["content"]["application/json"];
+type BankItem = BankItems[number];
 
 /** Dùng hợp đồng GET /items của develop hiện tại; cần rà khi nhánh item-bank được merge. */
 export function AdminItemBank() {
@@ -27,7 +20,7 @@ export function AdminItemBank() {
   const q = useQuery({
     queryKey: ["admin-bank-items", status],
     queryFn: ({ signal }) =>
-      apiRequest<BankItem[]>("/items", { query: { status: status || undefined }, signal }),
+      apiRequest<BankItems>("/items", { query: { status: status || undefined }, signal }),
   });
   const items = useMemo(() => {
     if (!Array.isArray(q.data)) return [];

@@ -1,12 +1,16 @@
-﻿"use client";
+"use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CalendarDays, ClipboardList, Search, Send, Users } from "lucide-react";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 
-type Teacher = { id: string; fullName: string; role: string; isActive: boolean };
-type Item = { id: string; content: string; status: string };
+type Teachers = paths["/api/v1/teachers"]["get"]["responses"][200]["content"]["application/json"];
+type Teacher = Teachers["items"][number];
+type BatchDetail =
+  paths["/api/v1/item-batches/{id}"]["get"]["responses"][200]["content"]["application/json"];
+type Item = BatchDetail["items"][number];
 type Row = { itemId: string; content: string; reviewerId: string; confirmerId: string };
 export function AssignBatch({ batchId }: { batchId: string }) {
   const router = useRouter();
@@ -30,12 +34,11 @@ export function AssignBatch({ batchId }: { batchId: string }) {
     async function load() {
       try {
         const [firstBatch, firstTeachers] = await Promise.all([
-          apiRequest<{
-            batch: { status: string; name?: string | null; cefrTarget?: string | null };
-            items: Item[];
-            total: number;
-          }>(`/item-batches/${batchId}`, { query: { page: 1, limit: 100 }, signal: abort.signal }),
-          apiRequest<{ items: Teacher[]; total: number }>("/teachers", {
+          apiRequest<BatchDetail>(`/item-batches/${batchId}`, {
+            query: { page: 1, limit: 100 },
+            signal: abort.signal,
+          }),
+          apiRequest<Teachers>("/teachers", {
             query: { page: 1, pageSize: 100 },
             signal: abort.signal,
           }),
@@ -45,7 +48,7 @@ export function AssignBatch({ batchId }: { batchId: string }) {
         setBatch(firstBatch.batch);
         const batchPages = await Promise.all(
           Array.from({ length: Math.max(0, Math.ceil(firstBatch.total / 100) - 1) }, (_, i) =>
-            apiRequest<{ items: Item[] }>(`/item-batches/${batchId}`, {
+            apiRequest<BatchDetail>(`/item-batches/${batchId}`, {
               query: { page: i + 2, limit: 100 },
               signal: abort.signal,
             }),
@@ -53,7 +56,7 @@ export function AssignBatch({ batchId }: { batchId: string }) {
         );
         const teacherPages = await Promise.all(
           Array.from({ length: Math.max(0, Math.ceil(firstTeachers.total / 100) - 1) }, (_, i) =>
-            apiRequest<{ items: Teacher[] }>("/teachers", {
+            apiRequest<Teachers>("/teachers", {
               query: { page: i + 2, pageSize: 100 },
               signal: abort.signal,
             }),
@@ -98,10 +101,9 @@ export function AssignBatch({ batchId }: { batchId: string }) {
     setError("");
     setBusy(true);
     try {
-      const result = await apiRequest<{
-        batchRevision: string;
-        assignments: Array<{ itemId: string; content: string; reviewerId: string }>;
-      }>(`/item-batches/${batchId}/assign-preview`, {
+      const result = await apiRequest<
+        paths["/api/v1/item-batches/{id}/assign-preview"]["post"]["responses"][201]["content"]["application/json"]
+      >(`/item-batches/${batchId}/assign-preview`, {
         method: "POST",
         body: { reviewerIds: reviewers },
       });
@@ -130,7 +132,9 @@ export function AssignBatch({ batchId }: { batchId: string }) {
     setBusy(true);
     setError("");
     try {
-      await apiRequest(`/item-batches/${batchId}/assign`, {
+      await apiRequest<
+        paths["/api/v1/item-batches/{id}/assign"]["post"]["responses"][201]["content"]["application/json"]
+      >(`/item-batches/${batchId}/assign`, {
         method: "POST",
         body: {
           confirmerId: confirmers[0],

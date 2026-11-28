@@ -3,9 +3,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 
-type Stats = { data: Array<{ key: string; label: string; count: number }>; hasMore: boolean };
+type Stats =
+  paths["/api/v1/item-batches/rejected-stats"]["get"]["responses"][200]["content"]["application/json"];
 const reasons: Record<string, string> = {
   DUPLICATE_EXACT: "T1 — Trùng chính xác",
   DUPLICATE_NEAR: "T2 — Trùng gần",

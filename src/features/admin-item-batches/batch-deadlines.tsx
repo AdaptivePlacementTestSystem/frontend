@@ -1,6 +1,7 @@
-﻿"use client";
+"use client";
 import { useState } from "react";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 export function BatchDeadlines({ batchId, onSaved }: { batchId: string; onSaved: () => void }) {
   const [first, setFirst] = useState("");
   const [second, setSecond] = useState("");
@@ -15,7 +16,9 @@ export function BatchDeadlines({ batchId, onSaved }: { batchId: string; onSaved:
     setBusy(true);
     setMessage("");
     try {
-      await apiRequest(`/item-batches/${batchId}/deadlines`, {
+      await apiRequest<
+        paths["/api/v1/item-batches/{id}/deadlines"]["patch"]["responses"][200]["content"]["application/json"]
+      >(`/item-batches/${batchId}/deadlines`, {
         method: "PATCH",
         body: {
           firstDueAt: new Date(first).toISOString(),

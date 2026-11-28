@@ -1,23 +1,15 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { batchStatusLabels } from "./batch-detail";
 
-interface BatchList {
-  data: Array<{
-    id: string;
-    name: string | null;
-    source: string;
-    status: string;
-    _count: { items: number };
-  }>;
-  total: number;
-  limit: number;
-}
+type BatchList =
+  paths["/api/v1/item-batches"]["get"]["responses"][200]["content"]["application/json"];
 
 export function BatchListView() {
   const [page, setPage] = useState(1);
