@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+﻿import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@/lib/env";
 import { TOKEN_COOKIE } from "@/lib/auth/roles";
 import { filterResponseHeaders, isAllowedProxyPath } from "@/lib/api/proxy-policy";
@@ -58,6 +58,7 @@ async function handle(req: NextRequest, ctx: RouteContext<"/api/proxy/[...path]"
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
   const isUpload =
     path.join("/") === "users/import/upload" ||
+    path.join("/") === "item-batches/import/upload" ||
     /^exam-rounds\/[A-Za-z0-9-]+\/participants\/import\/upload$/.test(path.join("/"));
   if (
     isUpload &&
@@ -81,7 +82,13 @@ async function handle(req: NextRequest, ctx: RouteContext<"/api/proxy/[...path]"
       body: hasBody ? await readBody(req) : undefined,
       cache: "no-store",
       redirect: "manual",
-      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+      signal: AbortSignal.timeout(
+        path.join("/") === "item-batches/generate"
+          ? 105_000
+          : path.join("/") === "item-batches/import/save"
+            ? 60_000
+            : UPSTREAM_TIMEOUT_MS,
+      ),
     });
   } catch (e) {
     if (e instanceof UploadTooLargeError)
