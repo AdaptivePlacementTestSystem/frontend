@@ -29,7 +29,8 @@ export function DiffViewer({ original, current }: DiffViewerProps) {
   const isCChanged = original.options.C.trim() !== current.options.C.trim();
   const isDChanged = original.options.D.trim() !== current.options.D.trim();
   const isAnswerChanged = original.correctAnswer.trim() !== current.correctAnswer.trim();
-  const isExplanationChanged = (original.explanation || "").trim() !== (current.explanation || "").trim();
+  const isExplanationChanged =
+    (original.explanation || "").trim() !== (current.explanation || "").trim();
 
   return (
     <div className="space-y-4" data-testid="diff-viewer">
@@ -64,10 +65,10 @@ export function DiffViewer({ original, current }: DiffViewerProps) {
                     opt === "A"
                       ? isAChanged
                       : opt === "B"
-                      ? isBChanged
-                      : opt === "C"
-                      ? isCChanged
-                      : isDChanged;
+                        ? isBChanged
+                        : opt === "C"
+                          ? isCChanged
+                          : isDChanged;
                   return (
                     <div
                       key={opt}
@@ -103,7 +104,9 @@ export function DiffViewer({ original, current }: DiffViewerProps) {
               <p className="text-xs font-semibold text-muted-foreground mb-1">Giải thích:</p>
               <div
                 className={`p-2 rounded border bg-background text-xs ${
-                  isExplanationChanged ? "border-red-300 line-through text-red-700 bg-red-50/40" : ""
+                  isExplanationChanged
+                    ? "border-red-300 line-through text-red-700 bg-red-50/40"
+                    : ""
                 }`}
               >
                 {original.explanation || "(Không có giải thích)"}
@@ -117,7 +120,10 @@ export function DiffViewer({ original, current }: DiffViewerProps) {
           <CardHeader className="pb-3 border-b border-emerald-100">
             <CardTitle className="text-sm font-semibold flex items-center justify-between text-emerald-900">
               <span>Bản GV A đã sửa</span>
-              <Badge variant="outline" className="text-emerald-700 border-emerald-300 bg-emerald-50">
+              <Badge
+                variant="outline"
+                className="text-emerald-700 border-emerald-300 bg-emerald-50"
+              >
                 Đã sửa
               </Badge>
             </CardTitle>
@@ -134,7 +140,9 @@ export function DiffViewer({ original, current }: DiffViewerProps) {
               </div>
               <div
                 className={`p-2 rounded border bg-background ${
-                  isContentChanged ? "border-emerald-400 underline decoration-emerald-500 font-medium bg-emerald-50/40" : ""
+                  isContentChanged
+                    ? "border-emerald-400 underline decoration-emerald-500 font-medium bg-emerald-50/40"
+                    : ""
                 }`}
               >
                 {current.content}
@@ -149,15 +157,17 @@ export function DiffViewer({ original, current }: DiffViewerProps) {
                     opt === "A"
                       ? isAChanged
                       : opt === "B"
-                      ? isBChanged
-                      : opt === "C"
-                      ? isCChanged
-                      : isDChanged;
+                        ? isBChanged
+                        : opt === "C"
+                          ? isCChanged
+                          : isDChanged;
                   return (
                     <div
                       key={opt}
                       className={`p-2 rounded border text-xs flex items-center gap-2 bg-background ${
-                        isChanged ? "border-emerald-400 underline decoration-emerald-500 font-medium bg-emerald-50/40" : ""
+                        isChanged
+                          ? "border-emerald-400 underline decoration-emerald-500 font-medium bg-emerald-50/40"
+                          : ""
                       }`}
                     >
                       <span className="font-bold text-muted-foreground">{opt}.</span>
@@ -189,7 +199,9 @@ export function DiffViewer({ original, current }: DiffViewerProps) {
               </div>
               <div
                 className={`p-2 rounded border bg-background font-bold ${
-                  isAnswerChanged ? "border-emerald-400 underline decoration-emerald-500 font-medium bg-emerald-50/40" : ""
+                  isAnswerChanged
+                    ? "border-emerald-400 underline decoration-emerald-500 font-medium bg-emerald-50/40"
+                    : ""
                 }`}
               >
                 Phương án {current.correctAnswer}
@@ -207,7 +219,9 @@ export function DiffViewer({ original, current }: DiffViewerProps) {
               </div>
               <div
                 className={`p-2 rounded border bg-background text-xs ${
-                  isExplanationChanged ? "border-emerald-400 underline decoration-emerald-500 font-medium bg-emerald-50/40" : ""
+                  isExplanationChanged
+                    ? "border-emerald-400 underline decoration-emerald-500 font-medium bg-emerald-50/40"
+                    : ""
                 }`}
               >
                 {current.explanation || "(Không có giải thích)"}

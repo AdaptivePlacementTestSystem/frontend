@@ -33,7 +33,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
       </head>
-      <body suppressHydrationWarning className="min-h-full flex flex-col bg-surface text-on-surface">
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col bg-surface text-on-surface"
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -70,7 +70,10 @@ export default function ConfirmTasksPage() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <Badge variant="outline" className="text-emerald-700 bg-emerald-50 border-emerald-200">
+                    <Badge
+                      variant="outline"
+                      className="text-emerald-700 bg-emerald-50 border-emerald-200"
+                    >
                       ✓ Đã xác nhận: {batch.confirmedCount}
                     </Badge>
                     <Badge variant="outline" className="text-red-700 bg-red-50 border-red-200">
@@ -85,8 +88,8 @@ export default function ConfirmTasksPage() {
                     <p className="text-sm text-muted-foreground">
                       {batch.pendingCount > 0 ? (
                         <span>
-                          Còn <strong className="text-foreground">{batch.pendingCount}</strong>{" "}
-                          câu cần thẩm định
+                          Còn <strong className="text-foreground">{batch.pendingCount}</strong> câu
+                          cần thẩm định
                         </span>
                       ) : (
                         <span className="text-emerald-600 font-medium">

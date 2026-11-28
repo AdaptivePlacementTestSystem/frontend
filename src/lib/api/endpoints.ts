@@ -42,8 +42,7 @@ import type {
 
 type ExamRoundsListApi =
   paths["/api/v1/exam-rounds"]["get"]["responses"][200]["content"]["application/json"];
-type PagedItemsApi =
-  paths["/api/v1/items"]["get"]["responses"][200]["content"]["application/json"];
+type PagedItemsApi = paths["/api/v1/items"]["get"]["responses"][200]["content"]["application/json"];
 type TeacherReviewTasksApi =
   paths["/api/v1/teacher/tasks/reviews"]["get"]["responses"][200]["content"]["application/json"];
 type BatchReviewItemsApi =
@@ -207,7 +206,10 @@ export const getStudentProfile = (studentCode: string, signal?: AbortSignal) =>
   apiRequest<StudentProfileView>(endpoints.profile(studentCode), { signal });
 
 // ───────── Ngân hàng câu hỏi ─────────
-export const listItems = async (filters: ItemFilters, signal?: AbortSignal): Promise<Paged<ItemRow>> => {
+export const listItems = async (
+  filters: ItemFilters,
+  signal?: AbortSignal,
+): Promise<Paged<ItemRow>> => {
   const res = await apiRequest<PagedItemsApi>(endpoints.items(), { query: { ...filters }, signal });
   if (Array.isArray(res)) {
     return { data: res as unknown as ItemRow[], total: res.length };

@@ -30,8 +30,22 @@ const mockProfile = {
       totalItems: 25,
     },
     skillProfiles: [
-      { skill: "VOCABULARY", theta: 0.5, standardError: 0.35, itemsAdministered: 13, correctCount: 9, accuracyRate: 0.69 },
-      { skill: "GRAMMAR", theta: 0.3, standardError: 0.38, itemsAdministered: 12, correctCount: 7, accuracyRate: 0.58 },
+      {
+        skill: "VOCABULARY",
+        theta: 0.5,
+        standardError: 0.35,
+        itemsAdministered: 13,
+        correctCount: 9,
+        accuracyRate: 0.69,
+      },
+      {
+        skill: "GRAMMAR",
+        theta: 0.3,
+        standardError: 0.38,
+        itemsAdministered: 12,
+        correctCount: 7,
+        accuracyRate: 0.58,
+      },
     ],
     errorPatterns: [],
     aiRecommendations: [],
@@ -101,7 +115,9 @@ describe("S14 - StudentProfileView Component", () => {
   });
 
   it("không tìm thấy sinh viên (404): hiển thị cảnh báo lỗi và nút quay lại", async () => {
-    api.getStudentProfile.mockRejectedValue(new ApiError(404, "NOT_FOUND", "Không tìm thấy sinh viên"));
+    api.getStudentProfile.mockRejectedValue(
+      new ApiError(404, "NOT_FOUND", "Không tìm thấy sinh viên"),
+    );
 
     renderView("SV_INVALID");
 

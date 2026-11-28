@@ -45,10 +45,7 @@ export function ResultView({ sessionId }: { sessionId: string }) {
 
   return (
     <>
-      <ResultCard
-        result={q.data}
-        onOpenReview={(sid) => setReviewSessionId(sid)}
-      />
+      <ResultCard result={q.data} onOpenReview={(sid) => setReviewSessionId(sid)} />
       {reviewSessionId && (
         <Dialog open={!!reviewSessionId} onOpenChange={(open) => !open && setReviewSessionId(null)}>
           <DialogContent className="w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">

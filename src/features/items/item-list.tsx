@@ -181,8 +181,12 @@ export function ItemList() {
                       {vi.itemStatus[it.status]}
                     </Badge>
                   </TableCell>
-                  <TableCell>{(it.source && vi.itemSource[it.source]) ?? it.source ?? "-"}</TableCell>
-                  <TableCell>{typeof it.irtB === "number" ? it.irtB.toFixed(1) : (it.irtB ?? "-")}</TableCell>
+                  <TableCell>
+                    {(it.source && vi.itemSource[it.source]) ?? it.source ?? "-"}
+                  </TableCell>
+                  <TableCell>
+                    {typeof it.irtB === "number" ? it.irtB.toFixed(1) : (it.irtB ?? "-")}
+                  </TableCell>
                   <TableCell>
                     <Link className="underline" href={`/teacher/items/${it.id}`}>
                       {vi.items.view}
