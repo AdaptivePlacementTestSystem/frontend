@@ -115,6 +115,8 @@ export const vi = {
     BATCH_BUDGET_EXCEEDED: "Lô vượt quá hạn mức cho phép.",
     VALIDATION_FAILED: "Dữ liệu chưa hợp lệ, vui lòng kiểm tra lại.",
     CONFLICT: "Thao tác không thực hiện được ở trạng thái hiện tại.",
+    MAIL_DELIVERY_FAILED:
+      "Mật khẩu đã được đặt lại nhưng email chưa gửi được. Hãy kiểm tra cấu hình email và gửi lại.",
     NETWORK: "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại.",
     TIMEOUT: "Máy chủ phản hồi quá chậm. Vui lòng thử lại.",
     UNKNOWN: "Đã có lỗi xảy ra. Vui lòng thử lại.",

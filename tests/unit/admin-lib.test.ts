@@ -37,6 +37,36 @@ describe("proxy-policy: route khu Admin", () => {
   });
 });
 
+describe("proxy-policy: kỳ thi", () => {
+  it.each([
+    [["exam-rounds"]],
+    [["exam-rounds", "mine"]],
+    [["exam-rounds", "abc-123"]],
+    [["exam-rounds", "abc-123", "publish"]],
+    [["exam-rounds", "abc-123", "close"]],
+    [["exam-rounds", "abc-123", "participants"]],
+    [["exam-rounds", "abc-123", "session", "current"]],
+    [["exam-rounds", "abc-123", "participants", "import", "upload"]],
+    [["exam-rounds", "abc-123", "participants", "import", "grid"]],
+    [["exam-rounds", "abc-123", "participants", "import", "grid", "abc-456"]],
+    [["exam-rounds", "abc-123", "participants", "import", "save"]],
+    [["exam-rounds", "abc-123", "participants", "import", "template"]],
+  ])("cho phép %j", (segments) => {
+    expect(isAllowedProxyPath(segments)).toBe(true);
+  });
+
+  it.each([
+    [["exam-rounds", "abc-123", "unknown"]],
+    [["exam-rounds", "abc-123", "session", "other"]],
+    [["exam-rounds", "abc-123", "participants", "import", "upload", "extra"]],
+    [["exam-rounds", "abc-123", "session", "current", "extra"]],
+    [["exam-rounds", ".."]],
+    [["exam-rounds", "a%2Fb"]],
+  ])("chặn %j", (segments) => {
+    expect(isAllowedProxyPath(segments)).toBe(false);
+  });
+});
+
 describe("điều hướng theo vai trò", () => {
   it("Admin vào /admin/dashboard sau đăng nhập; giảng viên vào ngân hàng câu hỏi", () => {
     expect(homeFor("ADMIN")).toBe("/admin/dashboard");

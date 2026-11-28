@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { toApiError } from "@/lib/api/errors";
+import { ApiError, toApiError } from "@/lib/api/errors";
+import { errorMessage } from "@/lib/api/error-message";
 import {
   normalizeNextItem,
   normalizeReview,
@@ -139,6 +140,12 @@ describe("errors", () => {
     expect(toApiError(500, "boom").code).toBe("UNKNOWN");
     expect(toApiError(400, { code: "LA_HOAC" }).code).toBe("VALIDATION_FAILED");
   });
+
+  it("giải thích rõ khi mật khẩu đã đổi nhưng email chưa gửi", () => {
+    const error = toApiError(503, { code: "MAIL_DELIVERY_FAILED" });
+    expect(error.code).toBe("MAIL_DELIVERY_FAILED");
+    expect(errorMessage(error)).toMatch(/Mật khẩu đã được đặt lại nhưng email chưa gửi/);
+  });
 });
 
 describe("buildUrl", () => {
@@ -155,7 +162,7 @@ describe("proxy-policy", () => {
     expect(isAllowedProxyPath(["exam-rounds", "mine"])).toBe(true);
     expect(isAllowedProxyPath(["exam-rounds", "round-uuid-1"])).toBe(true);
     expect(isAllowedProxyPath(["exam-rounds", "round-uuid-1", "session", "current"])).toBe(true);
-    expect(isAllowedProxyPath(["items", "abc", "clone"])).toBe(true);
+    expect(isAllowedProxyPath(["items", "abc", "clone"])).toBe(false);
     expect(isAllowedProxyPath(["reports", "export-csv"])).toBe(true);
     expect(isAllowedProxyPath(["admin", "users"])).toBe(false);
     expect(isAllowedProxyPath(["items", ".."])).toBe(false);

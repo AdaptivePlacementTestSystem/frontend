@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { NativeSelect } from "@/components/layout/native-select";
 import { getSystemOverview } from "@/lib/api/endpoints";
+import { listExamRounds } from "@/features/admin-exam-rounds/api";
 import { CEFR_COLORS, ITEM_STATUS_COLORS } from "@/lib/ui/badge-colors";
 import { vi } from "@/messages/vi";
 import { BreakdownCard, type BreakdownRow } from "./breakdown-card";
@@ -26,13 +27,17 @@ export function OverviewView() {
     queryKey: ["overview", roundId || null],
     queryFn: ({ signal }) => getSystemOverview(roundId || undefined, signal),
   });
+  const roundsQuery = useQuery({
+    queryKey: ["exam-rounds"],
+    queryFn: ({ signal }) => listExamRounds(signal),
+  });
   const [refreshing, setRefreshing] = useState(false);
 
   const refresh = async () => {
     setRefreshing(true);
-    const result = await query.refetch();
+    const [result, roundsResult] = await Promise.all([query.refetch(), roundsQuery.refetch()]);
     setRefreshing(false);
-    if (result.isSuccess) toast.success(vi.overview.refreshed);
+    if (result.isSuccess && roundsResult.isSuccess) toast.success(vi.overview.refreshed);
   };
 
   const data = query.data;
@@ -73,15 +78,20 @@ export function OverviewView() {
               data-testid="round-filter"
               value={roundId}
               onChange={(e) => setRoundId(e.target.value)}
+              disabled={roundsQuery.isPending || roundsQuery.isError}
             >
               <option value="">{vi.overview.allRounds}</option>
-              {/* Tạm thời chỉ liệt kê kỳ đang mở: chưa có GET /exam-rounds để liệt kê mọi kỳ. */}
-              {data?.openRounds.map((round) => (
+              {roundsQuery.data?.map((round) => (
                 <option key={round.id} value={round.id}>
                   {round.name}
                 </option>
               ))}
             </NativeSelect>
+            {roundsQuery.isError && (
+              <p role="alert" className="text-sm text-destructive">
+                Không tải được danh sách kỳ thi. Hãy bấm Làm mới để thử lại.
+              </p>
+            )}
           </div>
           <Button
             variant="secondary"

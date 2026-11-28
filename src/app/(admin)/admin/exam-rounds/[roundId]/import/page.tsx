@@ -1,7 +1,6 @@
-export default function Page() {
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">import</h1>
-    </div>
-  );
+import { RosterImportView } from "@/features/admin-exam-rounds/roster-import-view";
+
+export default async function Page({ params }: { params: Promise<{ roundId: string }> }) {
+  const { roundId } = await params;
+  return <RosterImportView roundId={roundId} />;
 }

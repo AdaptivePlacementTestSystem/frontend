@@ -81,6 +81,7 @@ export const endpoints = {
     `/placement-profiles/${encodeURIComponent(studentCode)}/history`,
   profile: (studentCode: string) => `/placement-profiles/${encodeURIComponent(studentCode)}`,
   examRounds: () => "/exam-rounds",
+  examRoundsReport: () => "/reports/exam-rounds",
   examRoundsMine: () => "/exam-rounds/mine",
   examRoundDetail: (id: string) => `/exam-rounds/${id}`,
   examRoundCurrentSession: (id: string) => `/exam-rounds/${id}/session/current`,
@@ -190,8 +191,24 @@ export const resumeSession = (sessionId: string, signal?: AbortSignal) =>
 export const getStudentExamRounds = (signal?: AbortSignal) =>
   apiRequest<StudentExamRound[]>(endpoints.examRoundsMine(), { signal });
 
-export const listExamRounds = (signal?: AbortSignal) =>
-  apiRequest<ExamRoundsListApi>(endpoints.examRounds(), { signal });
+export const listExamRounds = async (signal?: AbortSignal) => {
+  try {
+    return await apiRequest<ExamRoundsListApi>(endpoints.examRounds(), { signal });
+  } catch (err: unknown) {
+    if (
+      err &&
+      typeof err === "object" &&
+      ("status" in err || "statusCode" in err) &&
+      ((err as { status?: number }).status === 403 ||
+        (err as { statusCode?: number }).statusCode === 403)
+    ) {
+      return (await apiRequest<Array<{ id: string; name: string }>>(endpoints.examRoundsReport(), {
+        signal,
+      })) as unknown as ExamRoundsListApi;
+    }
+    throw err;
+  }
+};
 
 export const getExamRoundDetail = (id: string, signal?: AbortSignal) =>
   apiRequest<ExamRoundDetail>(endpoints.examRoundDetail(id), { signal });
