@@ -8,6 +8,7 @@ import { z } from "zod";
 const envSchema = z.object({
   /** URL gốc của Backend (kèm prefix), chỉ dùng phía server/BFF. Ví dụ: http://localhost:3001/api/v1 */
   API_BASE_URL: z.url({ message: "API_BASE_URL phải là một URL hợp lệ" }),
+  IMPORT_MAX_FILE_BYTES: z.coerce.number().int().positive().default(2097152),
   NEXT_PUBLIC_APP_NAME: z.string().min(1).default("Adaptive Placement Test"),
 });
 

@@ -1,7 +1,6 @@
-export default function Page() {
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">[roundId]</h1>
-    </div>
-  );
+import { ExamRoundDetailView } from "@/features/admin-exam-rounds/exam-round-detail-view";
+
+export default async function Page({ params }: { params: Promise<{ roundId: string }> }) {
+  const { roundId } = await params;
+  return <ExamRoundDetailView roundId={roundId} />;
 }

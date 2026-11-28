@@ -2,7 +2,12 @@ import { ErrorCode } from "@apt/shared-types";
 
 /** Mã nghiệp vụ từ API (nguồn: @apt/shared-types) + mã chỉ phát sinh phía client. FE chỉ `switch(code)`, không so chuỗi tiếng Việt. */
 export type ApiErrorCode =
-  `${ErrorCode}` | "NETWORK" | "TIMEOUT" | "CURRENT_PASSWORD_INVALID" | "UNKNOWN";
+  | `${ErrorCode}`
+  | "NETWORK"
+  | "TIMEOUT"
+  | "CURRENT_PASSWORD_INVALID"
+  | "MAIL_DELIVERY_FAILED"
+  | "UNKNOWN";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -35,7 +40,7 @@ export class ApiError extends Error {
 }
 
 /** Mã do BFF đặt (backend chưa có mã riêng, xem app/api/auth/change-password). */
-const BFF_CODES = ["CURRENT_PASSWORD_INVALID"];
+const BFF_CODES = ["CURRENT_PASSWORD_INVALID", "MAIL_DELIVERY_FAILED"];
 const KNOWN: ReadonlySet<string> = new Set<string>([...Object.values(ErrorCode), ...BFF_CODES]);
 
 function fallbackCode(status: number): ApiErrorCode {

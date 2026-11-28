@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/table";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { downloadCsv, getClassDistribution, getClassErrorPatterns } from "@/lib/api/endpoints";
-import { ApiError } from "@/lib/api/errors";
+import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 import { notifyError } from "@/lib/api/notify-error";
 import type { ExportType } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
@@ -31,28 +32,28 @@ function saveBlob(blob: Blob, filename: string) {
 }
 
 export function ReportsView() {
+  const [examRoundId, setExamRoundId] = useState("");
+  const rounds = useQuery({
+    queryKey: ["report", "exam-rounds"],
+    queryFn: ({ signal }) =>
+      apiRequest<
+        paths["/api/v1/reports/exam-rounds"]["get"]["responses"][200]["content"]["application/json"]
+      >("/reports/exam-rounds", { signal }),
+  });
   const dist = useQuery({
-    queryKey: ["report", "distribution"],
-    queryFn: ({ signal }) => getClassDistribution(undefined, signal),
+    queryKey: ["report", "distribution", examRoundId],
+    queryFn: ({ signal }) => getClassDistribution(examRoundId || undefined, signal),
   });
   const errs = useQuery({
-    queryKey: ["report", "errors"],
-    queryFn: async ({ signal }) => {
-      try {
-        return await getClassErrorPatterns(undefined, signal);
-      } catch (e) {
-        // Backend chưa có thống kê lỗi thường gặp (GET /reports/error-patterns): coi như chưa có dữ liệu, không báo lỗi
-        if (e instanceof ApiError && e.status === 404) return [];
-        throw e;
-      }
-    },
+    queryKey: ["report", "errors", examRoundId],
+    queryFn: ({ signal }) => getClassErrorPatterns(examRoundId || undefined, signal),
   });
   const [busy, setBusy] = useState<ExportType | null>(null);
 
   const exportCsv = async (type: ExportType) => {
     setBusy(type);
     try {
-      const { blob, filename } = await downloadCsv(type);
+      const { blob, filename } = await downloadCsv(type, examRoundId || undefined);
       saveBlob(blob, filename);
     } catch (e) {
       notifyError(e);
@@ -70,6 +71,22 @@ export function ReportsView() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{vi.reports.title}</h1>
+        <label>
+          Kỳ thi{" "}
+          <select
+            aria-label="Kỳ thi"
+            value={examRoundId}
+            onChange={(event) => setExamRoundId(event.target.value)}
+            disabled={rounds.isPending || rounds.isError}
+          >
+            <option value="">Tất cả kỳ thi</option>
+            {rounds.data?.map((round) => (
+              <option key={round.id} value={round.id}>
+                {round.name}
+              </option>
+            ))}
+          </select>
+        </label>
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -91,6 +108,8 @@ export function ReportsView() {
           </Button>
         </div>
       </div>
+
+      {rounds.isError && <ErrorBlock error={rounds.error} onRetry={() => rounds.refetch()} />}
 
       <Card>
         <CardHeader>
@@ -147,7 +166,7 @@ export function ReportsView() {
               </TableHeader>
               <TableBody>
                 {errs.data.map((e) => (
-                  <TableRow key={e.topicTag}>
+                  <TableRow key={`${e.skill}:${e.topicTag}`}>
                     <TableCell>{e.topicTag}</TableCell>
                     <TableCell>{vi.skill[e.skill]}</TableCell>
                     <TableCell>{e.studentCount}</TableCell>
