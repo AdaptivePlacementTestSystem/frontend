@@ -21,13 +21,22 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // suppressHydrationWarning: tiện ích trình duyệt (Katalon, v.v.) hay chèn thuộc tính vào <html> trước khi React chạy
+    // suppressHydrationWarning: tiện ích trình duyệt (Grammarly, Katalon, v.v.) hay chèn thuộc tính vào <html> và <body> trước khi React chạy
     <html
       lang="vi"
       suppressHydrationWarning
       className={`${beVietnamPro.variable} ${geistMono.variable} h-full antialiased font-sans`}
     >
-      <body className="min-h-full flex flex-col bg-surface text-on-surface">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        />
+      </head>
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col bg-surface text-on-surface"
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

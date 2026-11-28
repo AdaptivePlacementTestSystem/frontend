@@ -35,12 +35,12 @@ test.describe("đăng nhập và phân quyền", () => {
 test("sinh viên: làm bài đến khi có kết quả rồi xem lại đáp án", async ({ page }) => {
   await login(page, "sv002@example.test");
   await page.getByTestId("start-exam").click();
-  await expect(page).toHaveURL(/\/exam\//);
+  await expect(page).toHaveURL(/\/student\/exams\//);
   // Khi thi không có thanh điều hướng
   await expect(page.getByTestId("logout")).toHaveCount(0);
 
   for (let i = 0; i < 30; i++) {
-    if (/\/results\//.test(page.url())) break;
+    if (/\/student\/results\//.test(page.url())) break;
     const submit = page.getByTestId("submit-answer");
     await expect(submit.or(page.getByTestId("cefr-level"))).toBeVisible();
     if (!(await submit.isVisible())) break;
@@ -95,11 +95,11 @@ test("giảng viên: báo cáo và tra cứu đúng MSSV", async ({ page }) => {
   await expect(page.getByTestId("report-total")).toBeVisible();
 
   await page.goto("/teacher/students");
-  await page.getByTestId("mssv-input").fill("SV2026002"); // khác trường ⇒ không có quyền
-  await page.getByTestId("mssv-search").click();
+  await page.getByTestId("student-code-input").fill("SV2026002"); // khác trường ⇒ không có quyền
+  await page.getByTestId("student-search").click();
   await expect(page.getByTestId("student-not-found")).toBeVisible();
 
-  await page.getByTestId("mssv-input").fill("SV2026001");
-  await page.getByTestId("mssv-search").click();
+  await page.getByTestId("student-code-input").fill("SV2026001");
+  await page.getByTestId("student-search").click();
   await expect(page.getByTestId("student-name")).toContainText("SV2026001");
 });

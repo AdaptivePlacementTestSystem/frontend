@@ -4,6 +4,7 @@ export const TOKEN_COOKIE = "apt_token";
 export function homeFor(role: string | undefined | null): string {
   if (role === "ADMIN") return "/admin/dashboard"; // S36 là trang chủ Admin (R-5 đã chốt 14/11/2026)
   if (role === "TEACHER") return "/teacher/items";
+  if (role === "STUDENT") return "/student/dashboard";
   return "/";
 }
 
@@ -11,7 +12,7 @@ export function isStaff(role: string | undefined | null): boolean {
   return role === "TEACHER" || role === "ADMIN";
 }
 
-const STUDENT_PREFIXES = ["/exam", "/results", "/history"];
+const STUDENT_PREFIXES = ["/student", "/exam"];
 
 /** Trang xác thực công khai (S01, S17, S18): vào được khi chưa đăng nhập. */
 const PUBLIC_PATHS = ["/login", "/forgot-password", "/reset-password"];
@@ -26,12 +27,14 @@ export function routeVerdict(pathname: string, role: string | null | undefined):
   const isLogin = pathname === "/login";
   if (!role) return PUBLIC_PATHS.includes(pathname) ? "allow" : "login";
   if (isLogin) return "redirect-home";
+  const teacherTasksArea = pathname === "/teacher/tasks" || pathname.startsWith("/teacher/tasks/");
   const staffArea = pathname === "/teacher" || pathname.startsWith("/teacher/");
   const adminArea = pathname === "/admin" || pathname.startsWith("/admin/");
   const studentArea =
     pathname === "/" ||
     STUDENT_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"));
   if (adminArea && role !== "ADMIN") return "forbidden"; // Admin-only (DC-18); GV không vào /admin
+  if (teacherTasksArea && role !== "TEACHER") return "forbidden"; // Hộp việc duyệt A/B chỉ dành cho GV
   if (staffArea && !isStaff(role)) return "forbidden";
   if (studentArea && isStaff(role)) return "redirect-home";
   return "allow";

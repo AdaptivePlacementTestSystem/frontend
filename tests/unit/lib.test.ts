@@ -192,11 +192,15 @@ describe("auth", () => {
     expect(routeVerdict("/change-password", "TEACHER")).toBe("allow");
     expect(routeVerdict("/login", "STUDENT")).toBe("redirect-home");
     expect(routeVerdict("/teacher/items", "STUDENT")).toBe("forbidden");
+    expect(routeVerdict("/teacher/tasks/reviews", "ADMIN")).toBe("forbidden");
+    expect(routeVerdict("/teacher/reports", "ADMIN")).toBe("allow");
     expect(routeVerdict("/", "TEACHER")).toBe("redirect-home");
-    expect(routeVerdict("/exam/1", "STUDENT")).toBe("allow");
+    expect(routeVerdict("/student/dashboard", "STUDENT")).toBe("allow");
+    expect(routeVerdict("/student/exams/1/take", "STUDENT")).toBe("allow");
+    expect(routeVerdict("/student/history", "TEACHER")).toBe("redirect-home");
     expect(homeFor("ADMIN")).toBe("/admin/dashboard");
     expect(homeFor("TEACHER")).toBe("/teacher/items");
-    expect(homeFor("STUDENT")).toBe("/");
+    expect(homeFor("STUDENT")).toBe("/student/dashboard");
   });
 
   it("chuẩn hóa người dùng (payload JWT thiếu fullName ⇒ dùng email)", () => {

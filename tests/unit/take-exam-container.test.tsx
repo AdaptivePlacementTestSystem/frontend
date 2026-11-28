@@ -52,7 +52,7 @@ describe("TakeExamContainer Component", () => {
     });
   });
 
-  it("tự động redirect sang S05 /results/:id nếu phiên thi đã COMPLETED", async () => {
+  it("tự động redirect sang S05 /student/results/:id nếu phiên thi đã COMPLETED", async () => {
     vi.spyOn(endpoints, "getCurrentRoundSession").mockResolvedValue({
       status: "COMPLETED",
       sessionId: "sess-done-456",
@@ -66,11 +66,11 @@ describe("TakeExamContainer Component", () => {
     );
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith("/results/sess-done-456");
+      expect(mockReplace).toHaveBeenCalledWith("/student/results/sess-done-456");
     });
   });
 
-  it("tự động redirect về S03 /exams/:roundId nếu trạng thái là NOT_STARTED", async () => {
+  it("tự động redirect về S03 /student/exams/:roundId nếu trạng thái là NOT_STARTED", async () => {
     vi.spyOn(endpoints, "getCurrentRoundSession").mockResolvedValue({
       status: "NOT_STARTED",
     });
@@ -82,7 +82,7 @@ describe("TakeExamContainer Component", () => {
     );
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith("/exams/round-1");
+      expect(mockReplace).toHaveBeenCalledWith("/student/exams/round-1");
     });
   });
 });

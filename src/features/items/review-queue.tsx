@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { listItems } from "@/lib/api/endpoints";
+import type { ItemRow } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
 
 export function ReviewQueue() {
@@ -14,6 +15,11 @@ export function ReviewQueue() {
     queryKey: ["items", "queue"],
     queryFn: ({ signal }) => listItems({ status: "FIRST_APPROVED", page: 1, limit: 50 }, signal),
   });
+  const queueItems: ItemRow[] = Array.isArray(q.data)
+    ? (q.data as unknown as ItemRow[])
+    : Array.isArray(q.data?.data)
+      ? q.data.data
+      : [];
 
   return (
     <div className="space-y-4">
@@ -22,11 +28,11 @@ export function ReviewQueue() {
         <LoadingBlock />
       ) : q.isError ? (
         <ErrorBlock error={q.error} onRetry={() => q.refetch()} />
-      ) : q.data.data.length === 0 ? (
+      ) : queueItems.length === 0 ? (
         <EmptyBlock text={vi.items.queueEmpty} />
       ) : (
         <ul className="space-y-3" data-testid="queue-list">
-          {q.data.data.map((it) => (
+          {queueItems.map((it) => (
             <li key={it.id}>
               <Card>
                 <CardContent className="flex flex-wrap items-center justify-between gap-3 pt-4">

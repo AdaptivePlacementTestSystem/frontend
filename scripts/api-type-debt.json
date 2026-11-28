@@ -1,7 +1,6 @@
 {
   "src/lib/api/endpoints.ts|apiRequest|HistoryRow[]": 1,
   "src/lib/api/endpoints.ts|apiRequest|StudentProfileView": 1,
-  "src/lib/api/endpoints.ts|apiRequest|Paged<ItemRow>": 1,
   "src/lib/api/endpoints.ts|apiRequest|ItemDetail": 3,
   "src/lib/api/endpoints.ts|apiRequest|ExplanationContent": 1,
   "src/lib/api/endpoints.ts|apiRequest|ClassErrorPattern[]": 1,

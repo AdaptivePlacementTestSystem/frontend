@@ -33,7 +33,7 @@ export function ExamIntro({ roundId }: { roundId: string }) {
   const start = useMutation({
     mutationFn: () => startSession(roundId),
     onSuccess: () => {
-      router.push(`/exams/${roundId}/take`);
+      router.push(`/student/exams/${roundId}/take`);
     },
     onError: (e) => {
       if (e instanceof ApiError && e.code === "SESSION_IN_PROGRESS") {
@@ -54,11 +54,13 @@ export function ExamIntro({ roundId }: { roundId: string }) {
   }
 
   const round = roundQuery.data;
+  const hasInProgressSession =
+    Boolean(inProgressSessionId) || round.sessionStatus === "IN_PROGRESS";
 
   return (
     <div className="mx-auto w-full max-w-[800px] space-y-6 py-4 sm:py-8">
       {/* Thẻ Modal/Cảnh báo nếu đang có phiên dở dang */}
-      {inProgressSessionId && (
+      {hasInProgressSession && (
         <div className="rounded-xl border border-primary/30 bg-blue-50/80 p-5 shadow-sm">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-6 w-6 text-primary shrink-0 mt-0.5" />
@@ -72,18 +74,10 @@ export function ExamIntro({ roundId }: { roundId: string }) {
               </p>
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 <Button asChild className="bg-primary hover:bg-primary/90 text-white font-semibold">
-                  <Link href={`/exams/${roundId}/take`}>
+                  <Link href={`/student/exams/${roundId}/take`}>
                     <PlayCircle className="mr-2 h-4 w-4" />
                     Tiếp tục bài thi
                   </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled
-                  title="Chưa hỗ trợ hủy phiên thi theo quy định khảo thí"
-                  className="text-slate-400 border-slate-200 cursor-not-allowed"
-                >
-                  Hủy bài cũ và bắt đầu lại
                 </Button>
               </div>
             </div>
@@ -115,7 +109,7 @@ export function ExamIntro({ roundId }: { roundId: string }) {
             </span>
             <span>•</span>
             <span className="flex items-center gap-1.5 font-medium text-on-surface">
-              <HelpCircle className="h-4 w-4 text-secondary" />
+              <HelpCircle className="h-4 w-4 text-primary" />
               Tối đa 25 câu hỏi (Dừng khi SE &lt; 0.35)
             </span>
           </div>
@@ -202,7 +196,7 @@ export function ExamIntro({ roundId }: { roundId: string }) {
             data-testid="intro-back"
             className="w-full sm:w-auto h-12 text-on-surface-variant hover:text-on-surface font-semibold"
           >
-            <Link href="/">
+            <Link href="/student/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span>Quay lại trang chủ</span>
             </Link>

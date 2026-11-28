@@ -73,7 +73,7 @@ export function StudentHome() {
             </span>
             {closed.status === "COMPLETED" && (
               <Button asChild variant="link" size="sm" className="font-semibold underline">
-                <Link href={`/results/${closed.sessionId}`}>{vi.exam.viewResult}</Link>
+                <Link href={`/student/results/${closed.sessionId}`}>{vi.exam.viewResult}</Link>
               </Button>
             )}
           </AlertDescription>
@@ -120,7 +120,7 @@ export function StudentHome() {
                 data-testid="resume-banner-button"
                 className="w-full sm:w-auto h-12 px-6 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-semibold shadow-sm transition-colors"
               >
-                <Link href={`/exams/${session.examRoundId ?? session.sessionId}/take`}>
+                <Link href={`/student/exams/${session.examRoundId ?? session.sessionId}/take`}>
                   <span>Tiếp tục bài thi</span>
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
@@ -221,7 +221,7 @@ export function StudentHome() {
                           data-testid="view-result"
                           className="w-full sm:w-auto h-11 px-5 rounded-lg border-primary text-primary hover:bg-primary/5 font-semibold"
                         >
-                          <Link href={`/results/${round.sessionId}`}>
+                          <Link href={`/student/results/${round.sessionId}`}>
                             <span>Xem kết quả</span>
                             <ArrowRight className="ml-1.5 h-4 w-4" />
                           </Link>
@@ -232,7 +232,7 @@ export function StudentHome() {
                           data-testid="resume-exam"
                           className="w-full sm:w-auto h-11 px-5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold"
                         >
-                          <Link href={`/exams/${round.id}/take`}>
+                          <Link href={`/student/exams/${round.id}/take`}>
                             <span>Tiếp tục làm bài</span>
                             <PlayCircle className="ml-1.5 h-4 w-4" />
                           </Link>
@@ -243,7 +243,7 @@ export function StudentHome() {
                           data-testid="start-exam"
                           className="w-full sm:w-auto h-11 px-6 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold shadow-sm"
                         >
-                          <Link href={`/exams/${round.id}`}>
+                          <Link href={`/student/exams/${round.id}`}>
                             <span>Bắt đầu bài thi</span>
                             <ArrowRight className="ml-1.5 h-4 w-4" />
                           </Link>

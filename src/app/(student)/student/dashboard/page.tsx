@@ -1,5 +1,5 @@
 import { StudentHome } from "@/features/exam/student-home";
 
-export default function HomePage() {
+export default function StudentDashboardPage() {
   return <StudentHome />;
 }

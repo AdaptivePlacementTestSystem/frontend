@@ -20,6 +20,9 @@ const ALLOWED: readonly RegExp[] = [
   // Import tài khoản bằng file (S19): `import` là đoạn cố định, không trùng id người dùng
   /^users\/import\/(upload|grid|save|save-status|template)$/,
   /^users\/import\/grid\/[A-Za-z0-9-]+$/,
+  // Hộp việc và kiểm duyệt câu hỏi giảng viên (S33, S11, S34, S35 - UCGV04, UCGV14, UCGV15)
+  /^teacher\/tasks\/(reviews|confirms)(\/[A-Za-z0-9-]+(\/confirm-all)?)?$/,
+  /^teacher\/items\/[A-Za-z0-9-]+(\/(approve|reject|confirm|remove))?$/,
 ];
 
 export function isAllowedProxyPath(segments: readonly string[]): boolean {

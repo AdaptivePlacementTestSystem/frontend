@@ -1,6 +1,7 @@
 import { apiDownload, apiRequest, apiUpload, type DownloadResult } from "./client";
 import { normalizeNextItem, normalizeReview, normalizeSessionResult } from "./normalize";
 import { type ItemStatusValue as ItemStatus } from "@apt/shared-types";
+import type { paths } from "./schema";
 import type {
   AccountKind,
   AccountPage,
@@ -36,7 +37,34 @@ import type {
   StudentExamRound,
   StudentProfileView,
   SubmitResult,
+  EditItemInput,
 } from "./types";
+
+type ExamRoundsListApi =
+  paths["/api/v1/exam-rounds"]["get"]["responses"][200]["content"]["application/json"];
+type ReportExamRoundsListApi =
+  paths["/api/v1/reports/exam-rounds"]["get"]["responses"][200]["content"]["application/json"];
+type PagedItemsApi = paths["/api/v1/items"]["get"]["responses"][200]["content"]["application/json"];
+type TeacherReviewTasksApi =
+  paths["/api/v1/teacher/tasks/reviews"]["get"]["responses"][200]["content"]["application/json"];
+type BatchReviewItemsApi =
+  paths["/api/v1/teacher/tasks/reviews/{batchId}"]["get"]["responses"][200]["content"]["application/json"];
+type TeacherConfirmTasksApi =
+  paths["/api/v1/teacher/tasks/confirms"]["get"]["responses"][200]["content"]["application/json"];
+type BatchConfirmItemsApi =
+  paths["/api/v1/teacher/tasks/confirms/{batchId}"]["get"]["responses"][200]["content"]["application/json"];
+type ConfirmAllApi =
+  paths["/api/v1/teacher/tasks/confirms/{batchId}/confirm-all"]["post"]["responses"][201]["content"]["application/json"];
+type EditTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}"]["patch"]["responses"][200]["content"]["application/json"];
+type ApproveTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}/approve"]["post"]["responses"][201]["content"]["application/json"];
+type RejectTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}/reject"]["post"]["responses"][201]["content"]["application/json"];
+type ConfirmTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}/confirm"]["post"]["responses"][201]["content"]["application/json"];
+type RemoveTeacherItemApi =
+  paths["/api/v1/teacher/items/{id}/remove"]["post"]["responses"][201]["content"]["application/json"];
 
 /**
  * MỘT nơi duy nhất liệt kê route API (đổi tên route ở backend chỉ sửa ở đây). Đường dẫn tính từ prefix `api/v1`
@@ -54,6 +82,8 @@ export const endpoints = {
   history: (studentCode: string) =>
     `/placement-profiles/${encodeURIComponent(studentCode)}/history`,
   profile: (studentCode: string) => `/placement-profiles/${encodeURIComponent(studentCode)}`,
+  examRounds: () => "/exam-rounds",
+  examRoundsReport: () => "/reports/exam-rounds",
   examRoundsMine: () => "/exam-rounds/mine",
   examRoundDetail: (id: string) => `/exam-rounds/${id}`,
   examRoundCurrentSession: (id: string) => `/exam-rounds/${id}/session/current`,
@@ -77,6 +107,20 @@ export const endpoints = {
   importTemplate: () => "/users/import/template",
   accountAction: (id: string, action: "lock" | "unlock" | "resend-temporary-password" | "role") =>
     `/users/${encodeURIComponent(id)}/${action}`,
+  // Kiểm duyệt đề thi - Giảng viên (S33, S11, S34, S35)
+  teacherReviewTasks: () => "/teacher/tasks/reviews",
+  teacherBatchReviewItems: (batchId: string) =>
+    `/teacher/tasks/reviews/${encodeURIComponent(batchId)}`,
+  teacherConfirmTasks: () => "/teacher/tasks/confirms",
+  teacherBatchConfirmItems: (batchId: string) =>
+    `/teacher/tasks/confirms/${encodeURIComponent(batchId)}`,
+  teacherConfirmAllRemaining: (batchId: string) =>
+    `/teacher/tasks/confirms/${encodeURIComponent(batchId)}/confirm-all`,
+  teacherEditItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}`,
+  teacherApproveItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}/approve`,
+  teacherRejectItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}/reject`,
+  teacherConfirmItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}/confirm`,
+  teacherRemoveItem: (id: string) => `/teacher/items/${encodeURIComponent(id)}/remove`,
 } as const;
 
 // ───────── Xác thực ─────────
@@ -149,6 +193,25 @@ export const resumeSession = (sessionId: string, signal?: AbortSignal) =>
 export const getStudentExamRounds = (signal?: AbortSignal) =>
   apiRequest<StudentExamRound[]>(endpoints.examRoundsMine(), { signal });
 
+export const listExamRounds = async (signal?: AbortSignal) => {
+  try {
+    return await apiRequest<ExamRoundsListApi>(endpoints.examRounds(), { signal });
+  } catch (err: unknown) {
+    if (
+      err &&
+      typeof err === "object" &&
+      ("status" in err || "statusCode" in err) &&
+      ((err as { status?: number }).status === 403 ||
+        (err as { statusCode?: number }).statusCode === 403)
+    ) {
+      return (await apiRequest<ReportExamRoundsListApi>(endpoints.examRoundsReport(), {
+        signal,
+      })) as unknown as ExamRoundsListApi;
+    }
+    throw err;
+  }
+};
+
 export const getExamRoundDetail = (id: string, signal?: AbortSignal) =>
   apiRequest<ExamRoundDetail>(endpoints.examRoundDetail(id), { signal });
 
@@ -162,8 +225,16 @@ export const getStudentProfile = (studentCode: string, signal?: AbortSignal) =>
   apiRequest<StudentProfileView>(endpoints.profile(studentCode), { signal });
 
 // ───────── Ngân hàng câu hỏi ─────────
-export const listItems = (filters: ItemFilters, signal?: AbortSignal) =>
-  apiRequest<Paged<ItemRow>>(endpoints.items(), { query: { ...filters }, signal });
+export const listItems = async (
+  filters: ItemFilters,
+  signal?: AbortSignal,
+): Promise<Paged<ItemRow>> => {
+  const res = await apiRequest<PagedItemsApi>(endpoints.items(), { query: { ...filters }, signal });
+  if (Array.isArray(res)) {
+    return { data: res as unknown as ItemRow[], total: res.length };
+  }
+  return (res as unknown as Paged<ItemRow>) ?? { data: [], total: 0 };
+};
 
 export const getItem = (id: string, signal?: AbortSignal) =>
   apiRequest<ItemDetail>(endpoints.item(id), { signal });
@@ -258,3 +329,49 @@ export const getImportStatus = (kind: AccountKind, signal?: AbortSignal) =>
 
 export const downloadImportTemplate = (kind: AccountKind): Promise<DownloadResult> =>
   apiDownload(endpoints.importTemplate(), { query: { kind } });
+
+// ───────── Kiểm duyệt câu hỏi cho Giảng viên (S33, S11, S34, S35) ─────────
+export const getTeacherReviewTasks = (signal?: AbortSignal) =>
+  apiRequest<TeacherReviewTasksApi>(endpoints.teacherReviewTasks(), { signal });
+
+export const getBatchItemsForReview = (batchId: string, signal?: AbortSignal) =>
+  apiRequest<BatchReviewItemsApi>(endpoints.teacherBatchReviewItems(batchId), { signal });
+
+export const getTeacherConfirmTasks = (signal?: AbortSignal) =>
+  apiRequest<TeacherConfirmTasksApi>(endpoints.teacherConfirmTasks(), { signal });
+
+export const getBatchItemsForConfirm = (batchId: string, signal?: AbortSignal) =>
+  apiRequest<BatchConfirmItemsApi>(endpoints.teacherBatchConfirmItems(batchId), { signal });
+
+export const confirmAllRemainingItems = (batchId: string) =>
+  apiRequest<ConfirmAllApi>(endpoints.teacherConfirmAllRemaining(batchId), { method: "POST" });
+
+export const editTeacherItem = (id: string, body: EditItemInput) =>
+  apiRequest<EditTeacherItemApi>(endpoints.teacherEditItem(id), {
+    method: "PATCH",
+    body,
+  });
+
+export const approveTeacherItem = (id: string, comment?: string) =>
+  apiRequest<ApproveTeacherItemApi>(endpoints.teacherApproveItem(id), {
+    method: "POST",
+    body: { comment },
+  });
+
+export const rejectTeacherItem = (id: string, comment?: string) =>
+  apiRequest<RejectTeacherItemApi>(endpoints.teacherRejectItem(id), {
+    method: "POST",
+    body: { comment },
+  });
+
+export const confirmTeacherItem = (id: string, comment?: string) =>
+  apiRequest<ConfirmTeacherItemApi>(endpoints.teacherConfirmItem(id), {
+    method: "POST",
+    body: { comment },
+  });
+
+export const removeTeacherItem = (id: string, comment?: string) =>
+  apiRequest<RemoveTeacherItemApi>(endpoints.teacherRemoveItem(id), {
+    method: "POST",
+    body: { comment },
+  });

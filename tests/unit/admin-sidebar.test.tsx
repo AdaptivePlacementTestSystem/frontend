@@ -52,7 +52,7 @@ describe("AdminSidebar (L-SIDEBAR)", () => {
       ["Lô câu hỏi", "/admin/item-batches"],
       ["Kỳ thi", "/admin/exam-rounds"],
       ["Tài khoản", "/admin/users/students"],
-      ["Báo cáo lớp học", "/admin/reports"],
+      ["Báo cáo thống kê", "/admin/reports"],
       ["Hồ sơ sinh viên", "/admin/students"],
     ]);
   });

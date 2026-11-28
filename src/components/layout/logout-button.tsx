@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { MaterialIcon } from "@/components/ui/material-icon";
 import { bffRequest } from "@/lib/api/client";
@@ -9,12 +10,14 @@ import { vi } from "@/messages/vi";
 
 export function LogoutButton({ variant = "outline" }: { variant?: "outline" | "admin" }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
   const onClick = async () => {
     setBusy(true);
     try {
       await bffRequest("/api/auth/logout", { method: "POST" });
     } finally {
+      queryClient.clear();
       router.replace("/login");
       router.refresh();
     }

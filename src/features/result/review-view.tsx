@@ -11,6 +11,7 @@ import { ApiError } from "@/lib/api/errors";
 import { OPTION_KEYS, type OptionKey, type ReviewEntry } from "@/lib/api/types";
 import { parseExplanation } from "@/lib/explanation";
 import { vi } from "@/messages/vi";
+import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   XCircle,
@@ -77,7 +78,13 @@ function ExplanationPanel({ entry, index }: { entry: ReviewEntry; index: number 
   );
 }
 
-export function ReviewView({ sessionId }: { sessionId: string }) {
+export function ReviewView({
+  sessionId,
+  embedded = false,
+}: {
+  sessionId: string;
+  embedded?: boolean;
+}) {
   const [openItems, setOpenItems] = useState<Record<number, boolean>>({ 1: true });
   const [filter, setFilter] = useState<FilterType>("all");
 
@@ -100,7 +107,7 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
       variant="outline"
       className="h-10 px-4 rounded-xl font-semibold border-outline-variant/30 hover:bg-surface-container-low transition-colors"
     >
-      <Link href={`/results/${sessionId}`}>
+      <Link href={`/student/results/${sessionId}`}>
         <ArrowLeft className="mr-2 h-4 w-4" />
         <span>Quay lại kết quả</span>
       </Link>
@@ -112,7 +119,7 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
   if (q.isError) {
     if (q.error instanceof ApiError && q.error.code === "REVIEW_DISABLED") {
       return (
-        <div className="mx-auto w-full max-w-[800px] space-y-5 py-6">
+        <div className={cn("w-full space-y-5", !embedded && "mx-auto max-w-[800px] py-6")}>
           <Alert
             data-testid="review-disabled"
             className="rounded-xl border-amber-500/30 bg-amber-50 text-amber-900 p-5 shadow-sm"
@@ -120,7 +127,7 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
             <AlertTitle className="text-base font-bold">{vi.review.disabledTitle}</AlertTitle>
             <AlertDescription className="text-sm mt-1">{vi.review.disabledBody}</AlertDescription>
           </Alert>
-          {backBtn}
+          {!embedded && backBtn}
         </div>
       );
     }
@@ -141,18 +148,29 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
   });
 
   return (
-    <div className="w-full max-w-[800px] mx-auto px-margin-mobile md:px-margin py-space-lg flex flex-col gap-space-lg">
+    <div
+      className={cn(
+        "w-full flex flex-col gap-space-lg",
+        !embedded && "max-w-[800px] mx-auto px-margin-mobile md:px-margin py-space-lg",
+      )}
+    >
       {/* 1. Header Navigation & Action */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-space-sm">
-        <Link
-          href={`/results/${sessionId}`}
-          className="inline-flex items-center gap-space-xs text-primary-container font-medium hover:underline group w-fit text-sm"
-        >
-          <ArrowLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
-          <span>Quay lại kết quả</span>
-        </Link>
+        {!embedded ? (
+          <Link
+            href={`/student/results/${sessionId}`}
+            className="inline-flex items-center gap-space-xs text-primary-container font-medium hover:underline group w-fit text-sm"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
+            <span>Quay lại kết quả</span>
+          </Link>
+        ) : (
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Bảng tra cứu câu hỏi & lời giải
+          </span>
+        )}
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-medium w-fit">
-          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           Mã phiên: {sessionId.slice(0, 8)}...
         </span>
       </div>
@@ -185,7 +203,7 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
 
         <div className="flex items-center gap-space-md w-full sm:w-auto justify-start sm:justify-end">
           <div className="flex items-center gap-2 bg-surface-container-low px-3.5 py-2 rounded-lg border border-outline-variant/15">
-            <CheckCircle className="w-5 h-5 text-secondary" />
+            <CheckCircle className="w-5 h-5 text-emerald-600" />
             <span className="text-sm font-bold text-on-surface">{correctCount}</span>
             <span className="text-xs text-on-surface-variant">Đúng</span>
           </div>
@@ -249,160 +267,173 @@ export function ReviewView({ sessionId }: { sessionId: string }) {
       </div>
 
       {/* 5. Question Review List (Stitch UI Accordion) */}
-      <div className="flex flex-col gap-space-sm" data-testid="review-list">
-        {filteredEntries.map((e, idx) => {
-          const entryOrder = typeof e.order === "number" && e.order > 0 ? e.order : idx + 1;
-          const isOpen = openItems[entryOrder] ?? idx === 0;
-          const skillLabel = e.skill === "VOCABULARY" ? "Từ vựng" : "Ngữ pháp";
+      {entries.length === 0 ? (
+        <Alert className="rounded-xl border p-4 bg-surface-container-low/50">
+          <HelpCircle className="h-4 w-4 text-muted-foreground" />
+          <AlertDescription className="text-sm text-on-surface-variant">
+            Chưa có dữ liệu câu hỏi hoặc câu trả lời nào cho phiên thi này.
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <div className="flex flex-col gap-space-sm" data-testid="review-list">
+          {filteredEntries.map((e, idx) => {
+            const entryOrder = typeof e.order === "number" && e.order > 0 ? e.order : idx + 1;
+            const isOpen = openItems[entryOrder] ?? idx === 0;
+            const skillLabel = e.skill === "VOCABULARY" ? "Từ vựng" : "Ngữ pháp";
 
-          return (
-            <article
-              key={`review-${entryOrder}-${idx}`}
-              data-testid={`review-item-${entryOrder}`}
-              className="bg-surface-container-lowest rounded-xl shadow-xs overflow-hidden transition-all duration-200 border border-outline-variant/30"
-            >
-              {/* Accordion Header */}
-              <header
-                onClick={() => toggleAccordion(entryOrder)}
-                className="p-space-md sm:p-space-lg flex items-center justify-between cursor-pointer select-none hover:bg-surface-container-low/50 transition-colors"
+            return (
+              <article
+                key={`review-${entryOrder}-${idx}`}
+                data-testid={`review-item-${entryOrder}`}
+                className="bg-surface-container-lowest rounded-xl shadow-xs overflow-hidden transition-all duration-200 border border-outline-variant/30"
               >
-                <div className="flex items-center gap-space-md min-w-0 pr-2">
-                  <span className="w-8 h-8 rounded-full bg-surface-container-high text-on-surface font-semibold text-xs flex items-center justify-center shrink-0">
-                    {entryOrder}
-                  </span>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold shrink-0 w-fit ${
-                        e.skill === "VOCABULARY"
-                          ? "bg-surface-container-highest text-primary-container"
-                          : "bg-primary-fixed text-primary-container"
-                      }`}
-                    >
-                      {skillLabel}
+                {/* Accordion Header */}
+                <header
+                  onClick={() => toggleAccordion(entryOrder)}
+                  className="p-space-md sm:p-space-lg flex items-center justify-between cursor-pointer select-none hover:bg-surface-container-low/50 transition-colors"
+                >
+                  <div className="flex items-center gap-space-md min-w-0 pr-2">
+                    <span className="w-8 h-8 rounded-full bg-surface-container-high text-on-surface font-semibold text-xs flex items-center justify-center shrink-0">
+                      {entryOrder}
                     </span>
-                    <p className="text-sm font-medium text-on-surface truncate max-w-[280px] sm:max-w-[450px]">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 min-w-0">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold shrink-0 w-fit ${
+                          e.skill === "VOCABULARY"
+                            ? "bg-surface-container-highest text-primary-container"
+                            : "bg-primary-fixed text-primary-container"
+                        }`}
+                      >
+                        {skillLabel}
+                      </span>
+                      <p className="text-sm font-medium text-on-surface truncate max-w-[280px] sm:max-w-[450px]">
+                        {e.content}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-space-sm shrink-0 ml-2">
+                    {e.isCorrect ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 text-xs font-semibold border border-emerald-200">
+                        <Check className="h-3.5 w-3.5" />
+                        <span>Đúng</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-semibold border border-error/20">
+                        <XCircle className="h-3.5 w-3.5 text-error" />
+                        <span>Sai</span>
+                      </span>
+                    )}
+                    {isOpen ? (
+                      <ChevronUp className="h-4 w-4 text-outline" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-outline" />
+                    )}
+                  </div>
+                </header>
+
+                {/* Accordion Body */}
+                {isOpen && (
+                  <div className="px-space-md sm:px-space-lg pb-space-lg pt-2 flex flex-col gap-space-md border-t border-outline-variant/15">
+                    <div className="text-base font-medium text-on-surface leading-relaxed pt-2">
                       {e.content}
-                    </p>
-                  </div>
-                </div>
+                    </div>
 
-                <div className="flex items-center gap-space-sm shrink-0 ml-2">
-                  {e.isCorrect ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container text-xs font-semibold">
-                      <Check className="h-3.5 w-3.5" />
-                      <span>Đúng</span>
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container text-xs font-semibold">
-                      <XCircle className="h-3.5 w-3.5 text-error" />
-                      <span>Sai</span>
-                    </span>
-                  )}
-                  {isOpen ? (
-                    <ChevronUp className="h-4 w-4 text-outline" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-outline" />
-                  )}
-                </div>
-              </header>
+                    {/* Options Grid */}
+                    <div className="grid grid-cols-1 gap-2.5">
+                      {OPTION_KEYS.map((key: OptionKey) => {
+                        const isChosen = key === e.chosen;
+                        const isCorrect = key === e.correct;
 
-              {/* Accordion Body */}
-              {isOpen && (
-                <div className="px-space-md sm:px-space-lg pb-space-lg pt-2 flex flex-col gap-space-md border-t border-outline-variant/15">
-                  <div className="text-base font-medium text-on-surface leading-relaxed pt-2">
-                    {e.content}
-                  </div>
+                        let containerClass =
+                          "p-3.5 sm:p-4 rounded-xl bg-surface-container-low flex items-center justify-between border border-outline-variant/15";
+                        let badgeClass =
+                          "w-7 h-7 rounded-lg bg-surface-container text-on-surface-variant font-bold text-xs flex items-center justify-center shrink-0";
+                        let textClass = "text-sm text-on-surface-variant";
 
-                  {/* Options Grid */}
-                  <div className="grid grid-cols-1 gap-2.5">
-                    {OPTION_KEYS.map((key: OptionKey) => {
-                      const isChosen = key === e.chosen;
-                      const isCorrect = key === e.correct;
+                        if (isCorrect && isChosen) {
+                          containerClass =
+                            "p-3.5 sm:p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 flex items-center justify-between border border-emerald-500/40";
+                          badgeClass =
+                            "w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs";
+                          textClass =
+                            "text-sm text-emerald-950 dark:text-emerald-100 font-semibold";
+                        } else if (isCorrect) {
+                          containerClass =
+                            "p-3.5 sm:p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 flex items-center justify-between border border-emerald-500/40";
+                          badgeClass =
+                            "w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs";
+                          textClass =
+                            "text-sm text-emerald-950 dark:text-emerald-100 font-semibold";
+                        } else if (isChosen) {
+                          containerClass =
+                            "p-3.5 sm:p-4 rounded-xl bg-error-container/40 flex items-center justify-between border border-error/30";
+                          badgeClass =
+                            "w-7 h-7 rounded-lg bg-error text-on-error font-bold text-xs flex items-center justify-center shrink-0";
+                          textClass = "text-sm text-on-surface font-medium";
+                        }
 
-                      let containerClass =
-                        "p-3.5 sm:p-4 rounded-xl bg-surface-container-low flex items-center justify-between border border-outline-variant/15";
-                      let badgeClass =
-                        "w-7 h-7 rounded-lg bg-surface-container text-on-surface-variant font-bold text-xs flex items-center justify-center shrink-0";
-                      let textClass = "text-sm text-on-surface-variant";
+                        return (
+                          <div key={key} className={containerClass}>
+                            <div className="flex items-center gap-3 min-w-0 pr-2">
+                              <span className={badgeClass}>{key}</span>
+                              <span className={textClass}>{e.options ? e.options[key] : ""}</span>
+                            </div>
 
-                      if (isCorrect && isChosen) {
-                        containerClass =
-                          "p-3.5 sm:p-4 rounded-xl bg-secondary-container/40 flex items-center justify-between border border-secondary/30";
-                        badgeClass =
-                          "w-7 h-7 rounded-lg bg-secondary text-on-secondary font-bold text-xs flex items-center justify-center shrink-0";
-                        textClass = "text-sm text-on-surface font-semibold";
-                      } else if (isCorrect) {
-                        containerClass =
-                          "p-3.5 sm:p-4 rounded-xl bg-secondary-container/40 flex items-center justify-between border border-secondary/30";
-                        badgeClass =
-                          "w-7 h-7 rounded-lg bg-secondary text-on-secondary font-bold text-xs flex items-center justify-center shrink-0";
-                        textClass = "text-sm text-on-surface font-semibold";
-                      } else if (isChosen) {
-                        containerClass =
-                          "p-3.5 sm:p-4 rounded-xl bg-error-container/40 flex items-center justify-between border border-error/30";
-                        badgeClass =
-                          "w-7 h-7 rounded-lg bg-error text-on-error font-bold text-xs flex items-center justify-center shrink-0";
-                        textClass = "text-sm text-on-surface font-medium";
-                      }
-
-                      return (
-                        <div key={key} className={containerClass}>
-                          <div className="flex items-center gap-3 min-w-0 pr-2">
-                            <span className={badgeClass}>{key}</span>
-                            <span className={textClass}>{e.options ? e.options[key] : ""}</span>
+                            <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                              {isChosen && (
+                                <span
+                                  data-testid="chosen-mark"
+                                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-surface-container-lowest text-error text-xs font-semibold shadow-xs border border-outline-variant/20"
+                                >
+                                  <User className="h-3 w-3 text-error" />
+                                  <span>Bạn đã chọn</span>
+                                </span>
+                              )}
+                              {isCorrect && (
+                                <span
+                                  data-testid="correct-mark"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold shadow-xs border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-700"
+                                >
+                                  <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                                  <span>Đáp án đúng</span>
+                                </span>
+                              )}
+                            </div>
                           </div>
+                        );
+                      })}
+                    </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-                            {isChosen && (
-                              <span
-                                data-testid="chosen-mark"
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container-lowest text-error text-xs font-semibold shadow-xs border border-outline-variant/20"
-                              >
-                                <User className="h-3 w-3 text-error" />
-                                <span>Bạn đã chọn</span>
-                              </span>
-                            )}
-                            {isCorrect && (
-                              <span
-                                data-testid="correct-mark"
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-surface-container-lowest text-secondary text-xs font-semibold shadow-xs border border-outline-variant/20"
-                              >
-                                <Check className="h-3 w-3 text-secondary" />
-                                <span>Đáp án đúng</span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {/* AI Explanation Block */}
+                    <ExplanationPanel entry={e} index={entryOrder} />
                   </div>
-
-                  {/* AI Explanation Block */}
-                  <ExplanationPanel entry={e} index={entryOrder} />
-                </div>
-              )}
-            </article>
-          );
-        })}
-      </div>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      )}
 
       {/* 6. Bottom Navigation Footer Link */}
-      <div className="pt-space-md pb-space-2xl flex flex-col sm:flex-row items-center justify-between gap-space-md border-t border-outline-variant/30">
+      <div className="pt-space-md pb-space-md flex flex-col sm:flex-row items-center justify-between gap-space-md border-t border-outline-variant/30">
         <div className="flex items-center gap-2 text-on-surface-variant text-xs sm:text-sm">
-          <BadgeCheck className="w-5 h-5 text-secondary shrink-0" />
+          <BadgeCheck className="w-5 h-5 text-emerald-600 shrink-0" />
           <span>Câu hỏi và giải thích đã được kiểm duyệt bởi giảng viên</span>
         </div>
-        <div className="flex items-center gap-3">
-          {backBtn}
-          <Button
-            asChild
-            className="h-10 px-5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold shadow-xs"
-          >
-            <Link href="/history">
-              <span>Đến lịch sử bài thi</span>
-            </Link>
-          </Button>
-        </div>
+        {!embedded && (
+          <div className="flex items-center gap-3">
+            {backBtn}
+            <Button
+              asChild
+              className="h-10 px-5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold shadow-xs"
+            >
+              <Link href="/student/history">
+                <span>Đến lịch sử bài thi</span>
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

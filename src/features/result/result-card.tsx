@@ -80,7 +80,17 @@ const CEFR_DESCRIPTIONS: Record<string, { title: string; desc: string; bg: strin
   },
 };
 
-export function ResultCard({ result }: { result?: SessionResult | null }) {
+export function ResultCard({
+  result,
+  showFooter = true,
+  onOpenReview,
+  showBackHome = true,
+}: {
+  result?: SessionResult | null;
+  showFooter?: boolean;
+  onOpenReview?: (sessionId: string) => void;
+  showBackHome?: boolean;
+}) {
   if (!result) {
     return (
       <div className="w-full max-w-[720px] mx-auto p-6 text-center text-on-surface-variant">
@@ -103,10 +113,19 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
   };
   const rawRes = result as ExtendedResult;
 
-  const ability = result.ability ?? {
-    theta: rawRes.thetaFinal ?? rawRes.theta ?? 0,
-    standardError: rawRes.seFinal ?? rawRes.standardError ?? 0.35,
-    ci95: rawRes.confidenceInterval95 ?? [0, 0],
+  const abilityObj = result.ability as
+    | (SessionResult["ability"] & {
+        confidenceInterval95?: [number, number] | null;
+        ci95?: [number, number] | null;
+      })
+    | undefined;
+  const rawCi = abilityObj?.confidenceInterval95 ??
+    abilityObj?.ci95 ??
+    rawRes.confidenceInterval95 ?? [0, 0];
+  const ability = {
+    theta: result.ability?.theta ?? rawRes.thetaFinal ?? rawRes.theta ?? 0,
+    standardError: result.ability?.standardError ?? rawRes.seFinal ?? rawRes.standardError ?? 0.35,
+    ci95: rawCi,
   };
   const meta = result.meta ?? {
     itemsAdministered: rawRes.totalItems ?? rawRes.itemsAdministered ?? 0,
@@ -136,9 +155,13 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
           ? "Hết thời gian làm bài"
           : "Đã hoàn tất quy trình khảo thí thích ứng");
 
-  const skillProfiles = result.skillProfiles ?? [];
-  const vocabProfile = skillProfiles.find((s) => s.skill === "VOCABULARY");
-  const grammarProfile = skillProfiles.find((s) => s.skill === "GRAMMAR");
+  const rawSkills: Array<
+    SessionResult["skillProfiles"][number] & { questionsCount?: number; total?: number }
+  > = Array.isArray(result.skillProfiles)
+    ? result.skillProfiles
+    : Object.values(result.skillProfiles ?? {});
+  const vocabProfile = rawSkills.find((s) => s?.skill === "VOCABULARY");
+  const grammarProfile = rawSkills.find((s) => s?.skill === "GRAMMAR");
 
   type ExtendedProfile = {
     questionsCount?: number;
@@ -232,8 +255,8 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
             Kết quả kiểm tra xếp lớp CAT
           </span>
           <div className="flex items-center gap-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-tag text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 font-label-tag text-xs font-bold">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Độ tin cậy: {confidenceDisplay}
             </div>
             <span className="text-[11px] text-on-surface-variant font-medium">
@@ -452,7 +475,7 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
           <div className="flex flex-col gap-space-xs" data-testid="skill-grammar">
             <div className="flex justify-between items-center py-space-xs text-sm border-t border-outline-variant/20">
               <div className="flex items-center gap-2">
-                <SpellCheck className="text-secondary w-5 h-5" />
+                <SpellCheck className="text-primary w-5 h-5" />
                 <span className="font-semibold text-on-surface">Ngữ pháp (Grammar):</span>
               </div>
               <span className="font-bold text-on-surface text-base">
@@ -583,30 +606,46 @@ export function ResultCard({ result }: { result?: SessionResult | null }) {
       )}
 
       {/* KHỐI 6: CHÂN TRANG ĐIỀU HƯỚNG */}
-      <div className="flex flex-col items-center gap-space-md pt-space-xs pb-space-2xl">
-        <Button
-          asChild
-          data-testid="open-review"
-          className="w-full h-12 rounded-lg bg-primary-container text-on-primary font-semibold flex items-center justify-center gap-2 hover:bg-primary shadow-sm active:scale-[0.99] transition-all cursor-pointer text-base"
-        >
-          <Link href={`/results/${result.sessionId}/review`}>
-            <FileText className="w-5 h-5" />
-            <span>Xem giải thích chi tiết đáp án</span>
-          </Link>
-        </Button>
+      {showFooter && (
+        <div className="flex flex-col items-center gap-space-md pt-space-xs pb-space-2xl">
+          {onOpenReview ? (
+            <Button
+              type="button"
+              data-testid="open-review"
+              onClick={() => onOpenReview(result.sessionId)}
+              className="w-full h-12 rounded-lg bg-primary-container text-on-primary font-semibold flex items-center justify-center gap-2 hover:bg-primary shadow-sm active:scale-[0.99] transition-all cursor-pointer text-base"
+            >
+              <FileText className="w-5 h-5" />
+              <span>Xem giải thích chi tiết đáp án</span>
+            </Button>
+          ) : (
+            <Button
+              asChild
+              data-testid="open-review"
+              className="w-full h-12 rounded-lg bg-primary-container text-on-primary font-semibold flex items-center justify-center gap-2 hover:bg-primary shadow-sm active:scale-[0.99] transition-all cursor-pointer text-base"
+            >
+              <Link href={`/student/results/${result.sessionId}/review`}>
+                <FileText className="w-5 h-5" />
+                <span>Xem giải thích chi tiết đáp án</span>
+              </Link>
+            </Button>
+          )}
 
-        <Button
-          asChild
-          variant="ghost"
-          data-testid="back-home"
-          className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 py-space-xs font-medium"
-        >
-          <Link href="/">
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            <span>Về trang chủ sinh viên</span>
-          </Link>
-        </Button>
-      </div>
+          {showBackHome && (
+            <Button
+              asChild
+              variant="ghost"
+              data-testid="back-home"
+              className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5 py-space-xs font-medium"
+            >
+              <Link href="/student/dashboard">
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                <span>Về trang chủ sinh viên</span>
+              </Link>
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

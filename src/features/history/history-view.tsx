@@ -49,7 +49,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
           <div className="w-px h-4 bg-outline-variant/40" />
 
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-secondary" />
+            <TrendingUp className="h-4 w-4 text-sky-600" />
             <span className="text-xs text-on-surface-variant font-medium">Cấp độ hiện tại:</span>
             <span className="px-2 py-0.5 rounded text-xs font-bold bg-sky-100 text-sky-900">
               {latestCompleted?.cefrLevel
@@ -76,7 +76,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
               asChild
               className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold shadow-sm"
             >
-              <Link href="/">
+              <Link href="/student/dashboard">
                 <span>Bắt đầu bài thi</span>
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -209,7 +209,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
                             size="sm"
                             className="font-semibold text-primary"
                           >
-                            <Link href={`/results/${row.sessionId}`}>
+                            <Link href={`/student/results/${row.sessionId}`}>
                               <span>Xem chi tiết</span>
                               <ArrowRight className="ml-1 h-3.5 w-3.5" />
                             </Link>
@@ -220,7 +220,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
                             size="sm"
                             className="bg-amber-600 hover:bg-amber-700 text-white font-semibold"
                           >
-                            <Link href={`/exams/${row.examRoundId ?? row.sessionId}/take`}>
+                            <Link href={`/student/exams/${row.examRoundId ?? row.sessionId}/take`}>
                               <span>Tiếp tục</span>
                               <PlayCircle className="ml-1 h-3.5 w-3.5" />
                             </Link>
@@ -327,7 +327,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
                         size="sm"
                         className="font-semibold text-primary p-0 h-auto"
                       >
-                        <Link href={`/results/${row.sessionId}`}>
+                        <Link href={`/student/results/${row.sessionId}`}>
                           <span>Xem chi tiết</span>
                           <ArrowRight className="ml-1 h-3.5 w-3.5" />
                         </Link>
@@ -338,7 +338,7 @@ export function HistoryView({ studentCode }: { studentCode: string | null }) {
                         size="sm"
                         className="bg-amber-600 hover:bg-amber-700 text-white font-semibold h-8 text-xs"
                       >
-                        <Link href={`/exams/${row.examRoundId ?? row.sessionId}/take`}>
+                        <Link href={`/student/exams/${row.examRoundId ?? row.sessionId}/take`}>
                           <span>Tiếp tục</span>
                         </Link>
                       </Button>

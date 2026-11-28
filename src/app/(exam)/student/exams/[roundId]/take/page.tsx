@@ -2,7 +2,11 @@ import { Suspense } from "react";
 import { TakeExamContainer } from "@/features/exam/take-exam-container";
 import { LoadingBlock } from "@/components/layout/states";
 
-export default async function TakeExamPage({ params }: { params: Promise<{ roundId: string }> }) {
+export default async function StudentTakeExamPage({
+  params,
+}: {
+  params: Promise<{ roundId: string }>;
+}) {
   const { roundId } = await params;
 
   return (
