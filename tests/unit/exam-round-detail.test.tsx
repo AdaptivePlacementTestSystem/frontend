@@ -30,26 +30,24 @@ describe("chi tiết kỳ thi", () => {
   beforeEach(() => {
     getExamRound.mockReset();
     listExamRounds.mockReset().mockResolvedValue([{ id: "round-1", participantCount: 1 }]);
-    listParticipants
-      .mockReset()
-      .mockResolvedValue({
-        data: [
-          {
-            studentId: "student-1",
-            studentCode: "SV01",
-            fullName: "An",
-            status: "IN_PROGRESS",
-            overdue: true,
-            startedAt: null,
-            completedAt: null,
-            cefrLevel: null,
-          },
-        ],
-        total: 1,
-        page: 1,
-        pageSize: 20,
-        summary: { notStarted: 0, inProgress: 1, completed: 0, abandoned: 0 },
-      });
+    listParticipants.mockReset().mockResolvedValue({
+      data: [
+        {
+          studentId: "student-1",
+          studentCode: "SV01",
+          fullName: "An",
+          status: "IN_PROGRESS",
+          overdue: true,
+          startedAt: null,
+          completedAt: null,
+          cefrLevel: null,
+        },
+      ],
+      total: 1,
+      page: 1,
+      pageSize: 20,
+      summary: { notStarted: 0, inProgress: 1, completed: 0, abandoned: 0 },
+    });
     closeExamRound.mockReset().mockResolvedValue({});
     publishExamRound.mockReset().mockResolvedValue({});
     getExamRound.mockResolvedValue({

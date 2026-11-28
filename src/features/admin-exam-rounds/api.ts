@@ -1,4 +1,4 @@
-import type { ExamRoundStatus } from "@apt/shared-types";
+import { ExamRoundStatus } from "@apt/shared-types";
 import { apiDownload, apiRequest, apiUpload } from "@/lib/api/client";
 import type { paths } from "@/lib/api/schema";
 
@@ -67,10 +67,9 @@ export const closeExamRound = (id: string) =>
 export const listParticipants = (id: string, query: ParticipantsQuery, signal?: AbortSignal) =>
   apiRequest<Participants>(`${roundPath(id)}/participants`, { query, signal });
 export const removeParticipant = (id: string, studentId: string) =>
-  apiRequest<{ removed: boolean }>(
-    `${roundPath(id)}/participants/${encodeURIComponent(studentId)}`,
-    { method: "DELETE" },
-  );
+  apiRequest<
+    paths["/api/v1/exam-rounds/{id}/participants/{studentId}"]["delete"]["responses"][200]["content"]["application/json"]
+  >(`${roundPath(id)}/participants/${encodeURIComponent(studentId)}`, { method: "DELETE" });
 export const exportParticipants = (
   id: string,
   format: "csv" | "xlsx",
@@ -86,7 +85,9 @@ export const uploadRoster = (id: string, file: File) => {
 export const removeRosterRow = (id: string, studentId: string) =>
   apiRequest<Grid>(`${importPath(id)}/grid/${encodeURIComponent(studentId)}`, { method: "DELETE" });
 export const clearRosterGrid = (id: string) =>
-  apiRequest<void>(`${importPath(id)}/grid`, { method: "DELETE" });
+  apiRequest<
+    paths["/api/v1/exam-rounds/{roundId}/participants/import/grid"]["delete"]["responses"][204]["content"]
+  >(`${importPath(id)}/grid`, { method: "DELETE" });
 export const saveRosterGrid = (id: string, operationId: string) =>
   apiRequest<Save>(`${importPath(id)}/save`, { method: "POST", body: { operationId } });
 export const downloadRosterTemplate = (id: string) => apiDownload(`${importPath(id)}/template`);

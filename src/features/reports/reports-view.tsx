@@ -17,6 +17,7 @@ import {
 import { EmptyBlock, ErrorBlock, LoadingBlock } from "@/components/layout/states";
 import { downloadCsv, getClassDistribution, getClassErrorPatterns } from "@/lib/api/endpoints";
 import { apiRequest } from "@/lib/api/client";
+import type { paths } from "@/lib/api/schema";
 import { notifyError } from "@/lib/api/notify-error";
 import type { ExportType } from "@/lib/api/types";
 import { vi } from "@/messages/vi";
@@ -35,7 +36,9 @@ export function ReportsView() {
   const rounds = useQuery({
     queryKey: ["report", "exam-rounds"],
     queryFn: ({ signal }) =>
-      apiRequest<Array<{ id: string; name: string }>>("/reports/exam-rounds", { signal }),
+      apiRequest<
+        paths["/api/v1/reports/exam-rounds"]["get"]["responses"][200]["content"]["application/json"]
+      >("/reports/exam-rounds", { signal }),
   });
   const dist = useQuery({
     queryKey: ["report", "distribution", examRoundId],
