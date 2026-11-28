@@ -1,7 +1,6 @@
-export default function Page() {
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">final-check</h1>
-    </div>
-  );
+import { BatchDetailView } from "@/features/admin-item-batches/batch-detail";
+
+export default async function Page({ params }: { params: Promise<{ batchId: string }> }) {
+  const { batchId } = await params;
+  return <BatchDetailView batchId={batchId} />;
 }

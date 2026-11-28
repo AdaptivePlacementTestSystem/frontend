@@ -1,7 +1,5 @@
-export default function Page() {
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold tracking-tight">assign</h1>
-    </div>
-  );
+﻿import { AssignBatch } from "@/features/admin-item-batches/assign-batch";
+export default async function Page({ params }: { params: Promise<{ batchId: string }> }) {
+  const { batchId } = await params;
+  return <AssignBatch batchId={batchId} />;
 }
