@@ -193,7 +193,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["ExamRoundController_update"];
         trace?: never;
     };
     "/api/v1/exam-rounds/{id}/session/current": {
@@ -668,6 +668,134 @@ export interface paths {
             cookie?: never;
         };
         get: operations["UserImportController_downloadTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-rounds/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ExamRoundController_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-rounds/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ExamRoundController_close"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-rounds/{id}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ExamRoundController_listParticipants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-rounds/{roundId}/participants/import/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RosterGridController_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-rounds/{roundId}/participants/import/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RosterGridController_load"];
+        put?: never;
+        post?: never;
+        delete: operations["RosterGridController_clear"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-rounds/{roundId}/participants/import/grid/{studentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["RosterGridController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-rounds/{roundId}/participants/import/save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RosterGridController_save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/exam-rounds/{roundId}/participants/import/template": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RosterGridController_template"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1192,6 +1320,14 @@ export interface components {
             /** Format: date-time */
             timestamp: string;
             path: string;
+        };
+        AdminExamHttpError: {
+            statusCode: number;
+            message: string | string[];
+            error?: string;
+            code?: string;
+            timestamp?: string;
+            path?: string;
         };
     };
     responses: never;
@@ -1951,6 +2087,127 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    ExamRoundController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name?: string;
+                    /** Format: date-time */
+                    opensAt?: string;
+                    /** Format: date-time */
+                    closesAt?: string;
+                    durationMinutes?: number;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        createdById: string;
+                        /** Format: date-time */
+                        opensAt: string;
+                        /** Format: date-time */
+                        closesAt: string;
+                        durationMinutes: number;
+                        /** @enum {string} */
+                        status: "DRAFT" | "SCHEDULED" | "OPEN" | "CLOSED";
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
                 };
             };
         };
@@ -4202,6 +4459,963 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HttpErrorResponse"];
+                };
+            };
+        };
+    };
+    ExamRoundController_publish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        createdById: string;
+                        /** Format: date-time */
+                        opensAt: string;
+                        /** Format: date-time */
+                        closesAt: string;
+                        durationMinutes: number;
+                        /** @enum {string} */
+                        status: "DRAFT" | "SCHEDULED" | "OPEN" | "CLOSED";
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+        };
+    };
+    ExamRoundController_close: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** Format: uuid */
+                        createdById: string;
+                        /** Format: date-time */
+                        opensAt: string;
+                        /** Format: date-time */
+                        closesAt: string;
+                        durationMinutes: number;
+                        /** @enum {string} */
+                        status: "DRAFT" | "SCHEDULED" | "OPEN" | "CLOSED";
+                        /** Format: date-time */
+                        createdAt: string;
+                        /** Format: date-time */
+                        updatedAt: string;
+                    };
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+        };
+    };
+    ExamRoundController_listParticipants: {
+        parameters: {
+            query?: {
+                pageSize?: number;
+                page?: number;
+                status?: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+                q?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            /** Format: uuid */
+                            studentId: string;
+                            studentCode: string | null;
+                            fullName: string;
+                            note: string | null;
+                            /** @enum {string} */
+                            status: "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED" | "ABANDONED";
+                            /** Format: uuid */
+                            sessionId: string | null;
+                            /** Format: date-time */
+                            startedAt: string | null;
+                            /** Format: date-time */
+                            completedAt: string | null;
+                            /** Format: date-time */
+                            expiresAt: string | null;
+                            overdue: boolean;
+                            thetaFinal: number | null;
+                            cefrLevel: string | null;
+                        }[];
+                        total: number;
+                        page: number;
+                        pageSize: number;
+                        summary: {
+                            notStarted: number;
+                            inProgress: number;
+                            completed: number;
+                            abandoned: number;
+                        };
+                    };
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+        };
+    };
+    RosterGridController_upload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roundId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        grid: {
+                            /** Format: uuid */
+                            studentId: string;
+                            studentCode: string;
+                            note: string;
+                        }[];
+                        /** Format: uuid */
+                        operationId: string | null;
+                        rejected: {
+                            row: number;
+                            studentCode: string;
+                            reason: string;
+                        }[];
+                        added: number;
+                        ignoredDuplicates: number;
+                    };
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+        };
+    };
+    RosterGridController_load: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roundId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        grid: {
+                            /** Format: uuid */
+                            studentId: string;
+                            studentCode: string;
+                            note: string;
+                        }[];
+                        /** Format: uuid */
+                        operationId: string | null;
+                    };
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+        };
+    };
+    RosterGridController_clear: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roundId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+        };
+    };
+    RosterGridController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roundId: string;
+                studentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        grid: {
+                            /** Format: uuid */
+                            studentId: string;
+                            studentCode: string;
+                            note: string;
+                        }[];
+                        /** Format: uuid */
+                        operationId: string | null;
+                    };
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+        };
+    };
+    RosterGridController_save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roundId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    operationId: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        operationId: string;
+                        added: number;
+                    };
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+        };
+    };
+    RosterGridController_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roundId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": string;
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
+                };
+            };
+            /** @description Lỗi xử lý hoặc phân quyền */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminExamHttpError"];
                 };
             };
         };

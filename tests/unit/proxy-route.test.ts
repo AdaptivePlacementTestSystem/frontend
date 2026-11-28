@@ -48,6 +48,32 @@ describe("BFF proxy: thân yêu cầu", () => {
     expect(sent.includes(Buffer.from(bytes))).toBe(true); // byte gốc còn nguyên bên trong thân multipart
   });
 
+  it("chặn multipart quá lớn kể cả khi không có Content-Length", async () => {
+    const body = new Uint8Array(2097152 + 65536 + 1);
+    const req = new NextRequest("http://localhost/api/proxy/users/import/upload", {
+      method: "POST",
+      headers: { ...withToken, "content-type": "multipart/form-data; boundary=test" },
+      body,
+    });
+    const res = await POST(req, ctx("users", "import", "upload"));
+    expect(res.status).toBe(413);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("không nhận dữ liệu không phải multipart tại route upload", async () => {
+    const req = new NextRequest(
+      "http://localhost/api/proxy/exam-rounds/abc/participants/import/upload",
+      {
+        method: "POST",
+        headers: { ...withToken, "content-type": "application/json" },
+        body: "{}",
+      },
+    );
+    const res = await POST(req, ctx("exam-rounds", "abc", "participants", "import", "upload"));
+    expect(res.status).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("JSON: vẫn chuyển dưới dạng văn bản", async () => {
     const req = new NextRequest("http://localhost/api/proxy/students", {
       method: "POST",

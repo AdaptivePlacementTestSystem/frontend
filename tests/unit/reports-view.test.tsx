@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ReportsView } from "@/features/reports/reports-view";
 import { ApiError } from "@/lib/api/errors";
@@ -10,6 +10,9 @@ const api = vi.hoisted(() => ({
   downloadCsv: vi.fn(),
 }));
 vi.mock("@/lib/api/endpoints", () => api);
+vi.mock("@/lib/api/client", () => ({
+  apiRequest: vi.fn().mockResolvedValue([{ id: "round-1", name: "Kỳ 1" }]),
+}));
 // Biểu đồ recharts cần kích thước thật; ở jsdom chỉ cần khung bao
 vi.mock("recharts", () => {
   const Box = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
@@ -57,15 +60,29 @@ describe("ReportsView với dữ liệu backend thật", () => {
     expect(await screen.findByTestId("report-total")).toHaveTextContent("36");
   });
 
-  it("backend chưa có error-patterns (404): coi như chưa có dữ liệu, không hiện lỗi", async () => {
+  it("hiển thị lỗi khi không tải được thống kê", async () => {
     api.getClassDistribution.mockResolvedValue(backendReport);
     api.getClassErrorPatterns.mockRejectedValue(new ApiError(404, "NOT_FOUND", "Cannot GET"));
 
     renderView();
 
     await screen.findByTestId("report-total");
-    expect(screen.queryByText(/Cannot GET/)).not.toBeInTheDocument();
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
+  });
+
+  it("lọc cả hai báo cáo theo kỳ được chọn", async () => {
+    api.getClassDistribution.mockResolvedValue(backendReport);
+    api.getClassErrorPatterns.mockResolvedValue([]);
+    renderView();
+    await screen.findByRole("option", { name: "Kỳ 1" });
+    fireEvent.change(screen.getByLabelText("Kỳ thi"), { target: { value: "round-1" } });
+    await waitFor(() => {
+      expect(api.getClassDistribution).toHaveBeenLastCalledWith("round-1", expect.any(AbortSignal));
+      expect(api.getClassErrorPatterns).toHaveBeenLastCalledWith(
+        "round-1",
+        expect.any(AbortSignal),
+      );
+    });
   });
 
   it("chưa có sinh viên nào: hiện trạng thái rỗng", async () => {

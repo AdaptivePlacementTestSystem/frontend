@@ -152,8 +152,8 @@ export function CreateExamRoundView() {
                 onChange={(e) => setDuration(e.target.value)}
               />
               <p className="mt-2 text-xs text-on-surface-variant">
-                Phiên thi kết thúc khi hết thời lượng cá nhân hoặc khi kỳ thi đóng, tùy thời điểm
-                nào đến trước.
+                Hạn phiên được tính lúc bắt đầu theo thời lượng cá nhân và thời gian đóng kỳ khi đó.
+                Đóng kỳ thủ công không rút ngắn hạn đã cấp.
               </p>
             </div>
           </section>
@@ -175,7 +175,7 @@ export function CreateExamRoundView() {
             <div className="space-y-4 text-sm text-on-surface-variant">
               <p>
                 <strong className="text-on-surface">1. Bản nháp:</strong> kỳ thi mới ở trạng thái
-                DRAFT. Chức năng chỉnh sửa đang được phát triển.
+                DRAFT và có thể chỉnh sửa trước khi công bố.
               </p>
               <p>
                 <strong className="text-on-surface">2. Thêm thí sinh &amp; công bố:</strong> kỳ thi
@@ -183,7 +183,7 @@ export function CreateExamRoundView() {
               </p>
               <p>
                 <strong className="text-on-surface">3. Đóng kỳ thi:</strong> kỳ thi CLOSED không
-                được chỉnh sửa. Quy tắc sửa sau công bố đang chờ xác nhận.
+                được chỉnh sửa. Khi đang mở, chỉ có thể kéo dài thời gian đóng.
               </p>
             </div>
           </section>

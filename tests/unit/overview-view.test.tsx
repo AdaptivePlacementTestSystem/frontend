@@ -8,8 +8,12 @@ import type { SystemOverview } from "@/lib/api/types";
 import { buildOverview, MOCK_ROUND_ID } from "@/mocks/admin-handlers";
 
 const getSystemOverview = vi.fn();
+const listExamRounds = vi.fn();
 vi.mock("@/lib/api/endpoints", () => ({
   getSystemOverview: (...args: unknown[]) => getSystemOverview(...args),
+}));
+vi.mock("@/features/admin-exam-rounds/api", () => ({
+  listExamRounds: (...args: unknown[]) => listExamRounds(...args),
 }));
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
@@ -33,6 +37,11 @@ describe("OverviewView (S36)", () => {
   beforeEach(() => {
     getSystemOverview.mockReset();
     getSystemOverview.mockResolvedValue(data());
+    listExamRounds.mockReset();
+    listExamRounds.mockResolvedValue([
+      { id: MOCK_ROUND_ID, name: "Kỳ thi đang mở", effectiveStatus: "OPEN" },
+      { id: "closed-round", name: "Kỳ thi đã đóng", effectiveStatus: "CLOSED" },
+    ]);
   });
 
   it("hiện 4 thẻ số với số liệu từ API", async () => {
@@ -137,15 +146,28 @@ describe("OverviewView (S36)", () => {
     await screen.findByTestId("stat-students");
     expect(getSystemOverview).toHaveBeenLastCalledWith(undefined, expect.anything());
 
-    await user.selectOptions(screen.getByTestId("round-filter"), MOCK_ROUND_ID);
+    await screen.findByRole("option", { name: "Kỳ thi đã đóng" });
+    await user.selectOptions(screen.getByTestId("round-filter"), "closed-round");
     await waitFor(() =>
-      expect(getSystemOverview).toHaveBeenLastCalledWith(MOCK_ROUND_ID, expect.anything()),
+      expect(getSystemOverview).toHaveBeenLastCalledWith("closed-round", expect.anything()),
     );
 
     await user.selectOptions(screen.getByTestId("round-filter"), "");
     await waitFor(() =>
       expect(getSystemOverview).toHaveBeenLastCalledWith(undefined, expect.anything()),
     );
+  });
+
+  it("báo lỗi tải danh sách kỳ và thử lại bằng nút làm mới", async () => {
+    const user = userEvent.setup();
+    listExamRounds.mockRejectedValueOnce(new Error("không kết nối"));
+    renderView();
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Không tải được danh sách kỳ thi");
+    expect(screen.getByTestId("round-filter")).toBeDisabled();
+    await user.click(screen.getByTestId("overview-refresh"));
+    expect(await screen.findByRole("option", { name: "Kỳ thi đã đóng" })).toBeInTheDocument();
+    expect(screen.getByTestId("round-filter")).toBeEnabled();
   });
 
   it("nút Làm mới gọi lại API (không tự cập nhật theo chu kỳ)", async () => {

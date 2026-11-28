@@ -112,7 +112,14 @@ export function ExamRoundsView() {
                 <tbody>
                   {filtered.map((r) => (
                     <tr key={r.id} className="border-t border-slate-100">
-                      <td className="px-4 py-4 font-semibold">{r.name}</td>
+                      <td className="px-4 py-4 font-semibold">
+                        <Link
+                          className="text-primary hover:underline"
+                          href={`/admin/exam-rounds/${r.id}`}
+                        >
+                          {r.name}
+                        </Link>
+                      </td>
                       <td className="px-4 py-4">{date(r.opensAt)}</td>
                       <td className="px-4 py-4">{date(r.closesAt)}</td>
                       <td className="px-4 py-4">{r.durationMinutes} phút</td>
